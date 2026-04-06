@@ -15,6 +15,11 @@ class BaseHelper(ABC):
         matches = difflib.get_close_matches(text, options, n=1, cutoff=cutoff)
         return matches[0] if matches else None
 
+    def capitalize_first_letter(self, value) -> str:
+        if not value:
+            return ""
+        return value[0].upper() + value[1:]
+    
     def _interpret_user_input(self, raw: str, presenter: IOutputPresenter, default_model_agent):
         normalized = self._normalize_text(raw)
         if not normalized:
