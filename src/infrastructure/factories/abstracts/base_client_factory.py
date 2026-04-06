@@ -8,7 +8,7 @@ class BaseClientFactory:
         return self._build_client()
 
     def get_required_env(self, key: str, error_message: str) -> str:
-        value = os.environ.get(key)
+        value: str | None = os.environ.get(key)
         if not value:
             raise ValueError(error_message)
         return value
@@ -17,7 +17,7 @@ class BaseClientFactory:
         return os.environ.get(key, default)
 
     def get_optional_int_env(self, key: str, default: int) -> int:
-        raw_value = os.environ.get(key)
+        raw_value: str | None = os.environ.get(key)
         if not raw_value:
             return default
 
@@ -27,7 +27,7 @@ class BaseClientFactory:
             raise ValueError(f"Valor inválido para {key}: esperado inteiro") from exc
 
     def get_optional_float_env(self, key: str, default: float) -> float:
-        raw_value = os.environ.get(key)
+        raw_value: str | None = os.environ.get(key)
         if not raw_value:
             return default
 
