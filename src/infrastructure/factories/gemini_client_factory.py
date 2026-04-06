@@ -1,8 +1,7 @@
+from google.genai import Client
 from infrastructure.factories.abstracts.base_client_factory import BaseClientFactory
 
 class GeminiClientFactory(BaseClientFactory):
-    def _build_client(self):
-        from google import genai
-
-        api_key = self.get_required_env("LLM__GEMINI_API_KEY", "Gemini API key não encontrada no .env")
-        return genai.Client(api_key=api_key)
+    def _build_client(self) -> Client:
+        api_key: str = self.get_required_env(key="LLM__GEMINI_API_KEY", error_message="Gemini API key não encontrada no .env")
+        return Client(api_key=api_key)
