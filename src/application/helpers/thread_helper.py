@@ -1,4 +1,3 @@
-# application/ai_thread_controller.py
 import threading
 import time
 from queue import Queue
