@@ -10,9 +10,9 @@ class BaseAIAssistantApp(BaseHelper,  ABC):
     Presenter deve ser fornecido pela subclasse ou via factory.
     """
     def __init__(self,
-          strategy_factory: StrategyApplicationFactory | None = None,
-          presenter=None,
-          presenter_factory=None):
+        strategy_factory: StrategyApplicationFactory | None = None,
+        presenter=None,
+        presenter_factory=None):
         self._strategy_factory = strategy_factory or StrategyApplicationFactory()
         self._presenter_factory = presenter_factory
         self._presenter = presenter
