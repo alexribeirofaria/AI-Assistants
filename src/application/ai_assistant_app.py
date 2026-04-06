@@ -1,7 +1,6 @@
-# application/ai_assistant_app.py
 from queue import Queue
 from application.abstracts.base_ai_assistant_app import BaseAIAssistantApp
-from application.ai_thread_controller import AIThreadController
+from application.helpers.thread_helper import ThreadHelper
 
 class AIAssistantApp(BaseAIAssistantApp):
     """
@@ -10,7 +9,7 @@ class AIAssistantApp(BaseAIAssistantApp):
     def __init__(self, strategy_factory=None, presenter=None, presenter_factory=None):
         super().__init__(strategy_factory=strategy_factory, presenter=presenter, presenter_factory=presenter_factory)
         self._queue: Queue | None = None
-        self.thread_controller: AIThreadController
+        self.thread_controller: ThreadHelper
         self.default_model_agent = "groq"
         self.strategy = None
 
@@ -18,7 +17,7 @@ class AIAssistantApp(BaseAIAssistantApp):
     def queue(self) -> Queue:
         if self._queue is None:
             self._queue = Queue()
-            self.thread_controller = AIThreadController(self._queue, self.presenter)
+            self.thread_controller = ThreadHelper(self._queue, self.presenter)
         return self._queue
 
     def _get_current_strategy(self):
@@ -32,7 +31,7 @@ class AIAssistantApp(BaseAIAssistantApp):
             if not self.queue.empty():
                 self.thread_controller.show_elapsed_time_until_queue_finishes()
 
-            prompt = input("Chat: ")
+            prompt = input(f"{self.capitalize_first_letter(self.default_model_agent)} Chat: ")
             action, value = self._interpret_user_input(prompt, self.presenter, self.default_model_agent)
 
             if action == "exit":
