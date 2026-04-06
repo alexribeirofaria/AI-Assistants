@@ -4,9 +4,9 @@ from domain.cache.domain_list_cache import CachedDomainListMixin
 class Claude(BaseDomain, CachedDomainListMixin):
     _DEFAULT_MODEL_NAME = "claude-haiku-4-5-20251001"
 
-    def __init__(self, client , model_name: str = None):
+    def __init__(self, client , model_name: str = _DEFAULT_MODEL_NAME):
         CachedDomainListMixin.__init__(self)
-        super().__init__(client, self._DEFAULT_MODEL_NAME or model_name)
+        super().__init__(client, model_name)
 
     def send_message(self, prompt: str) -> str:
         try:
