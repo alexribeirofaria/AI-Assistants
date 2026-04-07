@@ -6,7 +6,7 @@ class IOutputPresenter(ABC):
         pass
 
     @abstractmethod
-    def show_model_switched(self, prompt: str) -> None:
+    def show_model_switched(self, prompt) -> None:
         pass
 
     @abstractmethod

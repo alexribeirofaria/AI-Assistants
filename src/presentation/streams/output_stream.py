@@ -6,14 +6,16 @@ class OutputStream(IOutputStream):
     def __init__(self) -> None:
         self._inline_active = False
         self._last_inline_length = 0
-
+    
     def write(self, content: str) -> None:
         if self._inline_active:
             sys.stdout.write("\n")
             sys.stdout.flush()
             self._inline_active = False
             self._last_inline_length = 0
-        print(content)
+
+        sys.stdout.write(content + "\n")
+        sys.stdout.flush()
 
     def write_inline(self, content: str) -> None:
         padded_content = content.ljust(self._last_inline_length)

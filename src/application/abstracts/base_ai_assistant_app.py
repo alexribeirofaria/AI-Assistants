@@ -1,10 +1,9 @@
 import os
 from abc import ABC, abstractmethod
 from queue import Queue
-from application.helpers.base_helper import BaseHelper
 from application.strategies.factories.strategy_application_factory import StrategyApplicationFactory
 
-class BaseAIAssistantApp(BaseHelper,  ABC):
+class BaseAIAssistantApp(ABC):
     """
     Classe base abstrata para AI Assistant.
     Presenter deve ser fornecido pela subclasse ou via factory.
@@ -42,8 +41,11 @@ class BaseAIAssistantApp(BaseHelper,  ABC):
     def clear_screen(self):
         os.system("cls" if os.name == "nt" else "clear")
 
-
     @abstractmethod
-    def run(self):
+    def run_console_app(self):
         """Deve ser implementado na subclasse concreta"""
+        pass
+    
+    @abstractmethod
+    def _handle_action(self, action, value):
         pass
