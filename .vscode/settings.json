@@ -1,13 +1,18 @@
 {
   "python.analysis.extraPaths": ["./src"],
   "python.autoComplete.extraPaths": ["./src"],
-  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.typeCheckingMode": "off",
   "python.analysis.autoImportCompletions": true,
   "python.analysis.useLibraryCodeForTypes": true,
   "python.analysis.diagnosticMode": "openFilesOnly",
   "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.inlayHints.functionReturnTypes": true,
-  "python.analysis.inlayHints.callArgumentNames": true,
+  "python.analysis.inlayHints.callArgumentNames": "all",
   "python.analysis.completeFunctionParens": true,
-  "python.analysis.indexing": true
+  "python.analysis.indexing": true,
+  "pylint.args": [
+    "--rcfile=pylintrc",
+    "--load-plugins=pylint_django",
+    "--ignore=E402,F401,F403,E0401,C0115,C0116"
+  ]
 }
