@@ -27,3 +27,4 @@ htmlcov/
 .env/*
 *.env/
 __docs/
+angular_app*/
