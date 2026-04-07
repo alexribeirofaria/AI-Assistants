@@ -23,15 +23,20 @@ class ThreadHelper:
             self.threads.append(t)
         self._threads_started = True
 
-    def stop_threads(self):
+    def stop_threads(self, wait: bool = True):
         if not self._threads_started:
             return
         self.running = False
+        # put sentinels to wake workers
         for _ in self.threads:
             self._queue.put(None)
-        for t in self.threads:
-            t.join()
-        self._threads_started = False
+        if wait:
+            for t in self.threads:
+                t.join()
+            self._threads_started = False
+
+    def stop_threads_non_blocking(self):
+        self.stop_threads(wait=False)
 
     def _worker(self):
         while self.running:
