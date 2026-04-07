@@ -1,27 +1,20 @@
 from domain.abstracts.base_domain import BaseDomain
-from domain.cache.domain_list_cache import CachedDomainListMixin
 
-class Claude(BaseDomain, CachedDomainListMixin):
-    _DEFAULT_MODEL_NAME = "claude-haiku-4-5-20251001"
+class Claude(BaseDomain):
 
-    def __init__(self, client , model_name: str = _DEFAULT_MODEL_NAME):
-        CachedDomainListMixin.__init__(self)
-        super().__init__(client, model_name)
+    def __init__(self, client, model_name):        
+        super().__init__(client=client, model_name=model_name)
+        self.model = "claude-haiku-4-5-20251001"
 
+    def build_response_messages(self, response) -> str:
+        return "\n".join([r.text for r in response.content])
+        
     def send_message(self, prompt: str) -> str:
-        try:
-            message = self.client.messages.create(
-                model=self.name,
+        return self.send(lambda: self.client.messages.create(
+                model=self.model,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=self.DEFAULT_MAX_TOKENS,
-            )
-            return "\n".join([r.text for r in message.content])
-
-        except Exception as e:
-            msg = str(e)
-            if "quota" in msg.lower():
-                return "[QUOTA ERROR] Limite de cota atingido"
-            return f"[ERROR] {msg}"
+                max_tokens=self.max_tokens,
+            ))
 
     def list_models(self):
         try:
