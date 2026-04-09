@@ -1,22 +1,24 @@
-from abc import ABC, abstractmethod
+from abc import ABC
+from typing import Type
+from domain.abstracts.base_domain import BaseDomain
+from domain.abstracts.domain_type import DomainType
 from repository.repository import Repository
 
 class BaseApplicationStrategy(ABC):
-    def __init__(self, domain_type: str | None = None):
-        self.repo = Repository()
-        self.domain_type = domain_type.strip().lower() if domain_type else None
-        self.domain = None
+    domain_type: DomainType
 
-    def ensure_domain(self):
-        if self.domain is None:
-            if not self.domain_type:
-                raise ValueError("domain_type não definido para esta strategy")
-            self.domain = self.repo.get_domain(self.domain_type)
-        return self.domain
+    def __init__(self, domain: Type[BaseDomain]):
+        self.repo = Repository()
+        self.domain: Type[BaseDomain] | None = domain or None
+
+    def ensure_domain(self) -> BaseDomain:
+        if self.domain is None and not self.domain_type:
+            raise ValueError("Domain Type não definido para esta strategy")
+        return self.repo.build_domain(self.domain)
 
     def list_domains(self):
         return self.ensure_domain().list_models()
 
-    @abstractmethod
     def execute(self, prompt: str) -> str:
-        pass
+        return self.ensure_domain().send_message(prompt)
+

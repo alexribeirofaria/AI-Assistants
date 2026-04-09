@@ -3,6 +3,7 @@ from application.abstracts.base_ai_assistant_app import BaseAIAssistantApp
 from application.decorator.interpreter.decorator_interpreter_factory import DecoratorInterpreterFactory
 from application.enums.user_action import UserAction
 from application.helpers.thread_helper import ThreadHelper
+from domain.abstracts.domain_type import DomainType
 
 class AIAssistantApp(BaseAIAssistantApp):
     """
@@ -12,9 +13,19 @@ class AIAssistantApp(BaseAIAssistantApp):
         super().__init__(strategy_factory=strategy_factory, presenter=presenter, presenter_factory=presenter_factory)
         self._queue: Queue | None = None
         self.thread_controller: ThreadHelper
-        self.default_model_agent = "groq"
+        self.default_model_agent = DomainType.Groq
         self.strategy = None
         self.interpreter = DecoratorInterpreterFactory.create()
+
+    @property
+    def default_model_agent(self) -> DomainType:
+        return self._default_model_agent
+
+    @default_model_agent.setter
+    def default_model_agent(self, value: DomainType):
+        if not isinstance(value, DomainType):
+            raise ValueError("default_model_agent must be a DomainType")
+        self._default_model_agent = value
 
     @property
     def queue(self) -> Queue:
@@ -43,12 +54,15 @@ class AIAssistantApp(BaseAIAssistantApp):
                 return False
 
         if action == UserAction.SWITCH_MODEL:
-            new_model = (value or "").strip().lower()            
-            if new_model:
-                self.default_model_agent = new_model
+            parsed = self.parse_domain_type(value)
+
+            if parsed:
+                self.default_model_agent = parsed
                 self.strategy = None
-                self.presenter.show_model_switched(new_model)
-                
+                self.presenter.show_model_switched(parsed.value)
+            else:
+                self.presenter.show_invalid_model(value)
+
         if action == UserAction.LIST_MODELS:
             header, names, prefix = self._get_current_strategy().list_domains()
             self.presenter.show_model_list(header, names, prefix=prefix)
@@ -61,7 +75,7 @@ class AIAssistantApp(BaseAIAssistantApp):
             _ = self.queue
             self.thread_controller.enqueue_task(
                 "message",
-                self._get_current_strategy(),
+                self.strategy,
                 value
             )
 
@@ -82,7 +96,6 @@ class AIAssistantApp(BaseAIAssistantApp):
             return {"header": header, "names": names, "prefix": prefix}
 
         if action == UserAction.SWITCH_MODEL:
-            # update model (non-blocking context) and return confirmation
             self._handle_action(action, value, stop_app=False)
             new_model = (value or "").strip().lower()
             return {"message": "model_switched", "model": new_model}
@@ -102,7 +115,7 @@ class AIAssistantApp(BaseAIAssistantApp):
             if not self.queue.empty():
                 self.thread_controller.show_elapsed_time_until_queue_finishes()
 
-            prompt = input(f"{self.default_model_agent} Chat: ")
+            prompt = input(f"{self.default_model_agent.value} Chat: ")
 
             action, value =  self.interpreter.interpret_user_input_with_feedback(
             prompt,self.presenter)
@@ -110,3 +123,18 @@ class AIAssistantApp(BaseAIAssistantApp):
             should_exit = self._handle_action(action, value)
             if should_exit:
                 break
+
+    def parse_domain_type(self, value: str) -> DomainType | None:
+        if not value:
+            return None
+
+        normalized = value.strip().lower().replace(" ", "")
+
+        for domain in DomainType:
+            enum_name = domain.name.lower()
+            enum_value = domain.value.lower().replace(" ", "")
+
+            if normalized in (enum_name, enum_value):
+                return domain
+
+        return None

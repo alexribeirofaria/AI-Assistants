@@ -4,57 +4,49 @@ from repository.registry import Registry
 from repository.strategies.abstracts.base_repository_strategy import BaseRepositoryStrategy
 
 class Repository:
+
     def __init__(
         self,
-        providers: Mapping[str, BaseRepositoryStrategy] | None = None,
-        default_provider: str | None = None,
-        provider_registry: Registry | None = None,
+        providers: Mapping[type[BaseDomain], BaseRepositoryStrategy] | None = None,
+        default_domain: type[BaseDomain] | None = None,
+        registry: Registry | None = None,
     ):
-        self._providers: dict[str, BaseRepositoryStrategy] = (
+        self._providers: dict[type[BaseDomain], BaseRepositoryStrategy] = (
             dict(providers) if providers else {}
         )
-        self._provider_registry = provider_registry or Registry()
-        self._default_provider = (
-            default_provider or self._provider_registry.default_provider_name
-        ).strip().lower() or self._provider_registry.default_provider_name
 
-    def available_providers(self) -> tuple[str, ...]:
-        names = set(self._provider_registry.available_provider_names()) | set(
-            self._providers.keys()
-        )
-        return tuple(sorted(names))
+        self._registry = registry or Registry()
+        self._default_domain = default_domain or self._registry.default_domain
 
-    def register_provider(self, name: str, provider: BaseRepositoryStrategy) -> None:
-        normalized = name.strip().lower()
-        if not normalized:
-            raise ValueError("Provider name inválido")
-        self._providers[normalized] = provider
+    # ----------------- PUBLIC -----------------
 
-    def _get_provider(self, provider_name: str) -> BaseRepositoryStrategy:
-        normalized = provider_name.strip().lower()
+    def available_domains(self) -> tuple[type[BaseDomain], ...]:
+        names = set(self._registry.available_domains()) | set(self._providers.keys())
+        return tuple(names)
 
-        if normalized in self._providers:
-            return self._providers[normalized]
+    def register(self, domain: type[BaseDomain], provider: BaseRepositoryStrategy) -> None:
+        self._providers[domain] = provider
 
-        if not self._provider_registry.has_provider(normalized):
-            available = ", ".join(self.available_providers())
+    def build_domain(self, domain: type[BaseDomain] | None) -> BaseDomain:
+        strategy = self._get_provider(domain)
+        return strategy.build_domain()
+
+    # ----------------- INTERNAL -----------------
+
+    def _get_provider(self, domain: type[BaseDomain] | None) -> BaseRepositoryStrategy:
+        resolved = domain or self._default_domain
+
+        # já instanciado
+        if resolved in self._providers:
+            return self._providers[resolved]
+
+        # precisa criar via registry
+        if not self._registry.has_domain(resolved):
+            available = ", ".join(d.__name__ for d in self.available_domains())
             raise KeyError(
-                f"Provider desconhecido: {normalized}. Disponíveis: {available}"
+                f"Domain desconhecido: {resolved.__name__}. Disponíveis: {available}"
             )
 
-        provider = self._provider_registry.create(normalized)
-        self._providers[normalized] = provider
+        provider = self._registry.create(resolved)
+        self._providers[resolved] = provider
         return provider
-
-    def get_domain(self, domain_type: str) -> BaseDomain:
-        """Retorna o modelo apropriado de acordo com a string passada."""
-        normalized = (domain_type or "").strip().lower()
-        provider_name = (
-            normalized
-            if (
-                normalized in self._providers
-                or self._provider_registry.has_provider(normalized)
-            )
-            else self._default_provider
-        )
-        return self._get_provider(provider_name).build_domain()

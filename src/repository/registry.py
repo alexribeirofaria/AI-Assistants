@@ -1,70 +1,65 @@
 from collections.abc import Callable, Mapping
-from domain.openai_domain import OpenAI
-from domain.claude_domain import Claude
-from domain.gemini_domain import Gemini
-from domain.groq_domain import Groq
-from infrastructure.clients.claude_client import ClaudeClient
-from infrastructure.clients.gemini_client import GeminiClient
-from infrastructure.clients.groq_client import GroqClient
-from infrastructure.clients.openai_client import OpenAIClient
+from domain.abstracts.base_domain import BaseDomain
 from repository.builder import Builder
 from repository.strategies.abstracts.base_repository_strategy import BaseRepositoryStrategy
 
 class Registry:
+
     def __init__(
         self,
-        factories: Mapping[str, Callable[[], BaseRepositoryStrategy]] | None = None,
-        default_provider_name: str = "groq",
+        factories: Mapping[type[BaseDomain], Callable[[], BaseRepositoryStrategy]] | None = None,
+        default_domain: type[BaseDomain] | None = None,
     ) -> None:
-        self._factories: dict[str, Callable[[], BaseRepositoryStrategy]] = (
+
+        self._factories: dict[type[BaseDomain], Callable[[], BaseRepositoryStrategy]] = (
             dict(factories) if factories else self._build_default_factories()
         )
-        self._default_provider_name = self._normalize_name(default_provider_name) or "claude"
 
-        if self._default_provider_name not in self._factories:
-            raise ValueError("O provider padrão precisa existir no registry")
+        self._default_domain = default_domain or next(iter(self._factories))
 
-    def create(self, provider_name: str | None) -> BaseRepositoryStrategy:
-        factory = self.get_factory(provider_name)
-        return factory()
+        if self._default_domain not in self._factories:
+            raise ValueError("O domínio padrão precisa existir no registry")
 
-    def get_factory(self, provider_name: str | None) -> Callable[[], BaseRepositoryStrategy]:
-        normalized = self._normalize_name(provider_name)
-        return self._factories.get(normalized, self._factories[self._default_provider_name])
+    def create(self, domain: type[BaseDomain] | None) -> BaseRepositoryStrategy:
+        return self.get_factory(domain)()
 
-    def has_provider(self, provider_name: str | None) -> bool:
-        normalized = self._normalize_name(provider_name)
-        return normalized in self._factories
+    def get_factory(self, domain: type[BaseDomain] | None) -> Callable[[], BaseRepositoryStrategy]:
+        resolved = domain or self._default_domain        
+        if resolved not in self._factories:
+            raise ValueError(f"Domain não registrado: {resolved.__name__}")
+        return self._factories[resolved]
+        
+    def has_domain(self, domain: type[BaseDomain]) -> bool:
+        return domain in self._factories
 
-    def available_provider_names(self) -> tuple[str, ...]:
-        return tuple(sorted(self._factories.keys()))
+    def available_domains(self) -> tuple[type[BaseDomain], ...]:
+        return tuple(self._factories.keys())
 
     def register(
         self,
-        provider_name: str,
-        factory: Callable[[], BaseRepositoryStrategy],
-    ) -> None:
-        normalized = self._normalize_name(provider_name)
-        if not normalized:
-            raise ValueError("Provider name inválido")
-        self._factories[normalized] = factory
+        domain: type[BaseDomain],
+        factory: Callable[[], BaseRepositoryStrategy]) -> None:
+        self._factories[domain] = factory
 
     @property
-    def default_provider_name(self) -> str:
-        return self._default_provider_name
+    def default_domain(self) -> type[BaseDomain]:
+        return self._default_domain
 
     @staticmethod
-    def _normalize_name(provider_name: str | None) -> str:
-        return (provider_name or "").strip().lower()
+    def _build_default_factories() -> dict[type[BaseDomain], Callable[[], BaseRepositoryStrategy]]:
+        from domain.openai_domain import OpenAI
+        from domain.claude_domain import Claude
+        from domain.gemini_domain import Gemini
+        from domain.groq_domain import Groq
 
-    @staticmethod
-    def _build_default_factories() -> dict[str, Callable[[], BaseRepositoryStrategy]]:
+        from infrastructure.clients.openai_client import OpenAIClient
+        from infrastructure.clients.claude_client import ClaudeClient
+        from infrastructure.clients.gemini_client import GeminiClient
+        from infrastructure.clients.groq_client import GroqClient
+
         return {
-            "claude": lambda: Builder(ClaudeClient().load_client(), Claude),
-            "openai": lambda: Builder(OpenAIClient().load_client(), OpenAI),
-            "gemini": lambda: Builder(GeminiClient().load_client(), Gemini),
-            "groq": lambda: Builder(GroqClient().load_client(), Groq),
+            Claude: lambda: Builder(ClaudeClient().load_client(), Claude),
+            OpenAI: lambda: Builder(OpenAIClient().load_client(), OpenAI),
+            Gemini: lambda: Builder(GeminiClient().load_client(), Gemini),
+            Groq: lambda: Builder(GroqClient().load_client(), Groq),
         }
-        
-        
-        

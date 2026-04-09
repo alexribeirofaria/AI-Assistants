@@ -36,7 +36,7 @@ class DecoratorInterpreter:
 
     def _interpret(self,
         normalized: str,
-        tokens: list[str]) -> Tuple[Any, Optional[str]]:
+        tokens: list[str]) -> Tuple[Any, Optional[Any]]:
 
         candidate = normalized.replace(" ", "")
 

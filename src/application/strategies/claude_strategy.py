@@ -1,9 +1,10 @@
 from application.strategies.abstracts.base_application_strategy import BaseApplicationStrategy
+from domain.abstracts.domain_type import DomainType
+from domain.claude_domain import Claude
 
 class ClaudeStrategy(BaseApplicationStrategy):
 
     def __init__(self):
-        super().__init__("claude")
-
-    def execute(self, prompt: str) -> str:
-        return self.ensure_domain().send_message(prompt)
+        super().__init__(domain=Claude)
+        self.domain_type = DomainType.Claude
+        
