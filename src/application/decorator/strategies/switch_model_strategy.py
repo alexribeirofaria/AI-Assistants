@@ -17,9 +17,43 @@ class SwitchModelStrategy(BaseHelperStrategy):
 
     def _build_aliases(self) -> dict[str, type[BaseDomain]]:
         aliases: dict[str, type[BaseDomain]] = {}
-        for domain in Registry().available_domains():
-            aliases[self._compact(domain.__name__)] = domain
-            aliases[self._compact(domain.get_domain_name())] = domain
+        registry = Registry()
+
+        for domain_name in registry.available_domains():
+            provider = registry.get_provider(domain_name)
+            domain_cls = None
+
+            if provider is not None:
+                try:
+                    builder = provider()
+                    # o Builder deve expor a classe do domínio; tentamos acessar atributos comuns
+                    domain_cls = getattr(builder, "_domain_cls", None) or getattr(builder, "domain_cls", None)
+                except Exception:
+                    # se falhar ao instanciar o provider, ignoramos este domínio
+                    domain_cls = None
+
+            # Se não conseguimos a classe, tentamos inferir a partir do nome (não ideal)
+            if domain_cls is None:
+                # pula se não for possível obter a classe concreta
+                continue
+
+            # registra aliases a partir do nome da classe e do nome do domínio (se disponível)
+            try:
+                cls_name = getattr(domain_cls, "__name__", None)
+                if cls_name:
+                    aliases[self._compact(cls_name)] = domain_cls
+            except Exception:
+                pass
+
+            try:
+                domain_display = getattr(domain_cls, "get_domain_name", None)
+                if callable(domain_display):
+                    name = domain_display()
+                    if isinstance(name, str):
+                        aliases[self._compact(name)] = domain_cls
+            except Exception:
+                pass
+
         return aliases
 
     def _resolve_domain(self, normalized: str, tokens: Sequence[str]) -> type[BaseDomain] | None:

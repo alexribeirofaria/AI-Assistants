@@ -11,5 +11,6 @@ class BaseServer(IServer):
     def create_factory(self) -> Any:
         pass
     
-    def load_server(self):
-        return self._server
+    def load_server(self)-> Any:
+        return self._server    
+    

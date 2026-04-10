@@ -1,66 +1,90 @@
-from collections.abc import Callable, Mapping
-from domain.abstracts.base_domain import BaseDomain
+import logging
+from typing import Callable, Dict, Optional, Tuple
+from domain.langchain_domain import LangChain
+from domain.openai_domain import OpenAI
+from domain.claude_domain import Claude
+from domain.gemini_domain import Gemini
+from domain.groq_domain import Groq
 from infrastructure.repository.builder import Builder
-from infrastructure.repository.strategies.abstracts.base_repository_strategy import BaseRepositoryStrategy
+from infrastructure.servers.factories.anthropic_server_factory import AnthropicServerFactory
+from infrastructure.servers.factories.gemini_server_factory import GeminiServerFactory
+from infrastructure.servers.factories.groq_server_factory import GroqServerFactory
+from infrastructure.servers.factories.langchain_server_factory import LangChainServerFactory
+from infrastructure.servers.factories.openai_server_factory import OpenAIServerFactory
+
+logger = logging.getLogger(__name__)
+
 
 class Registry:
+    """
+    Registry que fornece providers para construção de domínios.
+    Cada provider é um callable que retorna um Builder pronto para uso.
+    """
 
-    @property
-    def default_domain(self) -> type[BaseDomain]:
-        return self._default_domain
-
-    def __init__(self,
-        factories: Mapping[type[BaseDomain], Callable[[], BaseRepositoryStrategy]] | None = None,
-        default_domain: type[BaseDomain] | None = None,
-    ):
-
-        self._factories: dict[type[BaseDomain], Callable[[], BaseRepositoryStrategy]] = (
-            dict(factories) if factories else self._build_default_factories()
-        )
-
-        self._default_domain = default_domain or next(iter(self._factories))
-        if self._default_domain not in self._factories:
-            raise ValueError("Default domain must exist in registry") 
-
-    def create(self, domain: type[BaseDomain]) -> BaseRepositoryStrategy:
-        return self.get_factory(domain)()
-
-    def get_factory(self, domain: type[BaseDomain]) -> Callable[[], BaseRepositoryStrategy]:
-        resolved = domain or self.default_domain        
-        if resolved not in self._factories:
-            raise ValueError(f"Domain não registrado: {resolved.__name__}")
-        return self._factories[resolved]
-        
-    def has_domain(self, domain: type[BaseDomain]) -> bool:
-        return domain in self._factories
-
-    def available_domains(self) -> tuple[type[BaseDomain], ...]:
-        return tuple(self._factories.keys())
-
-    def register(
-        self,
-        domain: type[BaseDomain],
-        factory: Callable[[], BaseRepositoryStrategy]) -> None:
-        self._factories[domain] = factory
-
-    @staticmethod
-    def _build_default_factories() -> dict[type[BaseDomain], Callable[[], BaseRepositoryStrategy]]:
-        from domain.openai_domain import OpenAI
-        from domain.claude_domain import Claude
-        from domain.gemini_domain import Gemini
-        from domain.groq_domain import Groq
-        from domain.langchain_domain import LangChain
-        
-        from infrastructure.servers.openai_server import OpenAIServer
-        from infrastructure.servers.claude_server import ClaudeServer
-        from infrastructure.servers.gemini_server import GeminiServer
-        from infrastructure.servers.groq_server import GroqServer
-        from infrastructure.servers.langchain_server import LangChainServer
-
-        return {
-            Claude: lambda: Builder(ClaudeServer().load_server(), Claude),
-            OpenAI: lambda: Builder(OpenAIServer().load_server(), OpenAI),
-            Gemini: lambda: Builder(GeminiServer().load_server(), Gemini),
-            Groq: lambda: Builder(GroqServer().load_server(), Groq),
-            LangChain: lambda: Builder(LangChainServer().load_server(), LangChain),
+    def __init__(self):
+        # providers: mapeamento domain_name -> callable que retorna um Builder
+        # As factories são instanciadas aqui (não passamos classes).
+        self.default_domain = LangChain
+        self._providers: Dict[str, Callable[[], Builder]] = {
+            "LangChain": lambda: Builder(
+                domain_cls=LangChain,
+                servers_factory=LangChainServerFactory()
+            ),
+            "OpenAI": lambda: Builder(
+                domain_cls=OpenAI,
+                servers_factory=OpenAIServerFactory()
+            ),
+            "Claude": lambda: Builder(
+                domain_cls=Claude,
+                servers_factory=AnthropicServerFactory()
+            ),
+            "Gemini": lambda: Builder(
+                domain_cls=Gemini,
+                servers_factory=GeminiServerFactory()
+            ),
+            "Groq": lambda: Builder(
+                domain_cls=Groq,
+                servers_factory=GroqServerFactory()
+            ),
         }
+        logger.debug("Registry inicializado com providers: %r", list(self._providers.keys()))
+
+    def create(self, domain_name: str) -> Builder:
+        """
+        Cria e retorna um Builder para o domínio solicitado.
+        """
+        provider = self._providers.get(domain_name)
+        if provider is None:
+            raise RuntimeError(f"Registry: provider não encontrado para domínio '{domain_name}'")
+        builder = provider()
+        return builder
+
+    def get_provider(self, domain_name: str) -> Optional[Callable[[], Builder]]:
+        """
+        Retorna o provider callable para o nome informado, ou None se não existir.
+        """
+        return self._providers.get(domain_name)
+
+    def has_domain(self, domain_name: str) -> bool:
+        """
+        Verifica se existe provider registrado para o nome informado.
+        """
+        return domain_name in self._providers
+
+    def available_domains(self) -> Tuple[str, ...]:
+        """
+        Retorna os nomes dos domínios/providers disponíveis.
+        """
+        return tuple(self._providers.keys())
+
+    def register(self, domain_name: str, provider: Callable[[], Builder]) -> None:
+        """
+        Registra um novo provider.
+        domain_name: nome textual do domínio (ex: "OpenAI", "LangChain")
+        provider: callable que retorna um Builder quando chamado
+        """
+        if not callable(provider):
+            raise ValueError("provider deve ser um callable que retorna um Builder")
+        self._providers[domain_name] = provider
+        logger.debug("Registry: provider '%s' registrado", domain_name)
+

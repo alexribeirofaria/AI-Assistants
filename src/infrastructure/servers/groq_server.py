@@ -1,6 +1,6 @@
 from infrastructure.servers.factories.groq_server_factory import GroqServerFactory
-from infrastructure.servers.abstracts.base_server import IServer
+from infrastructure.servers.abstracts.base_server import BaseServer
 
-class GroqServer(IServer):
+class GroqServer(BaseServer):
     def create_factory(self) -> GroqServerFactory:
         return GroqServerFactory()

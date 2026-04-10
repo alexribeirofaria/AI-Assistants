@@ -4,7 +4,7 @@ from infrastructure.repository.strategies.abstracts.base_repository_strategy imp
 
 class RepositoryStrategy(BaseRepositoryStrategy):
 
-    def __init__(self, server: BaseServer, domain_cls: BaseDomain):
+    def __init__(self, server: BaseServer, domain_cls):
         self._server = server
         self._domain_cls = domain_cls
 

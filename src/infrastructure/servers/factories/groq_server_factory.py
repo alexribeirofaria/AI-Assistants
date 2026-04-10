@@ -1,7 +1,7 @@
 from openai import OpenAI
-from infrastructure.servers.factories.abstracts.i_server_factory import IServerFactory
+from infrastructure.servers.factories.abstracts.base_server_factory import BaseServerFactory
 
-class GroqServerFactory(IServerFactory):
+class GroqServerFactory(BaseServerFactory):
     def build_server(self) -> OpenAI:
         api_key: str = self.require_env(key="LLM__GROQ_API_KEY", error_message="Groq API key não encontrada no .env")
         base_url: str = self.optional_env(key="LLM__GROQ_BASE_URL", default="https://api.groq.com/openai/v1")

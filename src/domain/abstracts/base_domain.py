@@ -3,22 +3,26 @@ from google.genai.errors import ClientError
 from anthropic import RateLimitError
 from openai import APIError, OpenAIError
 from domain.cache.domain_list_cache import CachedDomainListMixin
+from infrastructure.servers.abstracts.i_server import IServer
 
 class BaseDomain(ABC, CachedDomainListMixin):
     _SUFFIXES = ("domain", "service", "server")
     
-    def __init__(self, server, model_name) :
-        self.server = server
+    def __init__(self, server: IServer, model_name) :
+        if server is None:
+            raise RuntimeError("server não fornecido para BaseDomain")
+        # Se for factory/wrapper, crie o cliente, senão use diretamente
+        if hasattr(server, "create_factory") and callable(server.create_factory):
+            self.server = server.create_factory()
+        else:
+            self.server = server
         self.model_name = model_name
         self.max_tokens = 512
-        self.model = None
+        self.model = self.__class__.__name__
         CachedDomainListMixin.__init__(self)
 
     def set_max_tokens(self, max_tokens: int):        
         self.max_tokens = max_tokens
-
-    def set_model(self, model: str):        
-        self.model = model
 
     def set_language(self, language: str):        
         self.language = language

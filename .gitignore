@@ -4,6 +4,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 .mypy_cache/
+.tmp.drivedownload/
+.tmp.driveupload/
+
 # Virtual Environments (most common names)
 venv/
 .venv/

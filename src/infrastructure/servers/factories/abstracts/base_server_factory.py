@@ -1,6 +1,7 @@
 import os
 from abc import abstractmethod
 from dotenv import load_dotenv
+from infrastructure.servers.abstracts.base_server import BaseServer
 from infrastructure.servers.factories.abstracts.i_server_factory import IServerFactory
 
 
@@ -10,8 +11,11 @@ class BaseServerFactory(IServerFactory):
         load_dotenv()
     
     @abstractmethod
-    def build_server(self):
+    def build_server(self, server_cls : BaseServer):
         pass
+    
+    def create_server(self):
+        return self.build_server(server_cls=self)
     
     def _get_env(self, key: str) -> str:
         value = os.environ.get(key)
@@ -40,9 +44,6 @@ class BaseServerFactory(IServerFactory):
             return float(value)
         except ValueError as exc:
             raise ValueError(f"Invalid float for env '{key}': {value}") from exc
-
-    def create_server(self):
-        return self.build_server()
 
     def require_env(self, key: str, error_message: str) -> str:
         value = self._get_env(key)

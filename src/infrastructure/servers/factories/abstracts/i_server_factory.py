@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
+from infrastructure.servers.abstracts.base_server import BaseServer
+
 
 class IServerFactory(ABC):
 
     @abstractmethod
-    def build_server(self):
+    def build_server(self, server_cls: BaseServer):
         pass
-
+    
     @abstractmethod
     def require_env(self, key: str, error_message: str) -> str:
         pass
