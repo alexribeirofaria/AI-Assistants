@@ -5,17 +5,14 @@ from infrastructure.repository.strategies.abstracts.base_repository_strategy imp
 
 class Repository:
 
-    def __init__(
-        self,
+    def __init__(self,
         providers: Mapping[type[BaseDomain], BaseRepositoryStrategy] | None = None,
         default_domain: type[BaseDomain] | None = None,
         registry: Registry | None = None,
     ):
-        self._providers: dict[type[BaseDomain], BaseRepositoryStrategy] = (
-            dict(providers) if providers else {}
-        )
-
-        self._registry = registry or Registry()
+        self._providers: dict[type[BaseDomain], 
+        BaseRepositoryStrategy] = (dict(providers) if providers else {})
+        self._registry: Registry = registry or Registry()
         self._default_domain = default_domain or self._registry.default_domain
 
     # ----------------- PUBLIC -----------------
@@ -27,13 +24,13 @@ class Repository:
     def register(self, domain: type[BaseDomain], provider: BaseRepositoryStrategy) -> None:
         self._providers[domain] = provider
 
-    def build_domain(self, domain: type[BaseDomain] | None) -> BaseDomain:
+    def build_domain(self, domain: type[BaseDomain]) -> BaseDomain:
         strategy = self._get_provider(domain)
         return strategy.build_domain()
 
     # ----------------- INTERNAL -----------------
 
-    def _get_provider(self, domain: type[BaseDomain] | None) -> BaseRepositoryStrategy:
+    def _get_provider(self, domain: type[BaseDomain]) -> BaseRepositoryStrategy:
         resolved = domain or self._default_domain
 
         # já instanciado

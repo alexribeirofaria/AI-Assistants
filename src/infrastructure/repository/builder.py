@@ -11,6 +11,6 @@ class Builder(BaseRepositoryStrategy):
 
     def build_domain(self) -> BaseDomain:
         return self._domain_cls(
-            client=self._servers,
+            server=self._servers,
             model_name=self._domain_cls.get_domain_name()
         )

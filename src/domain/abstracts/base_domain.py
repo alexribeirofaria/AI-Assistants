@@ -5,10 +5,10 @@ from openai import APIError, OpenAIError
 from domain.cache.domain_list_cache import CachedDomainListMixin
 
 class BaseDomain(ABC, CachedDomainListMixin):
-    _SUFFIXES = ("domain", "client", "service", "server")
-
-    def __init__(self, client, model_name) :
-        self.client = client
+    _SUFFIXES = ("domain", "service", "server")
+    
+    def __init__(self, server, model_name) :
+        self.server = server
         self.model_name = model_name
         self.max_tokens = 512
         self.model = None

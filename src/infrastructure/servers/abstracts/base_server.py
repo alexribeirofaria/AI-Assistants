@@ -1,7 +1,8 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Any
+from infrastructure.servers.abstracts.i_server import IServer
 
-class BaseServer(ABC):
+class BaseServer(IServer):
     def __init__(self):
         _factory = self.create_factory()
         self._server = _factory.create_server()
