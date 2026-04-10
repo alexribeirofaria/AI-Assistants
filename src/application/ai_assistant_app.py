@@ -1,9 +1,9 @@
 from queue import Queue
 from application.abstracts.base_ai_assistant_app import BaseAIAssistantApp
+from application.controller.thread_controller import ThreadController
 from application.decorator.interpreter.decorator_interpreter_factory import DecoratorInterpreterFactory
 from application.enums.user_action import UserAction
-from application.helpers.thread_helper import ThreadHelper
-from domain.abstracts.domain_type import DomainType
+from domain.abstracts.base_domain import BaseDomain
 
 class AIAssistantApp(BaseAIAssistantApp):
     """
@@ -12,26 +12,26 @@ class AIAssistantApp(BaseAIAssistantApp):
     def __init__(self, strategy_factory=None, presenter=None, presenter_factory=None):
         super().__init__(strategy_factory=strategy_factory, presenter=presenter, presenter_factory=presenter_factory)
         self._queue: Queue | None = None
-        self.thread_controller: ThreadHelper
-        self.default_model_agent = DomainType.Groq
+        self.thread_controller: ThreadController
+        self.default_model_agent = self._strategy_factory.default_domain
         self.strategy = None
         self.interpreter = DecoratorInterpreterFactory.create()
 
     @property
-    def default_model_agent(self) -> DomainType:
+    def default_model_agent(self) -> type[BaseDomain]:
         return self._default_model_agent
 
     @default_model_agent.setter
-    def default_model_agent(self, value: DomainType):
-        if not isinstance(value, DomainType):
-            raise ValueError("default_model_agent must be a DomainType")
+    def default_model_agent(self, value: type[BaseDomain]):
+        if not isinstance(value, type) or not issubclass(value, BaseDomain):
+            raise ValueError("default_model_agent must be a BaseDomain class")
         self._default_model_agent = value
 
     @property
     def queue(self) -> Queue:
         if self._queue is None:
             self._queue = Queue()
-            self.thread_controller = ThreadHelper(self._queue, self.presenter)
+            self.thread_controller = ThreadController(self._queue, self.presenter)
         return self._queue
 
     def _get_current_strategy(self):
@@ -54,12 +54,12 @@ class AIAssistantApp(BaseAIAssistantApp):
                 return False
 
         if action == UserAction.SWITCH_MODEL:
-            parsed = self.parse_domain_type(value)
+            parsed = self._strategy_factory.parse_domain(value)
 
             if parsed:
                 self.default_model_agent = parsed
                 self.strategy = None
-                self.presenter.show_model_switched(parsed.value)
+                self.presenter.show_model_switched(parsed.get_domain_name())
             else:
                 self.presenter.show_invalid_model(value)
 
@@ -73,9 +73,10 @@ class AIAssistantApp(BaseAIAssistantApp):
 
         if action == UserAction.MESSAGE:
             _ = self.queue
+            strategy = self._get_current_strategy()
             self.thread_controller.enqueue_task(
                 "message",
-                self.strategy,
+                strategy,
                 value
             )
 
@@ -97,7 +98,7 @@ class AIAssistantApp(BaseAIAssistantApp):
 
         if action == UserAction.SWITCH_MODEL:
             self._handle_action(action, value, stop_app=False)
-            new_model = (value or "").strip().lower()
+            new_model = self.default_model_agent.get_domain_name()
             return {"message": "model_switched", "model": new_model}
 
         # Default to MESSAGE handling for web: execute synchronously and return
@@ -115,7 +116,7 @@ class AIAssistantApp(BaseAIAssistantApp):
             if not self.queue.empty():
                 self.thread_controller.show_elapsed_time_until_queue_finishes()
 
-            prompt = input(f"{self.default_model_agent.value} Chat: ")
+            prompt = input(f"{self.default_model_agent.get_domain_name()} Chat: ")
 
             action, value =  self.interpreter.interpret_user_input_with_feedback(
             prompt,self.presenter)
@@ -123,18 +124,3 @@ class AIAssistantApp(BaseAIAssistantApp):
             should_exit = self._handle_action(action, value)
             if should_exit:
                 break
-
-    def parse_domain_type(self, value: str) -> DomainType | None:
-        if not value:
-            return None
-
-        normalized = value.strip().lower().replace(" ", "")
-
-        for domain in DomainType:
-            enum_name = domain.name.lower()
-            enum_value = domain.value.lower().replace(" ", "")
-
-            if normalized in (enum_name, enum_value):
-                return domain
-
-        return None

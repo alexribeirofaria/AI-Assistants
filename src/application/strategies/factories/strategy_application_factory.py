@@ -1,75 +1,93 @@
 from collections.abc import Callable, Mapping
-from enum import Enum
-from application.strategies.langchain_strategy import LangChainStrategy
-from domain.abstracts.domain_type import DomainType
 from application.strategies.abstracts.base_application_strategy import BaseApplicationStrategy
 from application.strategies.claude_strategy import ClaudeStrategy
 from application.strategies.gemini_strategy import GeminiStrategy
 from application.strategies.groq_strategy import GroqStrategy
+from application.strategies.langchain_strategy import LangChainStrategy
 from application.strategies.openai_strategy import OpenAIStrategy
+from domain.abstracts.base_domain import BaseDomain
+from domain.claude_domain import Claude
+from domain.gemini_domain import Gemini
+from domain.groq_domain import Groq
+from domain.langchain_domain import LangChain
+from domain.openai_domain import OpenAI
+
 
 class StrategyApplicationFactory:
-    
-    @property
-    def default(self) -> DomainType:
-        return self._default
-    def __init__(self,
-        creators: Mapping[DomainType, Callable[[], BaseApplicationStrategy]] | None = None,
-        default: DomainType = DomainType.Groq) -> None:
+    def __init__(
+        self,
+        creators: Mapping[type[BaseDomain], Callable[[], BaseApplicationStrategy]] | None = None,
+        default_domain: type[BaseDomain] = LangChain,
+    ) -> None:
+        self._creators: dict[type[BaseDomain], Callable[[], BaseApplicationStrategy]] = (
+            dict(creators)
+            if creators
+            else {
+                Claude: ClaudeStrategy,
+                OpenAI: OpenAIStrategy,
+                Gemini: GeminiStrategy,
+                Groq: GroqStrategy,
+                LangChain: LangChainStrategy,
+            }
+        )
+        self._default_domain = default_domain
 
-        self._creators: dict[DomainType, Callable[[], BaseApplicationStrategy]] = dict(creators) if creators else {
-            DomainType.Claude: ClaudeStrategy,
-            DomainType.OpenAI: OpenAIStrategy,
-            DomainType.Gemini: GeminiStrategy,
-            DomainType.Groq: GroqStrategy,
-            DomainType.LangChain: LangChainStrategy
-        }
-
-        self._default = default
-
-        if self._default not in self._creators:
+        if self._default_domain not in self._creators:
             raise ValueError("A strategy padrão precisa existir no catálogo")
 
-    def _parse_domain(self, name: str | DomainType | None) -> DomainType:
-        # Já é DomainType → retorna direto (fast path)
-        if isinstance(name, DomainType):
-            return name
+    @property
+    def default_domain(self) -> type[BaseDomain]:
+        return self._default_domain
 
-        # None ou vazio → default
-        if not name:
-            return self._default
+    @staticmethod
+    def _sanitize(value: str) -> str:
+        return value.strip().lower().replace("_", "").replace(" ", "")
 
-        normalized = name.strip().lower().replace(" ", "")
+    def parse_domain(
+        self, value: str | type[BaseDomain] | None
+    ) -> type[BaseDomain] | None:
+        if value is None:
+            return None
 
+        if isinstance(value, type) and issubclass(value, BaseDomain):
+            return value if value in self._creators else None
+
+        normalized = self._sanitize(value)
         for domain in self._creators:
-            enum_name = domain.name.lower()
-            enum_value = domain.value.lower().replace(" ", "")
-
-            if normalized in (enum_name, enum_value):
+            aliases = {
+                self._sanitize(domain.__name__),
+                self._sanitize(domain.get_domain_name()),
+            }
+            if normalized in aliases:
                 return domain
 
-        return self._default   
-    
-    def register(self,
-        domain: DomainType,
-        creator: Callable[[], BaseApplicationStrategy]) -> None:
+        return None
+
+    def _parse_or_default(self, value: str | type[BaseDomain] | None) -> type[BaseDomain]:
+        return self.parse_domain(value) or self._default_domain
+
+    def register(
+        self,
+        domain: type[BaseDomain],
+        creator: Callable[[], BaseApplicationStrategy],
+    ) -> None:
         self._creators[domain] = creator
 
-    def create(self, 
-        domain: DomainType) -> BaseApplicationStrategy:
+    def create(self, domain: type[BaseDomain]) -> BaseApplicationStrategy:
         return self._resolve_creator(domain)()
 
-    def _resolve_creator(self,
-        domain: DomainType) -> Callable[[], BaseApplicationStrategy]:
-        return self._creators.get(domain, self._creators[self._default])
+    def _resolve_creator(
+        self, domain: type[BaseDomain]
+    ) -> Callable[[], BaseApplicationStrategy]:
+        return self._creators.get(domain, self._creators[self._default_domain])
 
-    def available(self) -> tuple[Enum, ...]:
+    def available(self) -> tuple[type[BaseDomain], ...]:
         return tuple(self._creators.keys())
-    
-    def get_strategy(self,
-        name: str | None) -> BaseApplicationStrategy:
-        creator = self.get_creator(name)
-        return creator()    
 
-    def get_creator(self, name: str | None) -> Callable[[], BaseApplicationStrategy]:
-        return self._resolve_creator(self._parse_domain(name))
+    def get_strategy(self, value: str | type[BaseDomain] | None) -> BaseApplicationStrategy:
+        return self.get_creator(value)()
+
+    def get_creator(
+        self, value: str | type[BaseDomain] | None
+    ) -> Callable[[], BaseApplicationStrategy]:
+        return self._resolve_creator(self._parse_or_default(value))

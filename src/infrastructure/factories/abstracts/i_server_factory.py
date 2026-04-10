@@ -3,5 +3,5 @@ from typing import Any
 
 class IServerFactory(ABC):
     @abstractmethod
-    def create_client(self) -> Any:
+    def create_server(self) -> Any:
         pass

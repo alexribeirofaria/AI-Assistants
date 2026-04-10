@@ -1,14 +1,15 @@
 import os
 from abc import abstractmethod
+from typing import Any
 from dotenv import load_dotenv
 
 class BaseServerFactory:
-    def create_server(self):        
+    def create_client(self) -> Any:        
         load_dotenv()
         return self._build_server()
 
     def get_required_env(self, key: str, error_message: str) -> str:
-        value: str | None = os.environ.get(key)
+        value: str = os.environ.get(key)
         if not value:
             raise ValueError(error_message)
         return value
@@ -17,7 +18,7 @@ class BaseServerFactory:
         return os.environ.get(key, default)
 
     def get_optional_int_env(self, key: str, default: int) -> int:
-        raw_value: str | None = os.environ.get(key)
+        raw_value: str = os.environ.get(key)
         if not raw_value:
             return default
 
@@ -27,7 +28,7 @@ class BaseServerFactory:
             raise ValueError(f"Valor inválido para {key}: esperado inteiro") from exc
 
     def get_optional_float_env(self, key: str, default: float) -> float:
-        raw_value: str | None = os.environ.get(key)
+        raw_value: str = os.environ.get(key)
         if not raw_value:
             return default
 

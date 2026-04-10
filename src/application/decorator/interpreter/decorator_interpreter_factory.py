@@ -6,6 +6,4 @@ class DecoratorInterpreterFactory:
     @staticmethod
     def create() -> DecoratorInterpreter :
         strategies = DecoratorHelperStrategy.create_instances()
-        #strategies.sort(key=lambda s: getattr(s, "_priority", 0)) 
-
         return DecoratorInterpreter(strategies)

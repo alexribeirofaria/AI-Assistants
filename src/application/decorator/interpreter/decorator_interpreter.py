@@ -1,13 +1,15 @@
-from typing import Any, Tuple, Optional
+from collections.abc import Iterable
+from typing import Any
 from application.enums.user_action import UserAction
-from application.helpers.abstracts.base_helper import BaseHelper
+from application.decorator.helpers.decorator_text_helper import DecoratorTextHelper
 from application.decorator.strategies.abstracts.base_helper_strategy import BaseHelperStrategy
 from presentation.presenters.i_output_presenter import IOutputPresenter
 
 class DecoratorInterpreter:
 
-    def __init__(self, strategies: list[BaseHelperStrategy]):
-        self._strategies = strategies
+    def __init__(self, strategies: Iterable[BaseHelperStrategy]):
+        self._strategies = list(strategies)
+        self._strategies.sort(key=lambda s: getattr(s, "_priority", 0))
 
         self._expected_map = {
             UserAction.LIST_MODELS: "list models",
@@ -19,9 +21,9 @@ class DecoratorInterpreter:
         self,
         user_input: str,
         presenter: IOutputPresenter
-    ) -> Tuple[UserAction, Optional[str]]:
+    ) -> tuple[UserAction, Any | None]:
 
-        normalized = BaseHelper.normalize_text(user_input)
+        normalized = DecoratorTextHelper.normalize_text(user_input)
         tokens = normalized.split()
 
         action, value = self._interpret(normalized, tokens)
@@ -36,7 +38,7 @@ class DecoratorInterpreter:
 
     def _interpret(self,
         normalized: str,
-        tokens: list[str]) -> Tuple[Any, Optional[Any]]:
+        tokens: list[str]) -> tuple[UserAction, Any | None]:
 
         candidate = normalized.replace(" ", "")
 
