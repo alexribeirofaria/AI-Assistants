@@ -4,6 +4,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub](https://img.shields.io/github/license/yourusername/AI-Assistants)](https://github.com/yourusername/AI-Assistants)
 
+## 📖 README.md in English
+
 A modular Python CLI application for seamless interaction with multiple AI models: OpenAI, Claude (Anthropic), Gemini (Google), and Groq. Built with Domain-Driven Design (DDD), strategy patterns, and extensible factories for easy model switching and advanced features like interpreters and caching.
 
 ## Quick Start
@@ -67,7 +69,7 @@ MIT License - see [LICENSE](LICENSE) file.
 ---
 
 <details>
-<summary>🇧🇷 Português (BR)</summary>
+<summary>🇧🇷 README.md em Português (BR)</summary>
 
 # AI-Assistants 🧠🤖
 
