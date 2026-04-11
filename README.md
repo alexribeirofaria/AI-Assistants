@@ -12,7 +12,7 @@ Aplicação CLI modular em Python para interação perfeita com múltiplos model
 
 1. Clone o repositório:
    ```
-   git clone https://github.com/yourusername/AI-Assistants.git
+   https://github.com/alexribeirofaria/AI-Assistants.git
    cd AI-Assistants
    ```
 
@@ -65,4 +65,7 @@ Fork, crie uma branch, envie PR para `main`. Veja [CONTRIBUTING.md](#) para deta
 
 ## Licença
 Licença MIT - veja arquivo [LICENSE](LICENSE).
-</
+<details>
+<summary>en README.en.md em Inglês (EN)</summary>
+
+</details>

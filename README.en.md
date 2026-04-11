@@ -12,7 +12,7 @@ A modular Python CLI application for seamless interaction with multiple AI model
 
 1. Clone the repo:
    ```
-   git clone https://github.com/yourusername/AI-Assistants.git
+   https://github.com/alexribeirofaria/AI-Assistants.git
    cd AI-Assistants
    ```
 
@@ -63,8 +63,10 @@ src/
 ## Contributing
 Fork, create a branch, PR to `main`. See [CONTRIBUTING.md](#) for details.
 
-## License
-MIT License - see [LICENSE](LICENSE) file.
-
+## Licença
+Licença MIT - veja arquivo [LICENSE](LICENSE).
+<details>
+<summary>🇧🇷 README.md em Português (BR)</summary>
 
 </details>
+# AI-Assistants 🧠🤖
