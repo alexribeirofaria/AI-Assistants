@@ -66,8 +66,5 @@ Fork, create a branch, PR to `main`. See [CONTRIBUTING.md](#) for details.
 ## License
 MIT License - see [LICENSE](LICENSE) file.
 
----
 
-<details>
-<summary>🇧🇷 README.md em Português (BR)</summary>
 </details>
