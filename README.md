@@ -1,6 +1,9 @@
-<title><img src="https://upload.wikimedia.org/wikipedia/en/0/05/Flag_of_Brazil.svg" width="50"> README</title>
-
 <div dir="auto">
+<div align="center">
+  <img src="https://flagcdn.com/w320/br.png" alt="Bandeira do Brasil" width="120" />
+  <h1>README</h1>
+</div>
+
 
 # AI-Assistants 🧠🤖
 
