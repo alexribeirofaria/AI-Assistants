@@ -1,10 +1,20 @@
-<link rel="icon" href="https://twemoji.maxcdn.com/v/latest/svg/1f1ec-1f1e7.svg"> AI-Assistants
+## <img src="https://www.eccobandeiras.com.br/image/cache/catalog/antigas/reino-unido-1111x740.jpg" width="16"> AI-Assistants in English
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub](https://img.shields.io/github/license/yourusername/AI-Assistants)](https://github.com/yourusername/AI-Assistants)
+[![GitHub](https://img.shields.io/github/license/alexribeirofaria/AI-Assistants)](https://github.com/alexribeirofaria/AI-Assistants)
 
-## 📖 README.md in English
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Features](#features)
+- [Usage Example](#usage-example)
+- [Architecture](#architecture)
+- [Why Use It?](#why-use-it)
+- [Help and Support](#help-and-support)
+- [Contributing](#contributing)
+- [Maintenance](#maintenance)
+- [License](#license)
 
 A modular Python CLI application for seamless interaction with multiple AI models: OpenAI, Claude (Anthropic), Gemini (Google), and Groq. Built with Domain-Driven Design (DDD), strategy patterns, and extensible factories for easy model switching and advanced features like interpreters and caching.
 
@@ -12,7 +22,7 @@ A modular Python CLI application for seamless interaction with multiple AI model
 
 1. Clone the repo:
    ```
-   https://github.com/alexribeirofaria/AI-Assistants.git
+   git clone https://github.com/alexribeirofaria/AI-Assistants.git
    cd AI-Assistants
    ```
 
@@ -60,13 +70,24 @@ src/
 └── console_app.py
 ```
 
+## Why Use It?
+This project is useful because:
+- Allows testing and using multiple AI models in one CLI without tool switching.
+- DDD architecture facilitates extensions (new models, features).
+- Cache and threaded helpers improve performance.
+- Easy setup and quick start.
+
+## Help and Support
+- Create an [issue](https://github.com/alexribeirofaria/AI-Assistants/issues) for bugs or features.
+- Check code or [discussions](https://github.com/alexribeirofaria/AI-Assistants/discussions).
+
+English version. Versão em português: [README.md](README.md)
+
 ## Contributing
-Fork, create a branch, PR to `main`. See [CONTRIBUTING.md](#) for details.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details. Code of Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
-## Licença
-Licença MIT - veja arquivo [LICENSE](LICENSE).
-<details>
-<summary>🇧🇷 README.md em Português (BR)</summary>
+## Maintenance
+Maintained by alexribeirofaria. Contributions welcome!
 
-</details>
-# AI-Assistants 🧠🤖
+## License
+MIT License - see [LICENSE](license.md).
