@@ -1,5 +1,4 @@
-<title><img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" width="50">README</title>
-# AI-Assistants 🧠🤖
+<link rel="icon" href="https://twemoji.maxcdn.com/v/latest/svg/1f1ec-1f1e7.svg"> AI-Assistants
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

@@ -1,9 +1,5 @@
 <div dir="auto">
-<div align="center">
-  <img src="https://flagcdn.com/w320/br.png" alt="Bandeira do Brasil" width="120" />
-  <h1>README</h1>
-</div>
-
+# <link rel="icon" href="https://twemoji.maxcdn.com/v/latest/svg/1f1e7-1f1f7.svg"> AI-Assistants
 
 # AI-Assistants 🧠🤖
 
