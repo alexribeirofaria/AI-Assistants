@@ -1,93 +1,93 @@
-# <img src="https://images.icon-icons.com/2088/PNG/512/br_icon_128192.png" width="16"> AI-Assistants em português
+## <img src="https://www.eccobandeiras.com.br/image/cache/catalog/antigas/reino-unido-1111x740.jpg" width="16"> AI-Assistants in English
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub](https://img.shields.io/github/license/alexribeirofaria/AI-Assistants)](https://github.com/alexribeirofaria/AI-Assistants)
 
-## Índice
+## Table of Contents
 
-- [Início Rápido](#início-rápido)
-- [Funcionalidades](#funcionalidades)
-- [Exemplo de Uso](#exemplo-de-uso)
-- [Arquitetura](#arquitetura)
-- [Por que usar?](#por-que-usar)
-- [Ajuda e Suporte](#ajuda-e-suporte)
-- [Contribuições](#contribuições)
-- [Manutenção](#manutenção)
-- [Licença](#licença)
+- [Quick Start](#quick-start)
+- [Features](#features)
+- [Usage Example](#usage-example)
+- [Architecture](#architecture)
+- [Why Use It?](#why-use-it)
+- [Help and Support](#help-and-support)
+- [Contributing](#contributing)
+- [Maintenance](#maintenance)
+- [License](#license)
 
-Aplicação CLI modular em Python para interação perfeita com múltiplos modelos de IA: OpenAI, Claude (Anthropic), Gemini (Google) e Groq. Construída com Design Driven by Domain (DDD), padrões de estratégia e fábricas extensíveis para troca fácil de modelos e recursos avançados como interpretadores e cache.
+A modular Python CLI application for seamless interaction with multiple AI models: OpenAI, Claude (Anthropic), Gemini (Google), and Groq. Built with Domain-Driven Design (DDD), strategy patterns, and extensible factories for easy model switching and advanced features like interpreters and caching.
 
-## Início Rápido
+## Quick Start
 
-1. Clone o repositório:
+1. Clone the repo:
    ```
    git clone https://github.com/alexribeirofaria/AI-Assistants.git
    cd AI-Assistants
    ```
 
-2. Instale dependências:
+2. Install dependencies:
    ```
    pip install -r requirements.txt
    ```
 
-3. Copie exemplo de env:
+3. Copy env example:
    ```
    cp src/.env.example .env
    ```
-   Edite `.env` com suas chaves de API (OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.).
+   Edit `.env` with your API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.).
 
-4. Execute:
+4. Run:
    ```
    python src/console_app.py
    ```
 
-## Funcionalidades
-- **Suporte Multi-Modelo**: Troque entre OpenAI, Claude, Gemini, Groq.
-- **Comandos de Interpretador**: `/list-models`, `/switch-model <nome>`, `/clear`, `/exit`.
-- **Cache**: Cache de valores expiráveis e listas de domínio.
-- **Helpers Threaded**: Operações não-bloqueantes.
-- **Arquitetura Extensível**: Fábricas, estratégias, repositórios.
+## Features
+- **Multi-Model Support**: Switch between OpenAI, Claude, Gemini, Groq.
+- **Interpreter Commands**: `/list-models`, `/switch-model <name>`, `/clear`, `/exit`.
+- **Caching**: Expireable value and domain list caching.
+- **Threaded Helpers**: Non-blocking operations.
+- **Extensible Architecture**: Factories, strategies, repositories.
 
-## Exemplo de Uso
+## Usage Example
 ```
 $ python src/console_app.py
-> Olá, IA!
-[Resposta da IA streamada aqui...]
+> Hello, AI!
+[AI Response streamed here...]
 > /switch-model claude
-Trocado para Claude.
+Switched to Claude.
 > /exit
 ```
 
-## Arquitetura
+## Architecture
 ```
 src/
-├── domain/     # Domínios de modelo & cache
-├── application/ # Estratégias, helpers, interpretadores
-├── infrastructure/ # Clientes & fábricas
-├── presentation/ # Manipulação de saída
-├── repository/ # Registro DI
+├── domain/     # Model domains & cache
+├── application/ # Strategies, helpers, interpreters
+├── infrastructure/ # Clients & factories
+├── presentation/ # Output handling
+├── repository/ # DI registry
 └── console_app.py
 ```
 
-## Por que usar?
-Este projeto é útil porque:
-- Permite testar e usar múltiplos modelos de IA em um único CLI sem troca de ferramentas.
-- Arquitetura DDD facilita extensões (novos modelos, features).
-- Cache e threaded helpers melhoram performance.
-- Fácil configuração e início rápido.
+## Why Use It?
+This project is useful because:
+- Allows testing and using multiple AI models in one CLI without tool switching.
+- DDD architecture facilitates extensions (new models, features).
+- Cache and threaded helpers improve performance.
+- Easy setup and quick start.
 
-## Ajuda e Suporte
-- Crie uma [issue](https://github.com/alexribeirofaria/AI-Assistants/issues) para bugs ou features.
-- Consulte o código ou [discussões](https://github.com/alexribeirofaria/AI-Assistants/discussions).
+## Help and Support
+- Create an [issue](https://github.com/alexribeirofaria/AI-Assistants/issues) for bugs or features.
+- Check code or [discussions](https://github.com/alexribeirofaria/AI-Assistants/discussions).
 
-Versão em inglês: [README.en.md](README.en.md)
+English version. Versão em português: [README.md](README.md)
 
-## Contribuições
-Veja [CONTRIBUTING.md](CONTRIBUTING.md) para detalhes. Código de Conduta: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details. Code of Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
-## Manutenção
-Mantido por alexribeirofaria. Contribuições bem-vindas!
+## Maintenance
+Maintained by alexribeirofaria. Contributions welcome!
 
-## Licença
-Licença MIT - veja [LICENSE](license.md).
+## License
+MIT License - see [LICENSE](license.md).
