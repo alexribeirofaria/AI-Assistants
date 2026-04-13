@@ -2,26 +2,17 @@
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub](https://img.shields.io/github/license/alexribeirofaria/AI-Assistants)](https://github.com/alexribeirofaria/AI-Assistants)
+[![GitHub](https://img.shields.io/github/license/alexribeirofaria/AI-Assistants)](https://github.com/alexribeirofaria/AI-Assistants/license.md)
 
-## Índice
+**Versão em inglês:** [README](.github/README.md)
 
-- [Início Rápido](#início-rápido)
-- [Funcionalidades](#funcionalidades)
-- [Exemplo de Uso](#exemplo-de-uso)
-- [Arquitetura](#arquitetura)
-- [Por que usar?](#por-que-usar)
-- [Ajuda e Suporte](#ajuda-e-suporte)
-- [Contribuições](#contribuições)
-- [Manutenção](#manutenção)
-- [Licença](#licença)
 
 Aplicação CLI modular em Python para interação perfeita com múltiplos modelos de IA: OpenAI, Claude (Anthropic), Gemini (Google) e Groq. Construída com Design Driven by Domain (DDD), padrões de estratégia e fábricas extensíveis para troca fácil de modelos e recursos avançados como interpretadores e cache.
 
-## Início Rápido
+[... resto do conteúdo mantido igual ...]
 
-1. Clone o repositório:
-   ```
+**Versão principal em inglês (prioridade GitHub)**: [.github/README.md](.github/README.md)
+**Versão completa EN**: [README.en.md](README.en.md)
    git clone https://github.com/alexribeirofaria/AI-Assistants.git
    cd AI-Assistants
    ```
@@ -37,9 +28,11 @@ Aplicação CLI modular em Python para interação perfeita com múltiplos model
    ```
    Edite `.env` com suas chaves de API (OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.).
 
-4. Execute:
+4. Run:
    ```
-   python src/console_app.py
+   python src/main.py --app console to run terminal app
+
+   python src/main.py --app web to run web server app
    ```
 
 ## Funcionalidades
@@ -80,14 +73,6 @@ Este projeto é útil porque:
 ## Ajuda e Suporte
 - Crie uma [issue](https://github.com/alexribeirofaria/AI-Assistants/issues) para bugs ou features.
 - Consulte o código ou [discussões](https://github.com/alexribeirofaria/AI-Assistants/discussions).
-
-Versão em inglês: [README.en.md](README.en.md)
-
-## Contribuições
-Veja [CONTRIBUTING.md](CONTRIBUTING.md) para detalhes. Código de Conduta: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
-
-## Manutenção
-Mantido por alexribeirofaria. Contribuições bem-vindas!
 
 ## Licença
 Licença MIT - veja [LICENSE](license.md).

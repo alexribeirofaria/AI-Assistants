@@ -2,19 +2,9 @@
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub](https://img.shields.io/github/license/alexribeirofaria/AI-Assistants)](https://github.com/alexribeirofaria/AI-Assistants)
+[![GitHub](https://img.shields.io/github/license/alexribeirofaria/AI-Assistants)](https://github.com/alexribeirofaria/AI-Assistants/license.md)
 
-## Table of Contents
-
-- [Quick Start](#quick-start)
-- [Features](#features)
-- [Usage Example](#usage-example)
-- [Architecture](#architecture)
-- [Why Use It?](#why-use-it)
-- [Help and Support](#help-and-support)
-- [Contributing](#contributing)
-- [Maintenance](#maintenance)
-- [License](#license)
+**Versão em português:** [README](../README.md)
 
 A modular Python CLI application for seamless interaction with multiple AI models: OpenAI, Claude (Anthropic), Gemini (Google), and Groq. Built with Domain-Driven Design (DDD), strategy patterns, and extensible factories for easy model switching and advanced features like interpreters and caching.
 
@@ -39,7 +29,9 @@ A modular Python CLI application for seamless interaction with multiple AI model
 
 4. Run:
    ```
-   python src/console_app.py
+   python src/main.py --app console to run terminal app
+
+   python src/main.py --app web to run web server app
    ```
 
 ## Features
@@ -80,14 +72,6 @@ This project is useful because:
 ## Help and Support
 - Create an [issue](https://github.com/alexribeirofaria/AI-Assistants/issues) for bugs or features.
 - Check code or [discussions](https://github.com/alexribeirofaria/AI-Assistants/discussions).
-
-English version. Versão em português: [README.md](README.md)
-
-## Contributing
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details. Code of Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
-
-## Maintenance
-Maintained by alexribeirofaria. Contributions welcome!
 
 ## License
 MIT License - see [LICENSE](license.md).
