@@ -6,7 +6,6 @@ import { PageNotFoundComponent } from '../../pages/page-not-found/page-not-found
 import { PrivacyComponent } from '../../pages/privacy/privacy.component';
 import { AuthGuard } from '../services';
 
-
 describe('AppRoutingModule (Lazy Load)', () => {
   let router: Router;
 

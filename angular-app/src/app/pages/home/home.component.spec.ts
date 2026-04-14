@@ -1,11 +1,10 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { Router } from "@angular/router";
-import { of, throwError } from "rxjs";
 import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
 import { Platform } from '@ionic/angular';
-
 import { HomeComponent } from "./home.component";
+import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { AlertComponent } from '../../shared/components/alert-component/alert.component';
 
 describe('HomeComponent Unit Tests', () => {
@@ -19,7 +18,7 @@ describe('HomeComponent Unit Tests', () => {
     mockAlert = jasmine.createSpyObj('AlertComponent', ['open']);
 
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, HttpClientTestingModule, FooterComponent],
       declarations: [HomeComponent],
       providers: [
         FormBuilder,

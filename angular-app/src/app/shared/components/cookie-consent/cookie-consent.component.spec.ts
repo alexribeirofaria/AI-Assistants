@@ -2,7 +2,6 @@
 import {  ComponentFixture, TestBed } from '@angular/core/testing';
 import { CookieConsentComponent } from './cookie-consent.component';
 
-
 describe('CookieConsentComponent', () => {
   let component: CookieConsentComponent;
   let fixture: ComponentFixture<CookieConsentComponent>;

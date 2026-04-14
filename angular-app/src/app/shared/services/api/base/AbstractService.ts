@@ -1,8 +1,10 @@
 import { environment } from "../../../../../environments/environment";
+
 export abstract class AbstractService {
   protected routeUrl: string;
   private baseUrl = `${environment.BASE_URL}`;
+  
   constructor(route: string) {
-    this.routeUrl = `${ this.baseUrl }/${route}`;
+    this.routeUrl = `${this.baseUrl}/${route}`;
   }
 }

@@ -1,11 +1,11 @@
 ﻿import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, throwError, tap, finalize } from 'rxjs';
 import { TokenStorageService } from '../services/token/token.storage.service';
 
 @Injectable()
-export class CustomInterceptor implements HttpInterceptor {
+export class CustomInterceptor implements HttpInterceptor {  
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
   public isLoading$ = this.isLoadingSubject.asObservable();
 
@@ -27,13 +27,28 @@ export class CustomInterceptor implements HttpInterceptor {
       });
     }
 
+    const modalRef = this.modalService.open({});
     return next.handle(authReq).pipe(
+      tap(() => {
+        // successful response, nothing specific needed
+      }),
       catchError((error: HttpErrorResponse) => {
+        // Close loader on error
+        modalRef.close();
         if (error.status === 401) {
-          this.refreshTokenSubject.next(null);
-          this.tokenStorageService.clear();
+          // No refresh token scenario handled by signOut
+          this.tokenStorageService.signOut?.();
+        }
+        if (error.status === 404) {
+          this.tokenStorageService.signOut?.();
         }
         return throwError(() => error);
+      }),
+      finalize(() => {
+        // Ensure loader is closed on completion
+        if (modalRef && modalRef.close) {
+          modalRef.close();
+        }
       })
     );
   }

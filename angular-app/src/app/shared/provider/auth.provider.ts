@@ -1,7 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-// import { IAuth } from '../models';
 import { TokenStorageService } from '../services';
 
 @Injectable({

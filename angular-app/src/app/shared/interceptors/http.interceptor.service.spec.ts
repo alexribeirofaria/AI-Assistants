@@ -3,7 +3,6 @@ import { of, throwError } from 'rxjs';
 import { TokenStorageService, AuthService, CustomInterceptor } from '../services';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
-
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('CustomInterceptor', () => {
@@ -39,8 +38,7 @@ describe('CustomInterceptor', () => {
     modalService = TestBed.inject(NgbModal) as jasmine.SpyObj<NgbModal>;
     handler = TestBed.inject(HttpHandler) as jasmine.SpyObj<HttpHandler>;
   });
-
-  // Setup modal close spy
+  
   beforeEach(() => {
     modalCloseSpy = jasmine.createSpy('close');
     const modalRefMock: Partial<NgbModalRef> = { close: modalCloseSpy };
