@@ -1,5 +1,4 @@
-from flasgger import Swagger
-
+from flasgger import Swagger # type: ignore[import-untyped]
 class SwaggerConfig:
 
     @staticmethod

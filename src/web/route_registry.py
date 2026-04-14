@@ -22,7 +22,21 @@ class RouteRegistry:
             "/assistant",
             "assistant",
             self._controller.assistant,
+            methods=["POST"]
+        )
+
+        self._app.add_url_rule(
+            "/models",
+            "list_models",
+            self._controller.list_models,
             methods=["GET"]
+        )
+
+        self._app.add_url_rule(
+            "/change-provider",
+            "change_provider",
+            self._controller.change_provider,
+            methods=["POST"]
         )
 
         self._app.add_url_rule(

@@ -1,0 +1,16 @@
+---
+swagger: '2.0'
+info:
+  title: Health Check
+  version: 1.0.0
+parameters: []
+responses:
+  200:
+    description: Healthy
+    schema:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+

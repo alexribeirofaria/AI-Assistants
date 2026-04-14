@@ -109,6 +109,39 @@ class AIAssistantApp(BaseAIAssistantApp):
         response = strategy.execute(prompt)
         return {"response": response}
 
+    def list_models(
+        self,
+        search_query: str | None = None,
+        prefix: str | None = None,
+        provider: str | None = None,
+    ) -> list[str]:
+        if provider:
+            parsed = self._strategy_factory.parse_domain(provider)
+            if parsed is None:
+                raise ValueError(f"Invalid provider '{provider}'")
+            strategy = self._strategy_factory.get_strategy(parsed)
+        else:
+            strategy = self._get_current_strategy()
+
+        header, names, _ = strategy.list_domains()
+
+        if prefix:
+            normalized_prefix = prefix.strip().lower()
+            names = [name for name in names if name.lower().startswith(normalized_prefix)]
+
+        if search_query:
+            normalized = search_query.strip().lower()
+            names = [name for name in names if normalized in name.lower()]
+
+        return names
+
+    def set_provider(self, provider: str) -> None:
+        parsed = self._strategy_factory.parse_domain(provider)
+        if parsed is None:
+            raise ValueError(f"Invalid provider '{provider}'")
+        self.default_model_agent = parsed
+        self.strategy = None
+
     def run_console_app(self):
         self.presenter.show_ui()
 
