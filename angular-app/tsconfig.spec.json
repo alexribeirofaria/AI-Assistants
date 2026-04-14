@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec",
+    "types": ["jasmine", "node", "@angular/localize"],
+"module": "commonjs",
+    "moduleResolution": "node"
+  },
+  "files": [
+    "src/test.ts",
+    "src/polyfills.ts"
+  ],
+  "include": [
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules/**",
+    "dist/**",
+    ".angular/**",
+    ".vscode/**",
+    "obj/**",
+    "coverage/**"
+  ]
+}
