@@ -1,0 +1,11 @@
+<div class="chat-list-container scroll-content" #scrollContainer>
+  @if (messages.length === 0) {
+    <div class="empty-state">
+      <i class="bi bi-chat-dots"></i>
+      <p>Envie uma mensagem para iniciar a conversa</p>
+    </div>
+  }
+  @for (msg of messages; track msg.id) {
+    <app-chat-message [message]="msg"></app-chat-message>
+  }
+</div>

@@ -1,6 +1,3 @@
-export * from '../interceptors/http.interceptor.service';
-export * from '../auth-guard/auth.guard';
-export * from './auth/auth.google.service';
-export * from './auth/auth.service';
-export * from './token/token.storage.service';
-
+export * from './base/base.service';
+export * from './chat/chat.service';
+export * from './theme/theme.service';

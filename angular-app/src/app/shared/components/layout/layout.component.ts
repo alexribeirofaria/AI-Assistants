@@ -1,18 +1,18 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { AuthService } from "../../services/auth/auth.service";
+import { FooterComponent } from "../footer/footer.component";
+import { HeaderComponent } from "../header/header.component";
 
 @Component({
   selector: 'app-layout',
+  imports: [HeaderComponent, FooterComponent],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
-  standalone: false
-}) 
+  standalone: true
+})
 
 export class LayoutComponent implements OnInit {
-  urlPerfilImage = '../../../../assets/perfil_static.png';
   constructor(
-    private authService: AuthService,
     private router: Router
   ) { }
 

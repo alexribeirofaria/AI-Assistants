@@ -1,55 +1,48 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { AbstractService } from '../abstracts/abstract.service';
-import { IMessage, IModel } from '../../models';
+import { Observable } from 'rxjs';
+import { BaseService } from '../base/base.service';
+import { ChatStateService } from './state/chat-state.service';
+import { IHomeModel } from '../../models';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService extends AbstractService {
-  private messagesSubject = new BehaviorSubject<IMessage[]>([]);
-  public messages$ = this.messagesSubject.asObservable();
+export class ChatService extends BaseService {
 
-  private loadingSubject = new BehaviorSubject<boolean>(false);
-  public loading$ = this.loadingSubject.asObservable();
-
-  constructor(http: HttpClient) {
+  constructor(
+    http: HttpClient,
+    private chatState: ChatStateService
+  ) {
     super(http);
   }
 
-  getModels(): Observable<IModel[]> {
-    return this.get<IModel[]>('/models');
+  getModels(provider?: string): Observable<{ models: IHomeModel[] }> {
+    const params = provider ? `?provider=${encodeURIComponent(provider)}` : '';
+    return this.get<{ models: IHomeModel[] }>(`/models${params}`);
   }
 
-  changeProvider(provider: string): Observable<void> {
-    return this.post<void>('/change-provider', { provider });
+  changeProvider(provider: string): Observable<{ status: string }> {
+    return this.post<{ status: string }>('/change-provider', { provider });
   }
 
-  sendMessage(content: string): void {
-    const userMsg: IMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content
-    };
-    this.messagesSubject.value.push(userMsg);
-    this.messagesSubject.next([...this.messagesSubject.value]);
-    this.loadingSubject.next(true);
+  sendMessage(content: string): Observable<void> {
+    this.chatState.addUserMessage(content);
+    this.chatState.startStreaming();
 
-    // Streaming with fetch or EventSource
-    this.sendMessageStream(content);
+    return new Observable<void>(observer => {
+      this.sendMessageStream(content)
+        .then(() => {
+          observer.next();
+          observer.complete();
+        })
+        .catch(err => {
+          observer.error(err);
+        });
+    });
   }
 
-  private async sendMessageStream(content: string) {
-    const assistantMsg: IMessage = {
-      id: (Date.now() + 1).toString(),
-      role: 'assistant',
-      content: '',
-      streaming: true
-    };
-    const currentMessages = [...this.messagesSubject.value, assistantMsg];
-    this.messagesSubject.next(currentMessages);
-
+  private async sendMessageStream(content: string): Promise<void> {
     try {
       const response = await fetch(this.baseUrl + '/assistant', {
         method: 'POST',
@@ -59,30 +52,45 @@ export class ChatService extends AbstractService {
         body: JSON.stringify({ message: content })
       });
 
-      const reader = response.body!.getReader();
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+
+      if (contentType.includes('application/json')) {
+        const data = await response.json();
+        const text = data.response || data.message || JSON.stringify(data);
+        this.chatState.appendChunk(text);
+        this.chatState.stopStreaming();
+        return;
+      }
+
+      if (!response.body) {
+        const text = await response.text();
+        this.chatState.appendChunk(text);
+        this.chatState.stopStreaming();
+        return;
+      }
+
+      const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let done = false;
 
       while (!done) {
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
-        const chunk = decoder.decode(value, {stream: true});
-        assistantMsg.content += chunk;
-        this.updateLastMessage(assistantMsg);
+        if (value) {
+          const chunk = decoder.decode(value, { stream: !done });
+          this.chatState.appendChunk(chunk);
+        }
       }
 
-      assistantMsg.streaming = false;
-      this.loadingSubject.next(false);
-      this.updateLastMessage(assistantMsg);
+      this.chatState.stopStreaming();
     } catch (err) {
-      console.error('Stream error', err);
-      this.loadingSubject.next(false);
+      this.chatState.setError('Erro ao comunicar com o servidor');
+      this.chatState.stopStreaming();
+      throw err;
     }
-  }
-
-  private updateLastMessage(msg: IMessage) {
-    const messages = [...this.messagesSubject.value];
-    messages[messages.length - 1] = msg;
-    this.messagesSubject.next(messages);
   }
 }

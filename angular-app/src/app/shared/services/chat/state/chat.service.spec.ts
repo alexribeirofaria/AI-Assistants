@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ChatService } from './chat.service';
-import { ChatStateService } from './state/chat-state.service.spec';
+import { ChatStateService } from './state/chat-state.service';
 import { IModel } from '../../models';
 
 describe('ChatService', () => {

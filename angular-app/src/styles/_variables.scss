@@ -1,18 +1,21 @@
-$primary-color: #0d6efd;          // Azul do botão/textos
+// ============================================
+// Design Tokens (CSS Custom Properties)
+// ============================================
+$primary-color: #0d6efd;
 $secondary-color: #f5f5f5;
-$header-color: lightcyan;          // Cor do título
-$footer-opacity: 0.5;              // Opacidade do footer
-$scroll-thumb-color: gray;         // Cor do thumb do scroll
-$scroll-thumb-border: 0.1rem solid gray; // Borda do thumb
-$scroll-thumb-radius: 0.4rem;      // Raio do thumb
-$text-color: black;                // Cor padrão do texto
-$h2-color: white;                  // Cor padrão dos h2
+$header-color: lightcyan;
+$footer-opacity: 0.5;
+$scroll-thumb-color: gray;
+$scroll-thumb-border: 0.1rem solid gray;
+$scroll-thumb-radius: 0.4rem;
+$text-color: black;
+$h2-color: white;
 
-$height-full: 100%;                // Altura completa
-$height-header: 10vh;              // Altura do header
-$height-body: 80vh;                // Altura da área principal
-$max-width-body: 98vw;             // Largura máxima da área principal
-$max-height-body: 78vh;            // Altura máxima da área principal
-$padding-barra-ferramenta: 1vh;    // Padding da barra de ferramentas
-$margin-barra-ferramenta: 1vh;     // Margin da barra de ferramentas
-$scrollbar-width: 0.2rem;          // Largura da scrollbar
+$height-full: 100%;
+$height-header: 10vh;
+$height-body: 80vh;
+$max-width-body: 98vw;
+$max-height-body: 78vh;
+$padding-barra-ferramenta: 1vh;
+$margin-barra-ferramenta: 1vh;
+$scrollbar-width: 0.2rem;
