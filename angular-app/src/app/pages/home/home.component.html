@@ -1,13 +1,2 @@
 <div class="container-fluid h-100 d-flex flex-column p-0">
-  <app-chat-header></app-chat-header>
-  
-  <div class="flex-grow-1 d-flex flex-column chat-container">
-    <app-chat-list [messages]="messages() || []"></app-chat-list>
-    <app-loader [show]="isLoading()"></app-loader>
-  </div>
-  
-  <app-chat-input 
-    [disabled]="isLoading"
-    (sendMessage)="onMessageSend($event)">
-  </app-chat-input>
 </div>

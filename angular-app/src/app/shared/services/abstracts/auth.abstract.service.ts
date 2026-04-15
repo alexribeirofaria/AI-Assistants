@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { IAuth } from '../../models/IAuth';
+import { IAuth } from '../../models';
 import { TokenStorageService } from '../token/token.storage.service';
 
 @Injectable({ providedIn: 'root' })

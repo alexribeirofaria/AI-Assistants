@@ -10,5 +10,4 @@ import { AuthService } from './shared/services/auth/auth.service';
   imports: [RouterModule, CookieConsentComponent],
   providers: [AuthService]
 })
-export class AppComponent {
-}
+export class AppComponent {}
