@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AbstractService } from '../services/abstracts/abstract.service';
+import { AbstractService } from '../abstracts/abstract.service';
 
 @Injectable({
   providedIn: 'root'

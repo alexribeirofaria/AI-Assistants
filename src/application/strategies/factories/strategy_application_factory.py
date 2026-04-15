@@ -17,7 +17,7 @@ class StrategyApplicationFactory:
     def __init__(
         self,
         creators: Mapping[type[BaseDomain], Callable[[], BaseApplicationStrategy]] | None = None,
-        default_domain: type[BaseDomain] = LangChain,
+        default_domain: type[BaseDomain] = Groq,
     ) -> None:
         self._creators: dict[type[BaseDomain], Callable[[], BaseApplicationStrategy]] = (
             dict(creators)

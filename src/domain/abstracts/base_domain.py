@@ -53,7 +53,8 @@ class BaseDomain(ABC, CachedDomainListMixin):
 
     @classmethod
     def get_domain_name(cls) -> str:
-        return cls._normalize_class_name()
+        name = cls._normalize_class_name()
+        return name[0].upper() + name[1:] if name else ""
     
     def send(self, model_call_fn) -> str:
         print(f"\nEnviando mensagem para modelo usando provider {self.model_name} com modelo '{self.model}'...")

@@ -1,2 +1,2 @@
 export { IAuth } from "./IAuth";
-export { IHome } from './IHome'
+export { IHome } from './home.model'
