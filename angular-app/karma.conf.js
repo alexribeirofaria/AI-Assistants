@@ -27,7 +27,7 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage'),
+      dir: require('path').join(__dirname, './coverage/ai-assistants'),
       subdir: '.',
       reporters: [{
           type: 'lcov'
@@ -47,8 +47,8 @@ module.exports = function (config) {
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: true,
-    browsers: [selectedBrowser],
+    autoWatch: false,
+    browsers: ['ChromeHeadless', selectedBrowser],
     debugger: {
       ChromeDebugging: {
         base: 'Chrome',
@@ -57,7 +57,7 @@ module.exports = function (config) {
         port: 9876
       }
     },
-    singleRun: false,
+    singleRun: true,
     restartOnFileChange: true
   });
 };

@@ -6,7 +6,6 @@
     "app-android"
   ],
   "scripts": {
-    "ng": "ng",
     "start": "ng serve",
     "lint": "npx eslint src/**/*.ts --fix",
     "lint:check": "npx eslint src/**/*.ts",
@@ -15,7 +14,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "set BROWSER=ChromeHeadless && ng test --browsers=ChromeHeadless --no-watch",
     "test:debug": "set BROWSER=Chrome && ng test --browsers=Chrome",
-    "test:coverage": "ng test --code-coverage --browsers=ChromeHeadless --no-watch",
+    "test:coverage": "set BROWSER=ChromeHeadless && ng test --code-coverage --browsers=ChromeHeadless --no-watch",
     "test:watch": "ng test --code-coverage --browsers=ChromeHeadless --watch"
   },
   "private": true,

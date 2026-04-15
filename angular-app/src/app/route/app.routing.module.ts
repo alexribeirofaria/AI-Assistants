@@ -5,7 +5,7 @@ import { PrivacyComponent } from '../pages/privacy/privacy.page.component';
 import { HomePageComponent } from '../pages/home/home.page.component';
 
 const routes: Routes = [
-  { path: '', component: HomePageComponent, pathMatch: 'full' },
+  { path: '/', component: HomePageComponent, pathMatch: 'full' },
   { path: 'privacy', component: PrivacyComponent },
   { path: 'register', redirectTo: '/privacy', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent }

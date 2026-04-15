@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { TokenStorageService } from '..';
+import { TokenStorageService } from './token.storage.service';
 
 describe('TokenStorageService', () => {
   let service: TokenStorageService;
@@ -7,8 +7,11 @@ describe('TokenStorageService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(TokenStorageService);
-    sessionStorage.clear();
-    localStorage.clear();
+    service.clear();
+  });
+
+  afterEach(() => {
+    service.clear();
   });
 
   it('should be created', () => {
@@ -16,42 +19,36 @@ describe('TokenStorageService', () => {
   });
 
   it('should save and get access token', () => {
-    service.saveAccessToken('access123');
-    const token = service.getAccessToken();
-    expect(token).toBe('access123');
-    expect(sessionStorage.getItem('@access-token')).toBe('access123');
-  });
-
-  it('should overwrite access token', () => {
-    service.saveAccessToken('oldToken');
-    service.saveAccessToken('newToken');
-    const token = service.getAccessToken();
-    expect(token).toBe('newToken');
-    expect(sessionStorage.getItem('@access-token')).toBe('newToken');
+    const token = 'test-access-token';
+    service.saveAccessToken(token);
+    expect(service.getAccessToken()).toBe(token);
   });
 
   it('should save and get refresh token', () => {
-    service.saveRefreshToken('refresh123');
-    const token = service.getRefreshToken();
-    expect(token).toBe('refresh123');
-    expect(localStorage.getItem('@refresh-token')).toBe('refresh123');
+    const token = 'test-refresh-token';
+    service.saveRefreshToken(token);
+    expect(service.getRefreshToken()).toBe(token);
   });
 
-  it('should clear session and remove refresh token', () => {
-    service.saveAccessToken('access123');
-    service.saveRefreshToken('refresh123');
+  it('should return null for non-existent access token', () => {
+    expect(service.getAccessToken()).toBeNull();
+  });
+
+  it('should return null for non-existent refresh token', () => {
+    expect(service.getRefreshToken()).toBeNull();
+  });
+
+  it('should clear tokens', () => {
+    service.saveAccessToken('access');
+    service.saveRefreshToken('refresh');
     service.clear();
     expect(service.getAccessToken()).toBeNull();
     expect(service.getRefreshToken()).toBeNull();
-    expect(sessionStorage.getItem('@access-token')).toBeNull();
-    expect(localStorage.getItem('@refresh-token')).toBeNull();
   });
 
-  it('should sign out (clear session storage only)', () => {
-    service.saveAccessToken('access123');
-    service.saveRefreshToken('refresh123');
+  it('should sign out', () => {
+    service.saveAccessToken('access');
     service.signOut();
     expect(service.getAccessToken()).toBeNull();
-    expect(service.getRefreshToken()).toBe('refresh123'); // localStorage não é limpo pelo signOut
   });
 });

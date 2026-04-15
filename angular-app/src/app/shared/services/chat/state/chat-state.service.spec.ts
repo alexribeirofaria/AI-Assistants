@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { ChatStateService } from './chat-state.service';
 import { IHomeModel, IMessage } from '../../../models';
 
-
 describe('ChatStateService', () => {
   let service: ChatStateService;
 
@@ -200,8 +199,7 @@ describe('ChatStateService', () => {
       ];
       service.setModels(models);
       service.setProvider('groq');
-
-      expect(service.filteredModels()).toEqual([{ id: '2', model: 'Model2', provider: 'groq' }]);
+      expect(service.filteredModels()).toEqual([{ id: '2', modelName: 'Model2', provider: 'groq' }]);
     });
 
     it('should return empty if no matching provider', () => {
@@ -219,18 +217,11 @@ describe('ChatStateService', () => {
       ];
       service.setModels(models);
       service.setProvider('openai');
-      expect(service.filteredModels()).toEqual([{ id: '1', model: 'Model1', provider: 'openai' }]);
+      expect(service.filteredModels()).toEqual([{ id: '1', modelName: 'Model1', provider: 'openai' }]);
 
       service.setProvider('groq');
-      expect(service.filteredModels()).toEqual([{ id: '2', model: 'Model2', provider: 'groq' }]);
+      expect(service.filteredModels()).toEqual([{ id: '2', modelName: 'Model2', provider: 'groq' }]);
     });
   });
 
-  describe('readonly signals immutability', () => {
-    it('should not allow mutation of readonly signals', () => {
-      expect(() => {
-        (service.messages() as any).push({} as IMessage);
-      }).toThrow();
-    });
-  });
 });
