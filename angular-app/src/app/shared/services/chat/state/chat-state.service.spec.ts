@@ -149,9 +149,9 @@ describe('ChatStateService', () => {
   describe('setModels', () => {
     it('should set models and derive unique providers', () => {
       const models: IHomeModel[] = [
-        { id: '1', model: 'Model1', provider: 'openai' },
-        { id: '2', model: 'Model2', provider: 'openai' },
-        { id: '3', model: 'Model3', provider: 'groq' }
+        { id: '1', modelName: 'Model1', provider: 'openai' },
+        { id: '2', modelName: 'Model2', provider: 'openai' },
+        { id: '3', modelName: 'Model3', provider: 'groq' }
       ];
       service.setModels(models);
 
@@ -187,7 +187,7 @@ describe('ChatStateService', () => {
 
   describe('filteredModels (computed)', () => {
     it('should return all models if no provider selected', () => {
-      const models: IHomeModel[] = [{ id: '1', model: 'Model1', provider: 'openai' }];
+      const models: IHomeModel[] = [{ id: '1', modelName: 'Model1', provider: 'openai' }];
       service.setModels(models);
 
       expect(service.filteredModels()).toEqual(models);
@@ -195,8 +195,8 @@ describe('ChatStateService', () => {
 
     it('should filter models by selected provider', () => {
       const models: IHomeModel[] = [
-        { id: '1', model: 'Model1', provider: 'openai' },
-        { id: '2', model: 'Model2', provider: 'groq' }
+        { id: '1', modelName: 'Model1', provider: 'openai' },
+        { id: '2', modelName: 'Model2', provider: 'groq' }
       ];
       service.setModels(models);
       service.setProvider('groq');
@@ -205,7 +205,7 @@ describe('ChatStateService', () => {
     });
 
     it('should return empty if no matching provider', () => {
-      const models: IHomeModel[] = [{ id: '1', model: 'Model1', provider: 'openai' }];
+      const models: IHomeModel[] = [{ id: '1', modelName: 'Model1', provider: 'openai' }];
       service.setModels(models);
       service.setProvider('unknown');
 
@@ -214,8 +214,8 @@ describe('ChatStateService', () => {
 
     it('should react to provider change', () => {
       const models: IHomeModel[] = [
-        { id: '1', model: 'Model1', provider: 'openai' },
-        { id: '2', model: 'Model2', provider: 'groq' }
+        { id: '1', modelName: 'Model1', provider: 'openai' },
+        { id: '2', modelName: 'Model2', provider: 'groq' }
       ];
       service.setModels(models);
       service.setProvider('openai');

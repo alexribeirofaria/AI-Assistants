@@ -1,5 +1,5 @@
 export interface IHomeModel {
   id: string;
-  model: string;
+  modelName: string;
   provider: string;
 }

@@ -4,8 +4,8 @@ import { IMessage } from '../../../models';
 @Component({
   selector: 'app-chat-message',
   standalone: false,
-  templateUrl: './chat-message.html',
-  styleUrl: './chat-message.scss',
+  templateUrl: './chat-message.component.html',
+  styleUrl: './chat-message.component.scss',
 })
 export class ChatMessageComponent {
   @Input() message!: IMessage;

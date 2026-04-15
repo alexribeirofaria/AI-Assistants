@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, OnDestroy, computed } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ChatService } from '../../shared/services/chat/chat.service';
+import { ChatStateService } from '../../shared/services/chat/state/chat-state.service';
 
 
 @Component({

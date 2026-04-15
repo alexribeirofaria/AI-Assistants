@@ -4,8 +4,8 @@ import { IMessage } from '../../../models';
 @Component({
   selector: 'app-chat-list',
   standalone: false,
-  templateUrl: './chat-list.html',
-  styleUrl: './chat-list.scss',
+  templateUrl: './chat-list.component.html',
+  styleUrl: './chat-list.component.scss',
 })
 export class ChatListComponent implements AfterViewChecked {
   @Input() messages: IMessage[] = [];

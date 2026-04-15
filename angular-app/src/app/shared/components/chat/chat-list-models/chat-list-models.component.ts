@@ -1,14 +1,14 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { IModel } from '../../../models';
+import { IHomeModel } from '../../../models';
 
 @Component({
   selector: 'app-chat-list-models',
   standalone: false,
-  templateUrl: './chat-list-models.html',
-  styleUrl: './chat-list-models.scss',
+  templateUrl: './chat-list-models.component.html',
+  styleUrl: './chat-list-models.component.scss',
 })
 export class ChatListModelsComponent {
-  @Input() models: IModel[] = [];
+  @Input() models: IHomeModel[] = [];
   @Input() selectedModel = '';
   @Output() modelChange = new EventEmitter<string>();
 

@@ -3,8 +3,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 @Component({
   selector: 'app-chat-provider',
   standalone: false,
-  templateUrl: './chat-provider.html',
-  styleUrl: './chat-provider.scss',
+  templateUrl: './chat-provider.component.html',
+  styleUrl: './chat-provider.component.scss',
 })
 export class ChatProviderComponent {
   @Input() providers: string[] = [];
