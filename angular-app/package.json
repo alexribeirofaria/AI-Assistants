@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "start": "ng serve",
+    "start:silent": "ng serve --proxy-config proxy.conf.json --open=false",
     "lint": "npx eslint src/**/*.ts --fix",
     "lint:check": "npx eslint src/**/*.ts",
     "build": "ng build",

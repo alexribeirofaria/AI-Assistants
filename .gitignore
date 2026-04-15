@@ -190,3 +190,7 @@ secrets.json
 .openclaude/
 .TODO/
 *TODO*
+..use_cases/
+..user_stories/
+*coverage*
+.test/
