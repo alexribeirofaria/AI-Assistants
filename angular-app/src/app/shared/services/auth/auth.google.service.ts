@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { TokenStorageService } from '../token/token.storage.service';
-import { AuthServiceBase } from './auth.abstract.service';
+import { AuthServiceBase } from '../abstracts/auth.abstract.service';
 
 declare const google: any;
 

@@ -110,89 +110,8 @@
                   "with": "src/environments/environment.dev.ts"
                 }
               ]
-            },
-            "local-development": {
-              "buildOptimizer": true,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "10mb",
-                  "maximumError": "10mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "10kb",
-                  "maximumError": "10kb"
-                }
-              ],
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.local.ts"
-                }
-              ]
-            },
-            "development-android": {
-              "outputPath": "www",
-              "optimization": true,
-              "sourceMap": false,
-              "aot": true,
-              "extractLicenses": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.android.local.ts"
-                }
-              ]
-            },
-            "development-ios": {
-              "outputPath": "www",
-              "optimization": true,
-              "sourceMap": false,
-              "aot": true,
-              "extractLicenses": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.dev.ts"
-                }
-              ]
-            },
-            "production-android": {
-              "outputPath": "www",
-              "optimization": true,
-              "sourceMap": false,
-              "aot": true,
-              "extractLicenses": true,
-              "namedChunks": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "4mb",
-                  "maximumError": "4mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "production-ios": {
-              "outputPath": "www",
-              "optimization": true,
-              "sourceMap": false,
-              "aot": true,
-              "extractLicenses": true
             }
-          },
-          "defaultConfiguration": "production"
+          }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
@@ -212,17 +131,8 @@
             "production": {
               "buildTarget": "angularapp:build:production"
             },
-            "staging": {
-              "proxyConfig": "src/proxy.conf.js",
-              "buildTarget": "angularapp:build:staging"
-            },
             "development": {
-              "proxyConfig": "src/proxy.conf.js",
               "buildTarget": "angularapp:build:development"
-            },
-            "local-development": {
-              "proxyConfig": "src/proxy.conf.js",
-              "buildTarget": "angularapp:build:local-development"
             }
           },
           "defaultConfiguration": "production"
@@ -261,7 +171,7 @@
   "cli": {
     "analytics": false,
     "schematicCollections": [
-      "angular-eslint"
+"@angular-eslint/schematics"
     ]
   }
 }

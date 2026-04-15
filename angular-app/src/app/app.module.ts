@@ -1,7 +1,7 @@
 import { CommonModule, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom, NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter, MomentDateModule } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -14,9 +14,10 @@ import { NgbActiveModal, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
 import { AppRoutingModule } from './shared/route/app.routing.module';
 import { AuthService, CustomInterceptor } from './shared/services';
-import { AuthServiceBase } from './shared/services/auth/auth.abstract.service';
+import { AuthServiceBase } from './shared/services/abstracts/auth.abstract.service';
 import { HomeModule } from './pages/home/home.module';
 import { AlertModule } from './shared/components/alert-component/alert.component.module';
+import { ChatModule } from './shared/components/chat/chat.module';
 
 export function initializeAuth(authService: AuthServiceBase) {
   return () => authService.autoLogin();
@@ -31,6 +32,7 @@ export const appConfig: ApplicationConfig = {
       AppRoutingModule || RouterModule.forRoot([]),
       CommonModule,
       ReactiveFormsModule,
+      FormsModule,
       MatFormFieldModule,
       MatInputModule,
       MatSelectModule,
@@ -39,8 +41,9 @@ export const appConfig: ApplicationConfig = {
       MomentDateModule,
       NgbDropdownModule,
       NgxMaskDirective,
-      NgxMaskPipe
-    ),
+      NgxMaskPipe,
+      ChatModule
+    ),    
     provideRouter([]),
     provideHttpClient(withInterceptorsFromDi()),
     provideNgxMask(),

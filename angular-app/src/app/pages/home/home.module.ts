@@ -1,18 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { HomeComponent } from './home.component';
+import { ChatModule } from '../../shared/components/chat/chat.module';
+import { ChatState } from '../../shared/models/chat-state.model';
+import { ChatService } from '../../shared/services/chat/chat.service';
 
 @NgModule({
   declarations: [HomeComponent],
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     RouterModule,
-    FooterComponent
-  ]
+    ChatModule
+  ],
+  providers: [ChatService, ChatState]
 })
 export class HomeModule { }
+
 

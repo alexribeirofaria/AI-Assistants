@@ -1,32 +1,11 @@
-@use '../../../styles/variables' as v;
-
-.full-height {
-  height: v.$height-full; 
+.chat-container {
+  max-width: 800px;
+  margin: 0 auto;
+  flex: 1;
 }
 
-.tituloHeader {
-  color: v.$header-color; 
-}
-
-.textBtnHeader {
-  color: v.$primary-color;
-}
-
-.error-bi-input {
-  display: inline;
-}
-
-.not-error-input {
-  display: none;
-}
-
-.btn-google {
+:host {
+  min-height: 100vh;
   display: flex;
-  align-items: center;
-  gap: 8px;
-
-  .google-icon {
-    width: 16px;
-    height: 16px;
-  }
+  flex-direction: column;
 }

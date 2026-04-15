@@ -1,9 +1,9 @@
-﻿import { Component, inject, OnInit } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+﻿import { Component, inject, OnInit, signal, effect, computed, OnDestroy } from "@angular/core";
 import { Router } from "@angular/router";
 import { Platform } from '@ionic/angular';
-import { AlertComponent } from '../../shared/components/alert-component/alert.component';
-import { AuthService, AuthGoogleService } from "../../shared/services";
+import { ChatService } from '../../shared/services/chat/chat.service';
+import { ChatState } from '../../shared/models/chat-state.model';
+import { Subscription } from 'rxjs';
 import { isNativeMobile } from "../../shared/utils/platform.utils";
 
 @Component({
@@ -12,18 +12,17 @@ import { isNativeMobile } from "../../shared/utils/platform.utils";
   styleUrls: ['./home.component.scss'],
   standalone: false
 })
-
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   private platform = inject(Platform);
-  private fb = inject(FormBuilder);
-  public router = inject(Router);
-  public authService = inject(AuthService);
-  public authGoogleService = inject(AuthGoogleService);
-  public alertComponent = inject(AlertComponent);
+  private router = inject(Router);
+  private chatService = inject(ChatService);
+  private chatState = inject(ChatState);
 
-  homeForm!: FormGroup;
-  showPassword = false;
-  eyeIconClass = 'bi-eye';
+  messages = this.chatState.messages;
+  isLoading = this.chatState.isLoading;
+  error = this.chatState.error;
+
+  private sendSub?: Subscription;
 
   ngOnInit(): void {
     this.platform.ready().then(() => {
@@ -32,10 +31,22 @@ export class HomeComponent implements OnInit {
         elements.forEach(el => el.remove());
       }
     });
+  }
 
-    this.homeForm = this.fb.group({
-      email: ["user@example.com", [Validators.required, Validators.email]],
-      senha: ["12345T!", [Validators.required]]
+  ngOnDestroy(): void {
+    this.sendSub?.unsubscribe();
+  }
+
+  onMessageSend(message: string) {
+    if (this.isLoading()) return;
+    
+    this.sendSub = this.chatService.sendMessage(message).subscribe({
+      next: () => console.log('Streaming completed'),
+      error: (err) => {
+        console.error('Chat error:', err);
+        this.chatState.error.set('Erro na resposta');
+        this.chatState.stopStreaming();
+      }
     });
   }
 }

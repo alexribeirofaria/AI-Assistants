@@ -1,7 +1,0 @@
-{
-  "name": "despesas-frontend-mobile",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular"
-}
