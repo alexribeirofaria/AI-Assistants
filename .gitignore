@@ -195,4 +195,4 @@ secrets.json
 *coverage*
 .test/
 angular-app/test-results/.last-run.json
-.test-results/
+test-results/
