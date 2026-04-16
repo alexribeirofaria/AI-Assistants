@@ -1,6 +1,6 @@
 {
-  "python.analysis.extraPaths": ["./src"],
-  "python.autoComplete.extraPaths": ["./src"],
+  "python.analysis.extraPaths": ["./python-app"],
+  "python.autoComplete.extraPaths": ["./python-app"],
   "python.analysis.typeCheckingMode": "off",
   "python.analysis.autoImportCompletions": true,
   "python.analysis.useLibraryCodeForTypes": true,
