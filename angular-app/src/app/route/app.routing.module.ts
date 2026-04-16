@@ -4,8 +4,8 @@ import { PageNotFoundComponent } from '../pages/not-found/not-found.page.compone
 import { PrivacyComponent } from '../pages/privacy/privacy.page.component';
 import { HomePageComponent } from '../pages/home/home.page.component';
 
-const routes: Routes = [
-  { path: '/', component: HomePageComponent, pathMatch: 'full' },
+export const routes: Routes = [
+  { path: '', component: HomePageComponent, pathMatch: 'full' },
   { path: 'privacy', component: PrivacyComponent },
   { path: 'register', redirectTo: '/privacy', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent }

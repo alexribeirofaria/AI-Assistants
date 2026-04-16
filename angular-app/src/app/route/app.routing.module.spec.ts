@@ -11,6 +11,9 @@ describe('AppRoutingModule (Lazy Load)', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppRoutingModule],
+      providers: [
+        { provide: LocationStrategy, useClass: PathLocationStrategy }
+      ]
     }).compileComponents();
 
     router = TestBed.inject(Router);
