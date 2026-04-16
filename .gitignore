@@ -194,3 +194,5 @@ secrets.json
 ..user_stories/
 *coverage*
 .test/
+angular-app/test-results/.last-run.json
+.test-results/
