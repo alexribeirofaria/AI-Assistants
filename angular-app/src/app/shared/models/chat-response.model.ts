@@ -1,4 +1,4 @@
-﻿export interface IProviderListResponse {
+export interface IProviderListResponse {
   providers: string[];
 }
 
@@ -10,6 +10,7 @@ export interface IModelResponse {
 
 export interface IModelsListResponse {
   models: IModelResponse[];
+  defaultModel?: string;
 }
 
 export interface IAssistantResponseData {
