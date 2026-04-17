@@ -1,4 +1,4 @@
-﻿from flask import jsonify, request
+from flask import jsonify, request
 from flasgger import swag_from  # type: ignore[import-untyped]
 from application.ai_assistant_app import AIAssistantApp
 from web.controllers.static_controller import StaticController
@@ -37,6 +37,7 @@ class AssistantController(StaticController):
 
             models = self._assistant_app.list_models(search_query=query, prefix=prefix)
             current_provider = self._assistant_app.default_model_agent.get_domain_name()
+            default_model = self._assistant_app.get_default_model(provider)
 
             model_list = [
                 {
@@ -47,7 +48,10 @@ class AssistantController(StaticController):
                 for model_name in (models or [])
             ]
 
-            return jsonify({"models": model_list})
+            return jsonify({
+                "models": model_list,
+                "defaultModel": default_model
+            })
         except ValueError as exc:
             return jsonify({"error": str(exc)}), 400
         except Exception as exc:
