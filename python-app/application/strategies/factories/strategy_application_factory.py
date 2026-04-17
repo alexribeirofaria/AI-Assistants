@@ -1,5 +1,7 @@
 from collections.abc import Callable, Mapping
-from application.strategies.abstracts.base_application_strategy import BaseApplicationStrategy
+from application.strategies.abstracts.base_application_strategy import (
+    BaseApplicationStrategy,
+)
 from application.strategies.claude_strategy import ClaudeStrategy
 from application.strategies.gemini_strategy import GeminiStrategy
 from application.strategies.groq_strategy import GroqStrategy
@@ -16,17 +18,21 @@ from domain.openai_domain import OpenAI
 class StrategyApplicationFactory:
     def __init__(
         self,
-        creators: Mapping[type[BaseDomain], Callable[[], BaseApplicationStrategy]] | None = None,
+        creators: (
+            Mapping[type[BaseDomain], Callable[[], BaseApplicationStrategy]] | None
+        ) = None,
         default_domain: type[BaseDomain] = Groq,
     ) -> None:
-        self._creators: dict[type[BaseDomain], Callable[[], BaseApplicationStrategy]] = (
+        self._creators: dict[
+            type[BaseDomain], Callable[[], BaseApplicationStrategy]
+        ] = (
             dict(creators)
             if creators
             else {
-                Claude: ClaudeStrategy,
-                OpenAI: OpenAIStrategy,
-                Gemini: GeminiStrategy,
                 Groq: GroqStrategy,
+                Gemini: GeminiStrategy,
+                OpenAI: OpenAIStrategy,
+                Claude: ClaudeStrategy,
                 LangChain: LangChainStrategy,
             }
         )
@@ -63,7 +69,9 @@ class StrategyApplicationFactory:
 
         return None
 
-    def _parse_or_default(self, value: str | type[BaseDomain] | None) -> type[BaseDomain]:
+    def _parse_or_default(
+        self, value: str | type[BaseDomain] | None
+    ) -> type[BaseDomain]:
         return self.parse_domain(value) or self._default_domain
 
     def register(
@@ -84,7 +92,9 @@ class StrategyApplicationFactory:
     def available(self) -> tuple[type[BaseDomain], ...]:
         return tuple(self._creators.keys())
 
-    def get_strategy(self, value: str | type[BaseDomain] | None) -> BaseApplicationStrategy:
+    def get_strategy(
+        self, value: str | type[BaseDomain] | None
+    ) -> BaseApplicationStrategy:
         return self.get_creator(value)()
 
     def get_creator(
