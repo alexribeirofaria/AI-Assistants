@@ -1,5 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from "@angular/core";
-import { Subscription } from "rxjs";
+import { Component, inject, OnInit } from "@angular/core";
 import { ChatService } from "../../../services/chat/chat.service";
 import { ChatStateService } from "../../../services/chat/state/chat.state.service";
 
@@ -10,9 +9,10 @@ import { ChatStateService } from "../../../services/chat/state/chat.state.servic
   standalone: false,
 })
   
-export class ChatContainerComponent implements OnInit, OnDestroy {
+export class ChatContainerComponent implements OnInit {
   private chatService = inject(ChatService);
   private chatState = inject(ChatStateService);
+  
   providers = this.chatState.providers;
   selectedProvider = this.chatState.selectedProvider;
   models = this.chatState.filteredModels;
@@ -20,54 +20,58 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   messages = this.chatState.messages;
   isLoading = this.chatState.isLoading;
   error = this.chatState.error;
-  private subscriptions: Subscription[] = [];
   
   ngOnInit(): void {
-    this.loadModels();
+    this.loadProviders();
+  }
+
+  private async loadProviders(): Promise<void> {
+    try {
+      const providers = await this.chatService.getProviders();
+      this.chatState.setProviders(providers);
+      
+      if (providers.length > 0) {
+        this.chatState.setSelectedProvider(providers[0]);
+        await this.loadModels(providers[0]);
+      } else {
+        await this.loadModels();
+      }
+    } catch {
+      this.chatState.setError("Erro ao carregar providers");
+      await this.loadModels();
+    }
+  }
+
+  private async loadModels(provider?: string): Promise<void> {
+    try {
+      const models = await this.chatService.getModels(provider);
+      this.chatState.setModels(models);
+    } catch {
+      this.chatState.setError("Erro ao carregar modelos");
+    }
   }
   
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
-  }
-  
-  private loadModels(): void {
-    const sub = this.chatService.getModels().subscribe({
-      next: (response) => {
-        this.chatState.setModels(response.models || []);
-      },
-      error: () => {
-        this.chatState.setError("Erro ao carregar modelos");
-      },
-    });
-    this.subscriptions.push(sub);
-  }
-  
-  onProviderChange(provider: string): void {
-    this.chatState.setProvider(provider);
-    this.chatState.setModel("");
-    const sub = this.chatService.changeProvider(provider).subscribe({
-      next: () => {
-        this.loadModels();
-      },
-      error: () => {
-        this.chatState.setError("Erro ao trocar provider");
-      },
-    });
-    this.subscriptions.push(sub);
+  async onProviderChange(provider: string): Promise<void> {
+    this.chatState.setSelectedProvider(provider);
+    try {
+      await this.chatService.changeProvider(provider);
+      await this.loadModels(provider);
+    } catch {
+      this.chatState.setError("Erro ao trocar provider");
+    }
   }
   
   onModelChange(modelId: string): void {
     this.chatState.setModel(modelId);
   }
-  
-  onMessageSend(message: string): void {
+
+  async onMessageSend(message: string): Promise<void> {
     if (this.isLoading()) return;
     this.chatState.clearError();
-    const sub = this.chatService.sendMessage(message).subscribe({
-      error: () => {
-        this.chatState.setError("Erro ao enviar mensagem");
-      },
-    });
-    this.subscriptions.push(sub);
+    try {
+      await this.chatService.sendMessage(message);
+    } catch {
+      this.chatState.setError("Erro ao enviar mensagem");
+    }
   }
 }
