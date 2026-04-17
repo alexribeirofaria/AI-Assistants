@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ChatMessageComponent } from './chat-message.component';
 import { IMessage } from '../../../models';
 
@@ -9,8 +8,7 @@ describe('ChatMessageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ChatMessageComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      imports: [ChatMessageComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChatMessageComponent);
