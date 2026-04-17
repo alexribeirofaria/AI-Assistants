@@ -1,4 +1,4 @@
-﻿import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { IMessage, IHomeModel } from '../../../models';
 
 @Injectable({
@@ -108,8 +108,11 @@ export class ChatStateService {
 
   setModels(models: IHomeModel[]): void {
     this._models.set(models);
-    const providers = [...new Set(models.map(m => m.provider))];
-    this._providers.set(providers);
+    const currentProviders = this._providers();
+    if (currentProviders.length === 0) {
+      const providers = [...new Set(models.map(m => m.provider))];
+      this._providers.set(providers);
+    }
     this.autoSelectModelForProvider(this._selectedProvider());
   }
 
@@ -121,3 +124,4 @@ export class ChatStateService {
     this._error.set('');
   }
 }
+
