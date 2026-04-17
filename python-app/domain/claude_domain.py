@@ -18,10 +18,11 @@ class Claude(BaseDomain):
 
     def list_models(self):
         try:
-            return self._get_domain_view("=== Claude Models ===")
+            return self._get_domain_view()
         except Exception as e:
-            return "=== Claude Models ===", [f"[ERROR] {e}"], ""
+            return [f"[ERROR] {e}"]
 
     def _fetch_domain_names(self) -> list[str]:
         models = self.server.models.list()
         return [m.id for m in models.data]
+

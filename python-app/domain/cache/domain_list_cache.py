@@ -1,11 +1,16 @@
 from domain.cache.expiring_value_cache import ExpiringValueCache
 
+
 class CachedDomainListMixin:
+    """Mixin para cache de lista de dom?nios com m?todos para manipula??o de nomes."""
+
     _domain_cache_ttl_seconds = 30.0
     _domain_cache_max_items = 50
 
     def __init__(self):
-        self._domain_cache = ExpiringValueCache[tuple[str, ...]](ttl_seconds=self._domain_cache_ttl_seconds)
+        self._domain_cache = ExpiringValueCache[tuple[str, ...]](
+            ttl_seconds=self._domain_cache_ttl_seconds
+        )
 
     def _fetch_domain_names(self) -> list[str]:
         raise NotImplementedError
@@ -20,9 +25,14 @@ class CachedDomainListMixin:
         ordered = tuple(sorted(sanitized))
         return ordered[: self._domain_cache_max_items]
 
-    def _get_domain_view(self, header: str, prefix: str = "- ") -> tuple[str, list[str], str]:
+    def _clean_name(self, name: str) -> str:
+        if "/" in name:
+            return name.split("/")[-1]
+        return name
+
+    def _get_domain_view(self, prefix: str = "- ") -> list[str]:
         names = self._get_domain_names_cached()
-        return header, names, prefix
+        return [self._clean_name(name) for name in names]
 
     def clear_domain_cache(self) -> None:
         self._domain_cache.clear()

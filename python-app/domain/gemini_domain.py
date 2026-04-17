@@ -21,10 +21,11 @@ class Gemini(BaseDomain):
 
     def list_models(self):
         try:
-            return self._get_domain_view("=== Gemini Models ===", prefix="")
+            return self._get_domain_view()
         except Exception as e:
-            return "=== Gemini Models ===", [f"[ERROR] {e}"], ""
+            return [f"[ERROR] {e}"]
 
     def _fetch_domain_names(self) -> list[str]:
         return [m.name for m in self.server.models.list()]
+
 

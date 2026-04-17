@@ -32,7 +32,7 @@ class BaseDomain(ABC, CachedDomainListMixin):
         pass
 
     @abstractmethod
-    def list_models(self) -> tuple[str, list[str], str]:
+    def list_models(self) -> list[str]:
         pass
     
     @abstractmethod
@@ -78,3 +78,4 @@ class BaseDomain(ABC, CachedDomainListMixin):
             if "quota" in msg.lower():
                 return "[QUOTA ERROR] Limite de cota atingido"
             return f"[UNKNOWN ERROR] {e}"   
+

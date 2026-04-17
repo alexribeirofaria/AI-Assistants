@@ -37,9 +37,10 @@ class LangChain(BaseDomain):
 
     def list_models(self):
         try:
-            return self._get_domain_view("=== LangChain Models ===")
+            return self._get_domain_view()
         except Exception as e:
-            return "=== LangChain Models ===", [f"[ERROR] {e}"], ""
+            return [f"[ERROR] {e}"]
 
     def _fetch_domain_names(self) -> list[str]:
         return self.models
+
