@@ -8,8 +8,7 @@ describe('ChatProviderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ChatProviderComponent],
-      imports: [FormsModule]
+      imports: [ChatProviderComponent, FormsModule]
     }).compileComponents();
   });
 

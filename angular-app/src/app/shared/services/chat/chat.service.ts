@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { BaseService } from '../base/base.service';
-import { ChatStateService } from './state/chat-state.service';
+import { ChatStateService } from './state/chat.state.service';
 import { IHomeModel } from '../../models';
 
 @Injectable({

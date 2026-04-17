@@ -1,15 +1,1 @@
-<div class="chat-provider-container">
-  <label for="provider-select" class="form-label">Provider</label>
-  <select
-    id="provider-select"
-    class="form-select"
-    [value]="selectedProvider"
-    (change)="onProviderChange($event)">
-    <option value="" disabled>Selecione um provider</option>
-    @for (provider of providers; track provider) {
-      <option [value]="provider" [selected]="provider === selectedProvider">
-        {{ provider }}
-      </option>
-    }
-  </select>
-</div>
+<div class="chat-provider-container">  <label for="provider-select" class="form-label">Provider</label>  <select    id="provider-select"    class="form-select"    [value]="selectedProvider"    (change)="providerChange.emit($any($event.target).value)">    <option value="" disabled>Selecione um provider</option>    @for (provider of providers; track provider) {      <option [value]="provider" [selected]="provider === selectedProvider">        {{ provider }}      </option>    }  </select></div>

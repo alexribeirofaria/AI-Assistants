@@ -1,7 +1,7 @@
 ﻿import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ChatService } from './chat.service';
-import { ChatStateService } from './state/chat-state.service';
+import { ChatStateService } from './state/chat.state.service';
 import { IHomeModel } from '../../models';
 
 describe('ChatService', () => {

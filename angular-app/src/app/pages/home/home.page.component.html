@@ -1,27 +1,5 @@
 <div class="home-container">
   <app-layout>
-    <div class="chat-area">
-      <div class="chat-controls">
-        <app-chat-provider [providers]="providers()" [selectedProvider]="selectedProvider()"
-          (providerChange)="onProviderChange($event)">
-        </app-chat-provider>
-
-        <app-chat-list-models [models]="filteredModels()" [selectedModel]="selectedModel()"
-          (modelChange)="onModelChange($event)">
-        </app-chat-list-models>
-      </div>
-
-      @if (error()) {
-      <div class="alert alert-danger alert-dismissible mx-3 mt-2 mb-0" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        {{ error() }}
-      </div>
-      }
-
-      <app-chat-list [messages]="messages()"></app-chat-list>
-
-      <app-chat-input (messageSend)="onMessageSend($event)" [disabled]="isLoading()">
-      </app-chat-input>
-    </div>
+    <app-chat-container></app-chat-container>
   </app-layout>
 </div>

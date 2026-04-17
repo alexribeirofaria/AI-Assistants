@@ -1,0 +1,20 @@
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.chat-header {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+app-chat-provider,
+app-chat-list-models {
+  flex: 1;
+  min-width: 200px;
+}

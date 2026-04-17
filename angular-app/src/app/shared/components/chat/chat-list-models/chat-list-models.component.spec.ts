@@ -9,8 +9,7 @@ describe('ChatListModelsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ChatListModelsComponent],
-      imports: [FormsModule]
+      imports: [ChatListModelsComponent, FormsModule]
     }).compileComponents();
   });
 

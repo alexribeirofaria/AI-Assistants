@@ -2,7 +2,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { ChatService } from '../../shared/services/chat/chat.service';
-import { ChatStateService } from '../../shared/services/chat/state/chat-state.service';
+import { ChatStateService } from '../../shared/services/chat/state/chat.state.service';
 import { HomePageComponent } from './home.page.component';
 import { IHomeModel } from '../../shared/models';
 
