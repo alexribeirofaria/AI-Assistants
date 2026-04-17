@@ -38,8 +38,7 @@ describe('ChatListModelsComponent', () => {
 
   it('should emit model change on selection', () => {
     spyOn(component.modelChange, 'emit');
-    const event = { target: { value: 'gpt35' } } as any;
-    component.onModelChange(event);
+    component.onModelSelected('gpt35');
     expect(component.modelChange.emit).toHaveBeenCalledWith('gpt35');
   });
 

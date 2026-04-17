@@ -1,8 +1,11 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 import { IHomeModel } from "../../../models";
+
 @Component({
   selector: "app-chat-list-models",
   standalone: true,
+  imports: [FormsModule],
   templateUrl: "./chat-list-models.component.html",
   styleUrl: "./chat-list-models.component.scss",
 })
@@ -12,8 +15,9 @@ export class ChatListModelsComponent {
   @Input() selectedModel = "";
   @Output() modelChange = new EventEmitter<string>();
 
-  onModelChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.modelChange.emit(select.value);
+  onModelSelected(value: string): void {
+    if (value) {
+      this.modelChange.emit(value);
+    }
   }
 }

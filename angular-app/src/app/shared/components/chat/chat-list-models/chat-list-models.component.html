@@ -1,8 +1,11 @@
 <div class="chat-list-models-container">
   <label for="model-select" class="form-label">Modelo</label>
-  <select id="model-select" class="form-select" [value]="selectedModel"
-    (change)="modelChange.emit($any($event.target).value)">
-    <option value="" disabled>Selecione um modelo</option> @for (model of models; track model.id) {
-    <option [value]="model.id" [selected]="model.id === selectedModel"> {{ model.modelName || model.id }} </option> }
+  <select id="model-select" class="form-select" 
+    [ngModel]="selectedModel" 
+    (ngModelChange)="onModelSelected($event)">
+    <option value="" disabled>Selecione um modelo</option>
+    @for (model of models; track model.id) {
+      <option [value]="model.id">{{ model.modelName || model.id }}</option>
+    }
   </select>
 </div>
