@@ -31,8 +31,9 @@ export class ChatContainerComponent implements OnInit {
       this.chatState.setProviders(providers);
       
       if (providers.length > 0) {
-        this.chatState.setSelectedProvider(providers[0]);
-        await this.loadModels(providers[0]);
+        const defaultProvider = providers[0];
+        this.chatState.setSelectedProvider(defaultProvider);
+        await this.loadModels(defaultProvider);
       } else {
         await this.loadModels();
       }
@@ -44,8 +45,13 @@ export class ChatContainerComponent implements OnInit {
 
   private async loadModels(provider?: string): Promise<void> {
     try {
-      const models = await this.chatService.getModels(provider);
-      this.chatState.setModels(models);
+      const modelsData = await this.chatService.getModels(provider);
+      this.chatState.setModels(modelsData);
+      
+      const defaultModel = await this.chatService.getDefaultModel(provider);
+      if (defaultModel) {
+        this.chatState.setModel(defaultModel);
+      }
     } catch {
       this.chatState.setError("Erro ao carregar modelos");
     }
