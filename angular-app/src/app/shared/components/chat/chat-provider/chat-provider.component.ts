@@ -1,7 +1,10 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+
 @Component({
   selector: "app-chat-provider",
   standalone: true,
+  imports: [FormsModule],
   templateUrl: "./chat-provider.component.html",
   styleUrl: "./chat-provider.component.scss",
 })
@@ -11,8 +14,9 @@ export class ChatProviderComponent {
   @Input() selectedProvider = "";
   @Output() providerChange = new EventEmitter<string>();
   
-  onProviderChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.providerChange.emit(select.value);
+  onProviderSelected(value: string): void {
+    if (value) {
+      this.providerChange.emit(value);
+    }
   }
 }
