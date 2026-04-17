@@ -1,4 +1,4 @@
-param (
+﻿param (
     [string]$FrontendUrl = "http://localhost:4200",
     [string]$BackendUrl = "http://localhost:5000/health"
 )
@@ -99,7 +99,7 @@ $frontend = Start-Process cmd `
     -WorkingDirectory $frontendPath `
     -PassThru `
     -WindowStyle Hidden `
-    -ArgumentList "/c npm run start:silent"
+    -ArgumentList "/c npm run start:silent "
 
 $testFailed = $false
 
