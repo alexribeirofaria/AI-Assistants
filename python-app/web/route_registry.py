@@ -1,57 +1,54 @@
-import os
+﻿import os
 from flask import Flask, send_from_directory
 from web.controllers.assistant_controller import AssistantController
 
 
 class RouteRegistry:
 
-    def __init__(self, app: Flask, controller: AssistantController | None = None) -> None:
+    def __init__(
+        self, app: Flask, controller: AssistantController | None = None
+    ) -> None:
         self._app: Flask = app
         self._controller: AssistantController = controller or AssistantController()
 
     def register(self):
 
         self._app.add_url_rule(
-            "/health",
-            "health",
-            self._controller.health,
-            methods=["GET"]
+            "/health", "health", self._controller.health, methods=["GET"]
         )
 
         self._app.add_url_rule(
-            "/assistant",
-            "assistant",
-            self._controller.assistant,
-            methods=["POST"]
+            "/assistant", "assistant", self._controller.assistant, methods=["POST"]
         )
 
         self._app.add_url_rule(
-            "/models",
-            "list_models",
-            self._controller.list_models,
-            methods=["GET"]
+            "/models", "list_models", self._controller.list_models, methods=["GET"]
+        )
+
+        self._app.add_url_rule(
+            "/providers",
+            "list_providers",
+            self._controller.list_providers,
+            methods=["GET"],
+        )
+
+        self._app.add_url_rule(
+            "/current-provider",
+            "get_current_provider",
+            self._controller.get_current_provider,
+            methods=["GET"],
         )
 
         self._app.add_url_rule(
             "/change-provider",
             "change_provider",
             self._controller.change_provider,
-            methods=["POST"]
+            methods=["POST"],
         )
 
-        self._app.add_url_rule(
-            "/api/hello",
-            "hello",
-            self._hello,
-            methods=["GET"]
-        )
+        self._app.add_url_rule("/api/hello", "hello", self._hello, methods=["GET"])
 
-        self._app.add_url_rule(
-            "/<path:path>",
-            "spa",
-            self._spa,
-            methods=["GET"]
-        )
+        self._app.add_url_rule("/<path:path>", "spa", self._spa, methods=["GET"])
 
     def _hello(self):
         return {"message": "Hello from Flask"}
