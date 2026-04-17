@@ -1,10 +1,10 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ChatService } from './chat.service';
-import { ChatStateService } from './state/chat.state.service';
-import { IHomeModel } from '../../models';
+import { TestBed, fakeAsync, tick } from "@angular/core/testing";
+import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
+import { ChatService } from "./chat.service";
+import { ChatStateService } from "./state/chat.state.service";
+import { IHomeModel } from "../../models";
 
-describe('ChatService', () => {
+describe("ChatService", () => {
   let service: ChatService;
   let httpMock: HttpTestingController;
   let chatState: ChatStateService;
@@ -23,31 +23,31 @@ describe('ChatService', () => {
     httpMock.verify();
   });
 
-  it('should be created', () => {
+  it("should be created", () => {
     expect(service).toBeTruthy();
   });
 
-  describe('getModels', () => {
-    it('should fetch models without provider', fakeAsync(() => {
-      const mockModels: IHomeModel[] = [{ id: '1', modelName: 'GPT-4', provider: 'openai' }];
+  describe("getModels", () => {
+    it("should fetch models without provider", fakeAsync(() => {
+      const mockModels: IHomeModel[] = [{ id: "1", modelName: "GPT-4", provider: "openai" }];
       
       const promise = service.getModels();
 
-      const req = httpMock.expectOne(req => req.url.includes('/models'));
-      expect(req.request.method).toBe('GET');
+      const req = httpMock.expectOne(req => req.url.includes("/models"));
+      expect(req.request.method).toBe("GET");
       req.flush({ models: mockModels });
       tick();
 
       expectAsync(promise).toBeResolvedTo(mockModels);
     }));
 
-    it('should fetch models with provider', fakeAsync(() => {
-      const mockModels: IHomeModel[] = [{ id: '2', modelName: 'GPT-3.5', provider: 'openai' }];
+    it("should fetch models with provider", fakeAsync(() => {
+      const mockModels: IHomeModel[] = [{ id: "2", modelName: "GPT-3.5", provider: "openai" }];
       
-      const promise = service.getModels('openai');
+      const promise = service.getModels("openai");
 
-      const req = httpMock.expectOne(req => req.url.includes('/models?provider=openai'));
-      expect(req.request.method).toBe('GET');
+      const req = httpMock.expectOne(req => req.url.includes("/models?provider=openai"));
+      expect(req.request.method).toBe("GET");
       req.flush({ models: mockModels });
       tick();
 
@@ -55,16 +55,31 @@ describe('ChatService', () => {
     }));
   });
 
-  describe('changeProvider', () => {
-    it('should post provider change', fakeAsync(() => {
-      const promise = service.changeProvider('openai');
+  describe("getDefaultModel", () => {
+    it("should fetch default model from API", fakeAsync(() => {
+      const mockResponse = { models: [], defaultModel: "gpt-3.5-turbo" };
+      
+      const promise = service.getDefaultModel();
 
-      const req = httpMock.expectOne(req => req.url.includes('/change-provider'));
-      expect(req.request.method).toBe('POST');
-      req.flush({ status: 'ok' });
+      const req = httpMock.expectOne(req => req.url.includes("/models"));
+      expect(req.request.method).toBe("GET");
+      req.flush(mockResponse);
       tick();
 
-      expectAsync(promise).toBeResolvedTo({ status: 'ok' });
+      expectAsync(promise).toBeResolvedTo("gpt-3.5-turbo");
+    }));
+  });
+
+  describe("changeProvider", () => {
+    it("should post provider change", fakeAsync(() => {
+      const promise = service.changeProvider("openai");
+
+      const req = httpMock.expectOne(req => req.url.includes("/change-provider"));
+      expect(req.request.method).toBe("POST");
+      req.flush({ status: "ok" });
+      tick();
+
+      expectAsync(promise).toBeResolvedTo({ status: "ok" });
     }));
   });
 });
