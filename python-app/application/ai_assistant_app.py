@@ -1,3 +1,4 @@
+﻿# -*- coding: utf-8 -*-
 from queue import Queue
 from application.abstracts.base_ai_assistant_app import BaseAIAssistantApp
 from application.controller.thread_controller import ThreadController
@@ -51,15 +52,12 @@ class AIAssistantApp(BaseAIAssistantApp):
 
     def _handle_action(self, action, value, stop_app: bool = True):
         if action == UserAction.EXIT:
-            # ensure thread controller exists
             _ = self.queue
             if stop_app:
-                # console shutdown: block until workers stop, then show goodbye
                 self.thread_controller.stop_threads(wait=True)
                 self.presenter.show_goodbye()
                 return True
             else:
-                # web/contextual: stop workers asynchronously, don't shut down app
                 self.thread_controller.stop_threads_non_blocking()
                 return False
 
@@ -89,7 +87,6 @@ class AIAssistantApp(BaseAIAssistantApp):
         return False
 
     def run_web_app(self, message):
-        # show elapsed time if there are pending tasks
         if not self.queue.empty():
             self.thread_controller.show_elapsed_time_until_queue_finishes()
 
@@ -97,7 +94,6 @@ class AIAssistantApp(BaseAIAssistantApp):
             message, self.presenter
         )
 
-        # Only explicitly execute LIST_MODELS or SWITCH_MODEL; otherwise treat as MESSAGE
         if action == UserAction.LIST_MODELS:
             header, names, prefix = self._get_current_strategy().list_domains()
             return {"header": header, "names": names, "prefix": prefix}
@@ -107,9 +103,6 @@ class AIAssistantApp(BaseAIAssistantApp):
             new_model = self.default_model_agent.get_domain_name()
             return {"message": "model_switched", "model": new_model}
 
-        # Default to MESSAGE handling for web: execute synchronously and return
-        # the model response. Use `value` if provided by interpreter, otherwise
-        # fall back to the raw request message.
         strategy = self._get_current_strategy()
         prompt = (
             value if (action == UserAction.MESSAGE and value is not None) else message
@@ -145,6 +138,21 @@ class AIAssistantApp(BaseAIAssistantApp):
 
         return names
 
+    def get_default_model(self, provider: str | None = None) -> str | None:
+        """Retorna o modelo padrão para o provider especificado."""
+        try:
+            if provider:
+                domain_class = self._strategy_factory.parse_domain(provider)
+                if domain_class is None:
+                    return None
+            else:
+                domain_class = self.default_model_agent
+            
+            domain_instance = self._strategy_factory.get_strategy(domain_class).ensure_domain()
+            return domain_instance.model
+        except Exception:
+            return None
+
     def get_available_providers(self) -> tuple[type[BaseDomain], ...]:
         return self._strategy_factory.available()
 
@@ -171,3 +179,4 @@ class AIAssistantApp(BaseAIAssistantApp):
             should_exit = self._handle_action(action, value)
             if should_exit:
                 break
+
