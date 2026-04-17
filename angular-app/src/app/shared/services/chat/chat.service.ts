@@ -30,67 +30,27 @@ export class ChatService extends BaseService {
     this.chatState.addUserMessage(content);
     this.chatState.startStreaming();
 
+    // Usar HttpClient para manter compatibilidade com o proxy
     return new Observable<void>(observer => {
-      this.sendMessageStream(content)
-        .then(() => {
-          observer.next();
-          observer.complete();
-        })
-        .catch(err => {
-          observer.error(err);
+      this.post<{ input: string; response: { response?: string; message?: string } }>('/assistant', { message: content })
+        .subscribe({
+          next: (data) => {
+            // Extrair texto da resposta
+            let text = '';
+            if (data.response) {
+              text = data.response.response || data.response.message || JSON.stringify(data.response);
+            }
+            this.chatState.appendChunk(text);
+            this.chatState.stopStreaming();
+            observer.next();
+            observer.complete();
+          },
+          error: (err) => {
+            this.chatState.setError('Erro ao comunicar com o servidor');
+            this.chatState.stopStreaming();
+            observer.error(err);
+          }
         });
     });
-  }
-
-  private async sendMessageStream(content: string): Promise<void> {
-    try {
-      const response = await fetch(this.baseUrl + '/assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: content })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const contentType = response.headers.get('content-type') || '';
-
-      if (contentType.includes('application/json')) {
-        const data = await response.json();
-        const text = data.response || data.message || JSON.stringify(data);
-        this.chatState.appendChunk(text);
-        this.chatState.stopStreaming();
-        return;
-      }
-
-      if (!response.body) {
-        const text = await response.text();
-        this.chatState.appendChunk(text);
-        this.chatState.stopStreaming();
-        return;
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        if (value) {
-          const chunk = decoder.decode(value, { stream: !done });
-          this.chatState.appendChunk(chunk);
-        }
-      }
-
-      this.chatState.stopStreaming();
-    } catch (err) {
-      this.chatState.setError('Erro ao comunicar com o servidor');
-      this.chatState.stopStreaming();
-      throw err;
-    }
   }
 }
