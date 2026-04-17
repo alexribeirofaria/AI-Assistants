@@ -1,9 +1,11 @@
-from flask import jsonify, request
+﻿from flask import jsonify, request
 from flasgger import swag_from  # type: ignore[import-untyped]
 from application.ai_assistant_app import AIAssistantApp
 from web.controllers.static_controller import StaticController
 
 class AssistantController(StaticController):
+    """Controller responsible for handling chat and model-related endpoints."""
+
     def __init__(self, assistant_app: AIAssistantApp | None = None) -> None:
         self._assistant_app = assistant_app or AIAssistantApp()
 
@@ -29,10 +31,40 @@ class AssistantController(StaticController):
             query = request.args.get("q")
             prefix = request.args.get("prefix")
             provider = request.args.get("provider")
-            models = self._assistant_app.list_models(search_query=query, prefix=prefix, provider=provider)
-            return jsonify({"models": models or []})
+
+            if provider:
+                self._assistant_app.set_provider(provider)
+
+            models = self._assistant_app.list_models(search_query=query, prefix=prefix)
+            current_provider = self._assistant_app.default_model_agent.get_domain_name()
+
+            model_list = [
+                {
+                    "id": model_name.strip(),
+                    "modelName": model_name.strip(),
+                    "provider": current_provider,
+                }
+                for model_name in (models or [])
+            ]
+
+            return jsonify({"models": model_list})
         except ValueError as exc:
             return jsonify({"error": str(exc)}), 400
+        except Exception as exc:
+            return jsonify({"error": str(exc)}), 500
+
+    def list_providers(self):
+        try:
+            available = self._assistant_app.get_available_providers()
+            providers = [p.get_domain_name() for p in available]
+            return jsonify({"providers": providers})
+        except Exception as exc:
+            return jsonify({"error": str(exc)}), 500
+
+    def get_current_provider(self):
+        try:
+            provider = self._assistant_app.default_model_agent.get_domain_name()
+            return jsonify({"provider": provider})
         except Exception as exc:
             return jsonify({"error": str(exc)}), 500
 
@@ -49,4 +81,3 @@ class AssistantController(StaticController):
             return jsonify({"error": str(exc)}), 400
         except Exception as exc:
             return jsonify({"error": str(exc)}), 500
-
