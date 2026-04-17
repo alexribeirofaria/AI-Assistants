@@ -8,6 +8,7 @@ import { FormsModule } from "@angular/forms";
   templateUrl: "./chat-input.component.html",
   styleUrl: "./chat-input.component.scss",
 })
+  
 export class ChatInputComponent {
   @Input() disabled = false;
   @Output() messageSend = new EventEmitter<string>();
