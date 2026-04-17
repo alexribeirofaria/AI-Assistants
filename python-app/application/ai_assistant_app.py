@@ -1,5 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-from queue import Queue
+﻿from queue import Queue
 from application.abstracts.base_ai_assistant_app import BaseAIAssistantApp
 from application.controller.thread_controller import ThreadController
 from application.decorator.interpreter.decorator_interpreter_factory import (
@@ -147,8 +146,10 @@ class AIAssistantApp(BaseAIAssistantApp):
                     return None
             else:
                 domain_class = self.default_model_agent
-            
-            domain_instance = self._strategy_factory.get_strategy(domain_class).ensure_domain()
+
+            domain_instance = self._strategy_factory.get_strategy(
+                domain_class
+            ).ensure_domain()
             return domain_instance.model
         except Exception:
             return None
@@ -179,4 +180,3 @@ class AIAssistantApp(BaseAIAssistantApp):
             should_exit = self._handle_action(action, value)
             if should_exit:
                 break
-
