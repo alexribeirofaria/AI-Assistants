@@ -1,4 +1,5 @@
-﻿import { Page, Locator } from '@playwright/test';
+﻿import { Page, Locator } from "@playwright/test";
+import { environment } from "../environments/environment";
 
 export class HomePage {
   readonly page: Page;
@@ -12,17 +13,17 @@ export class HomePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.chatProviderSelector = page.locator('app-chat-provider');
-    this.chatListModelsSelector = page.locator('app-chat-list-models');
-    this.chatInput = page.locator('#chat-message-input');
-    this.chatSendButton = page.locator('#chat-send-button');
-    this.chatList = page.locator('app-chat-list');
-    this.errorAlert = page.locator('.alert-danger');
-    this.loadingIndicator = page.locator('.spinner-border');
+    this.chatProviderSelector = page.locator("app-chat-provider");
+    this.chatListModelsSelector = page.locator("app-chat-list-models");
+    this.chatInput = page.locator("#chat-message-input");
+    this.chatSendButton = page.locator("#chat-send-button");
+    this.chatList = page.locator("app-chat-list");
+    this.errorAlert = page.locator(".alert-danger");
+    this.loadingIndicator = page.locator(".spinner-border");
   }
 
   async navigate(): Promise<void> {
-    await this.page.goto('http://localhost:4200/');
+    await this.page.goto(environment.BASE_URL);
   }
 
   async sendMessage(message: string): Promise<void> {
