@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+﻿import { Injectable, signal, computed } from '@angular/core';
 import { IMessage, IHomeModel } from '../../../models';
 
 @Injectable({
@@ -22,9 +22,10 @@ export class ChatStateService {
   readonly providers = this._providers.asReadonly();
 
   readonly filteredModels = computed(() => {
+    const models = this._models();
     const provider = this._selectedProvider();
-    if (!provider) return this._models();
-    return this._models().filter(m => m.provider === provider);
+    if (!provider || !models.length) return models;
+    return models.filter(m => m.provider === provider);
   });
 
   addUserMessage(content: string): IMessage {
@@ -81,8 +82,24 @@ export class ChatStateService {
     this._isLoading.set(false);
   }
 
-  setProvider(provider: string): void {
+  setSelectedProvider(provider: string): void {
     this._selectedProvider.set(provider);
+    this.autoSelectModelForProvider(provider);
+  }
+
+  setProvider(provider: string): void {
+    this.setSelectedProvider(provider);
+  }
+
+  private autoSelectModelForProvider(provider: string): void {
+    if (!provider) return;
+    const models = this._models();
+    if (!models.length) return;
+    
+    const providerModels = models.filter(m => m.provider === provider);
+    if (providerModels.length > 0) {
+      this._selectedModel.set(providerModels[0].id);
+    }
   }
 
   setModel(model: string): void {
@@ -93,6 +110,7 @@ export class ChatStateService {
     this._models.set(models);
     const providers = [...new Set(models.map(m => m.provider))];
     this._providers.set(providers);
+    this.autoSelectModelForProvider(this._selectedProvider());
   }
 
   setProviders(providers: string[]): void {
