@@ -6,7 +6,7 @@
     "app-android"
   ],
   "scripts": {
-    "start": "ng serve",
+    "start": "ng serve ",
     "start:dev": "ng serve --configuration=development",
     "start:silent": "ng serve --proxy-config proxy.conf.json --open=false",
     "start:e2e": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\e2e\\run-e2e.ps1",
