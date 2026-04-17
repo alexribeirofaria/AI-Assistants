@@ -200,3 +200,4 @@ playwright-report/
 copilot/
 .claude/
 .openclaude/
+*mypy.ini
