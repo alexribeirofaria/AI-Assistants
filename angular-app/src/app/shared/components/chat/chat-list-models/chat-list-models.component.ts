@@ -6,7 +6,7 @@ import { IHomeModel } from "../../../models";
   templateUrl: "./chat-list-models.component.html",
   styleUrl: "./chat-list-models.component.scss",
 })
-
+  
 export class ChatListModelsComponent {
   @Input() models: IHomeModel[] = [];
   @Input() selectedModel = "";
