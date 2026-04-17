@@ -9,6 +9,7 @@
     "start": "ng serve",
     "start:dev": "ng serve --configuration=development",
     "start:silent": "ng serve --proxy-config proxy.conf.json --open=false",
+    "start:e2e": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\e2e\\run-e2e.ps1",
     "lint": "npx eslint src/**/*.ts --fix",
     "lint:check": "npx eslint src/**/*.ts",
     "build": "ng build",
@@ -17,7 +18,8 @@
     "test": "set BROWSER=ChromeHeadless && ng test --browsers=ChromeHeadless --no-watch",
     "test:debug": "set BROWSER=Chrome && ng test --browsers=Chrome",
     "test:coverage": "set BROWSER=ChromeHeadless && ng test --code-coverage --browsers=ChromeHeadless --no-watch",
-    "test:watch": "ng test --code-coverage --browsers=ChromeHeadless --watch"
+    "test:watch": "ng test --code-coverage --browsers=ChromeHeadless --watch",
+    "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
@@ -60,6 +62,7 @@
     "@types/bootstrap": "^5.2.10",
     "@types/jasmine": "~6.0.0",
     "@types/jquery": "^3.5.32",
+    "@types/node": "^25.6.0",
     "@typescript-eslint/eslint-plugin": "^8.58.2",
     "@typescript-eslint/parser": "^8.58.2",
     "eslint": "^10.2.0",
@@ -69,6 +72,7 @@
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.2.0",
+    "playwright-ng-schematics": "^21.0.9",
     "ts-evaluator": "^2.0.0",
     "typescript": "^5.9.3"
   },

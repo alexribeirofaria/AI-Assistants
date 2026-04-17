@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
-from src.console_app import ConsoleApp
-from src.web_app import WebApp
+from app.console_app import ConsoleApp
+from app.web_app import WebApp
 
 
 def main():

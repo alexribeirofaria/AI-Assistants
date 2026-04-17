@@ -10,6 +10,7 @@ export class ChatProviderComponent {
   @Input() providers: string[] = [];
   @Input() selectedProvider = "";
   @Output() providerChange = new EventEmitter<string>();
+  
   onProviderChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
     this.providerChange.emit(select.value);

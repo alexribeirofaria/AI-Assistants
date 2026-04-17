@@ -196,3 +196,4 @@ secrets.json
 .test/
 angular-app/test-results/.last-run.json
 test-results/
+playwright-report/

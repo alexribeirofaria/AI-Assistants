@@ -1,16 +1,24 @@
 from queue import Queue
 from application.abstracts.base_ai_assistant_app import BaseAIAssistantApp
 from application.controller.thread_controller import ThreadController
-from application.decorator.interpreter.decorator_interpreter_factory import DecoratorInterpreterFactory
+from application.decorator.interpreter.decorator_interpreter_factory import (
+    DecoratorInterpreterFactory,
+)
 from application.enums.user_action import UserAction
 from domain.abstracts.base_domain import BaseDomain
+
 
 class AIAssistantApp(BaseAIAssistantApp):
     """
     Classe concreta do AI Assistant.
     """
+
     def __init__(self, strategy_factory=None, presenter=None, presenter_factory=None):
-        super().__init__(strategy_factory=strategy_factory, presenter=presenter, presenter_factory=presenter_factory)
+        super().__init__(
+            strategy_factory=strategy_factory,
+            presenter=presenter,
+            presenter_factory=presenter_factory,
+        )
         self._queue: Queue | None = None
         self.thread_controller: ThreadController
         self.default_model_agent = self._strategy_factory.default_domain
@@ -36,9 +44,11 @@ class AIAssistantApp(BaseAIAssistantApp):
 
     def _get_current_strategy(self):
         if self.strategy is None:
-            self.strategy = self._strategy_factory.get_strategy(self.default_model_agent)
+            self.strategy = self._strategy_factory.get_strategy(
+                self.default_model_agent
+            )
         return self.strategy
-    
+
     def _handle_action(self, action, value, stop_app: bool = True):
         if action == UserAction.EXIT:
             # ensure thread controller exists
@@ -74,11 +84,7 @@ class AIAssistantApp(BaseAIAssistantApp):
         if action == UserAction.MESSAGE:
             _ = self.queue
             strategy = self._get_current_strategy()
-            self.thread_controller.enqueue_task(
-                "message",
-                strategy,
-                value
-            )
+            self.thread_controller.enqueue_task("message", strategy, value)
 
         return False
 
@@ -105,7 +111,9 @@ class AIAssistantApp(BaseAIAssistantApp):
         # the model response. Use `value` if provided by interpreter, otherwise
         # fall back to the raw request message.
         strategy = self._get_current_strategy()
-        prompt = value if (action == UserAction.MESSAGE and value is not None) else message
+        prompt = (
+            value if (action == UserAction.MESSAGE and value is not None) else message
+        )
         response = strategy.execute(prompt)
         return {"response": response}
 
@@ -127,13 +135,18 @@ class AIAssistantApp(BaseAIAssistantApp):
 
         if prefix:
             normalized_prefix = prefix.strip().lower()
-            names = [name for name in names if name.lower().startswith(normalized_prefix)]
+            names = [
+                name for name in names if name.lower().startswith(normalized_prefix)
+            ]
 
         if search_query:
             normalized = search_query.strip().lower()
             names = [name for name in names if normalized in name.lower()]
 
         return names
+
+    def get_available_providers(self) -> tuple[type[BaseDomain], ...]:
+        return self._strategy_factory.available()
 
     def set_provider(self, provider: str) -> None:
         parsed = self._strategy_factory.parse_domain(provider)
@@ -151,8 +164,9 @@ class AIAssistantApp(BaseAIAssistantApp):
 
             prompt = input(f"{self.default_model_agent.get_domain_name()} Chat: ")
 
-            action, value =  self.interpreter.interpret_user_input_with_feedback(
-            prompt,self.presenter)
+            action, value = self.interpreter.interpret_user_input_with_feedback(
+                prompt, self.presenter
+            )
 
             should_exit = self._handle_action(action, value)
             if should_exit:

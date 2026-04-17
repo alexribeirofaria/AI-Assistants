@@ -9,6 +9,7 @@ import { ChatStateService } from "../../../services/chat/state/chat.state.servic
   styleUrl: "./chat-container.component.scss",
   standalone: false,
 })
+  
 export class ChatContainerComponent implements OnInit, OnDestroy {
   private chatService = inject(ChatService);
   private chatState = inject(ChatStateService);
@@ -20,12 +21,15 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   isLoading = this.chatState.isLoading;
   error = this.chatState.error;
   private subscriptions: Subscription[] = [];
+  
   ngOnInit(): void {
     this.loadModels();
   }
+  
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
+  
   private loadModels(): void {
     const sub = this.chatService.getModels().subscribe({
       next: (response) => {
@@ -37,6 +41,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
     });
     this.subscriptions.push(sub);
   }
+  
   onProviderChange(provider: string): void {
     this.chatState.setProvider(provider);
     this.chatState.setModel("");
@@ -50,9 +55,11 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
     });
     this.subscriptions.push(sub);
   }
+  
   onModelChange(modelId: string): void {
     this.chatState.setModel(modelId);
   }
+  
   onMessageSend(message: string): void {
     if (this.isLoading()) return;
     this.chatState.clearError();
