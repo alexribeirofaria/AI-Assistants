@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+
 import { ChatStateService } from './chat.state.service';
-import { IHomeModel, IMessage } from '../../../models';
+import { IHomeModel } from '../../../models';
 
 describe('ChatStateService', () => {
   let service: ChatStateService;

@@ -1,6 +1,7 @@
-import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
+
 import { BaseService } from "../base/base.service";
 import { ChatStateService } from "./state/chat.state.service";
 import { IHomeModel } from "../../models";
