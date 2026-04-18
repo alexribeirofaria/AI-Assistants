@@ -1,6 +1,7 @@
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+
 import { AppRoutingModule } from './app.routing.module';
 import { PageNotFoundComponent } from '../pages/not-found/not-found.page.component';
 import { PrivacyComponent } from '../pages/privacy/privacy.page.component';
