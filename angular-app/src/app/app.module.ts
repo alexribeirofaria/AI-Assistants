@@ -8,6 +8,7 @@ import { ChatModule } from "./shared/components/chat/chat.module";
 import { LayoutComponent } from "./shared/components/layout/layout.component";
 import { CookieConsentComponent } from "./shared/components/cookie-consent/cookie-consent.component";
 import { AlertModule } from "./shared/components/alert/alert.component.module";
+import { AlertComponent } from "./shared/components";
 
 @NgModule({
   declarations: [AppComponent],
@@ -19,7 +20,7 @@ import { AlertModule } from "./shared/components/alert/alert.component.module";
     ChatModule,
     AlertModule,
     LayoutComponent,
-    CookieConsentComponent,
+    CookieConsentComponent,    
   ],
   bootstrap: [AppComponent],
 })

@@ -1,10 +1,14 @@
 import { Component } from "@angular/core";
-import { RouterModule } from "@angular/router";
-import { CookieConsentComponent } from "./shared/components/cookie-consent/cookie-consent.component";
+import { overrideBrowserAlert } from "./shared/components/alert/alert.override";
+import { AlertService } from "./shared/services/alert/alert.service";
 
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
-  standalone: false
+  standalone: false,
 })
-export class AppComponent { }
+export class AppComponent {
+  constructor(alertService: AlertService) {
+    overrideBrowserAlert(alertService);
+  }
+}
