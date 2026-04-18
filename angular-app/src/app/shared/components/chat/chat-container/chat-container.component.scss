@@ -4,17 +4,18 @@
   height: 100%;
   gap: 0.5rem;
   padding: 1rem;
+  overflow: auto;
 }
 
 .chat-header {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
 }
 
 app-chat-provider,
 app-chat-list-models {
   flex: 1;
-  min-width: 200px;
+  min-width: 12.5rem;
 }
