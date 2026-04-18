@@ -1,18 +1,28 @@
-import { Component, Input } from '@angular/core';
-import { NgbModalConfig, NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, Input } from "@angular/core";
+import {
+  NgbModalConfig,
+  NgbModal,
+  NgbActiveModal,
+} from "@ng-bootstrap/ng-bootstrap";
+import { AlertService } from "../../services/alert/alert.service";
 
 @Component({
   selector: "app-alert-component",
   templateUrl: "./alert.component.html",
-  standalone: false
+  styleUrl: "./alert.component.scss",
+  standalone: false,
 })
-
 export class AlertComponent {
   @Input() header = "Mensagem";
-  @Input() message = "";
   alertTypeClass = "alert alert-success mt-2";
+  public alert = this.alertService.alert$;
 
-  constructor(config: NgbModalConfig, public modalService: NgbModal, public activeModal: NgbActiveModal) {
+  constructor(
+    config: NgbModalConfig,
+    public modalService: NgbModal,
+    public activeModal: NgbActiveModal,
+    private alertService: AlertService,
+  ) {
     config.backdrop = "static";
     config.keyboard = false;
   }
@@ -24,12 +34,16 @@ export class AlertComponent {
     return modalRef;
   }
 
-  close() {
+  close(): void {
     this.activeModal.close();
+    this.alertService.hide();
   }
 }
 
-export enum AlertType { Success = 0, Warning = 1 };
+export enum AlertType {
+  Success = 0,
+  Warning = 1,
+}
 const AlertTypeClass: Record<AlertType, string> = {
   0: "alert alert-success mt-2 bi bi-emoji-smile",
   1: "alert alert-danger mt-2 bi bi-exclamation-circle",

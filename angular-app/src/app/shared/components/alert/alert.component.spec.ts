@@ -1,5 +1,5 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbModal, NgbActiveModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NgbActiveModal, NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AlertComponent, AlertType } from './alert.component';
 
 describe('AlertComponent', () => {
@@ -30,12 +30,8 @@ describe('AlertComponent', () => {
     expect(component.header).toBe('Mensagem');
   });
 
-  it('should have default message', () => {
-    expect(component.message).toBe('');
-  });
-
-  it('should have alertTypeClass', () => {
-    expect(component.alertTypeClass).toBe('alert alert-success mt-2');
+  it('should have alertTypeClass with success type', () => {
+    expect(component.alertTypeClass).toBe('alert alert-success mt-2 bi bi-emoji-smile');
   });
 
   it('should expose AlertType enum', () => {
