@@ -1,3 +1,4 @@
+import { CommonModule } from "@angular/common";
 import {
   Component,
   Input,
@@ -5,8 +6,8 @@ import {
   ViewChild,
   AfterViewChecked,
 } from "@angular/core";
-import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
+
 import { IMessage } from "../../../models";
 import { ChatMessageComponent } from "../chat-message/chat-message.component";
 @Component({

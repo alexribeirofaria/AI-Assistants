@@ -1,12 +1,12 @@
-import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { ChatProviderComponent } from "./chat-provider/chat-provider.component";
+
+import { ChatInputComponent } from "./chat-input/chat-input.component";
+import { ChatListComponent } from "./chat-list/chat-list.component";
 import { ChatListModelsComponent } from "./chat-list-models/chat-list-models.component";
 import { ChatMessageComponent } from "./chat-message/chat-message.component";
-import { ChatListComponent } from "./chat-list/chat-list.component";
-import { ChatInputComponent } from "./chat-input/chat-input.component";
-import { ChatContainerComponent } from "./chat-container/chat-container.component";
+import { ChatProviderComponent } from "./chat-provider/chat-provider.component";
 
 @NgModule({
 

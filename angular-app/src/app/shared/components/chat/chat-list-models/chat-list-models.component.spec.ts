@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+
 import { ChatListModelsComponent } from './chat-list-models.component';
-import { IHomeModel } from '../../../models';
 
 describe('ChatListModelsComponent', () => {
   let component: ChatListModelsComponent;

@@ -1,6 +1,7 @@
-import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+
 import { ChatModule } from "../chat.module";
 import { ChatContainerComponent } from "./chat-container.component";
 
