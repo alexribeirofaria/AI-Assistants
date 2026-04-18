@@ -1,14 +1,14 @@
+import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
-import { HttpClientModule } from "@angular/common/http";
 import { RouterModule } from "@angular/router";
+
 import { AppComponent } from "./app.component";
 import { AppRoutingModule } from "./route/app.routing.module";
-import { ChatModule } from "./shared/components/chat/chat.module";
-import { LayoutComponent } from "./shared/components/layout/layout.component";
-import { CookieConsentComponent } from "./shared/components/cookie-consent/cookie-consent.component";
 import { AlertModule } from "./shared/components/alert/alert.component.module";
-import { AlertComponent } from "./shared/components";
+import { ChatModule } from "./shared/components/chat/chat.module";
+import { CookieConsentComponent } from "./shared/components/cookie-consent/cookie-consent.component";
+import { LayoutComponent } from "./shared/components/layout/layout.component";
 
 @NgModule({
   declarations: [AppComponent],
