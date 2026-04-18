@@ -1,10 +1,6 @@
 {
   "name": "ai-assistants",
   "version": "1.0.0",
-  "workspaces": [
-    "app-ios",
-    "app-android"
-  ],
   "scripts": {
     "start": "ng serve ",
     "start:dev": "ng serve --configuration=development",
@@ -49,7 +45,7 @@
     "@angular/compiler-cli": "21.2.7",
     "@angular/localize": "21.2.7",
     "@eslint/js": "^9.17.0",
-    "eslint": "^9.39.4",    
+    "eslint": "^9.39.4",
     "@playwright/test": "^1.59.1",
     "@types/bootstrap": "^5.2.10",
     "@types/jasmine": "~6.0.0",
@@ -65,10 +61,6 @@
     "playwright-ng-schematics": "^21.0.9",
     "ts-evaluator": "^2.0.0",
     "typescript": "^5.9.3"
-  },
- "overrides": {
-    "autoprefixer": "10.4.5",
-    "ajv": "^8.18.0",
-    "ajv-keywords": "^5.1.0"
   }
 }
+
