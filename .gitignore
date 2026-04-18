@@ -144,6 +144,7 @@ obj/**
 .cache/
 .temp/
 .tmp/
+.ruff_cache
 
 # 🧠 VS Code
 .vscode/*
@@ -180,7 +181,7 @@ node_modules/
 .env.*
 *.env
 
-# 🔑 Chaves e segredos
+# 🔑 Chaves e segredos e stubs
 *.key
 *.pem
 *.crt
