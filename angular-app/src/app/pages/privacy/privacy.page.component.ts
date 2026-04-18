@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
-import { FooterComponent } from '../../shared/components';
+import { Component, OnInit } from "@angular/core";
+import { FooterComponent } from "../../shared/components";
 
 @Component({
-  selector: 'app-privacy',
-  templateUrl: './privacy.page.html',
-  styleUrls: ['./privacy.page.scss'],
+  selector: "app-privacy",
+  templateUrl: "./privacy.page.component.html",
+  styleUrls: ["./privacy.page.component.scss"],
   imports: [FooterComponent],
-  standalone: true
+  standalone: true,
 })
+export class PrivacyComponent implements OnInit {
+  constructor() {}
 
-export class PrivacyComponent {
+  public ngOnInit(): void {}
 }
