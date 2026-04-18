@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { PrivacyComponent } from './privacy.page.component';
 
 describe('PrivacyComponent', () => {
