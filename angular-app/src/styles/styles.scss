@@ -1,7 +1,7 @@
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
-@use '@angular/material'as mat;
-@use '_variables'as v; // importa variáveis globais
+@use '@angular/material' as mat;
+@use '_variables' as v; // importa variáveis globais
 
 // Plus imports for other components in your app.
 
@@ -15,10 +15,10 @@
 // hue. Available color palettes: https://material.io/design/color/
 
 $my-theme: mat.define-theme((color: (theme-type: light,
-      primary: mat.$azure-palette),
-    typography: (brand-family: 'sans-serif'
-    ),
-    density: (scale: -5)));
+        primary: mat.$azure-palette),
+      typography: (brand-family: 'sans-serif'
+      ),
+      density: (scale: -5)));
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
@@ -132,13 +132,6 @@ h2 {
   height: v.$height-header;
 }
 
-.content-barra-ferramenta-max-height {
-  height: v.$height-header;
-  padding: v.$padding-barra-ferramenta;
-  padding-bottom: 0;
-  margin-bottom: v.$margin-barra-ferramenta;
-}
-
 .content-body-max-height {
   height: v.$height-body;
   max-width: v.$max-width-body;
@@ -154,4 +147,51 @@ h2 {
 .loading-modal .modal-content {
   background-color: transparent;
   text-align: center;
+}
+
+
+.custom-alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s;
+
+  &.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .custom-alert-box {
+    background: #1e1e2f;
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    min-width: 300px;
+    text-align: center;
+
+    .custom-alert-message {
+      margin-bottom: 15px;
+    }
+
+    .custom-alert-btn {
+      background: #4f46e5;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+
+      &:hover {
+        background: #4338ca;
+      }
+    }
+  }
 }
