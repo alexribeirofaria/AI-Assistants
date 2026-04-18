@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
+
 import { ModalFormComponent } from './form.modal.component';
 
 describe('ModalFormComponent', () => {
