@@ -1,0 +1,16 @@
+﻿{
+  "unusedDependencies": [
+    "moment",
+    "dayjs",
+    "jquery",
+    "mdb-ui-kit",
+    "ngx-mask",
+    "@popperjs/core",
+    "@date-io/dayjs",
+    "@angular/material-moment-adapter"
+  ],
+  "removed": true,
+  "angularJsonCleaned": true,
+  "timestamp": "2025-01-10T00:00:00Z",
+  "removedPackages": 10
+}
