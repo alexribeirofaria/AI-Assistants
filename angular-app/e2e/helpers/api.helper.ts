@@ -1,8 +1,9 @@
-﻿import { request, APIRequestContext } from "@playwright/test";
+﻿import { APIRequestContext, request } from "@playwright/test";
+
 import { environment } from "../environments/environment";
 
 export class ApiHelper {
-  private baseUrl = environment.BASE_URL;
+  private baseUrl = environment.API_URL;
 
   async getRequestContext(): Promise<APIRequestContext> {
     return await request.newContext({ baseURL: this.baseUrl });
