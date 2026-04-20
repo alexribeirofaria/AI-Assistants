@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+
 import { environment } from "../../environments/environment";
 
 test.describe("Chat Provider Integration Tests", () => {
@@ -28,7 +29,7 @@ test.describe("Chat Provider Integration Tests", () => {
     const providerSelect = page.locator("#provider-select");
     const modelSelect = page.locator("#model-select");
     
-    // 2. Verificar que os providers estão carregados
+    // 2. Verificar que os providers estï¿½o carregados
     const providerOptions = providerSelect.locator("option");
     const initialProviderCount = await providerOptions.count();
     console.log("Initial provider count:", initialProviderCount);
@@ -39,11 +40,11 @@ test.describe("Chat Provider Integration Tests", () => {
     const firstProvider = await providerOptions.nth(1).getAttribute("value");
     console.log("First provider:", firstProvider);
     
-    // 4. Clicar no select de provider - não deve sumir os providers
+    // 4. Clicar no select de provider - nï¿½o deve sumir os providers
     await providerSelect.click();
     await page.waitForTimeout(500);
     
-    // 5. Verificar que os providers ainda estão lá após clicar
+    // 5. Verificar que os providers ainda estï¿½o lï¿½ apï¿½s clicar
     const providerCountAfterClick = await providerOptions.count();
     console.log("Provider count after click:", providerCountAfterClick);
     expect(providerCountAfterClick).toBe(initialProviderCount);
@@ -52,7 +53,7 @@ test.describe("Chat Provider Integration Tests", () => {
     await providerSelect.selectOption(firstProvider!);
     await page.waitForTimeout(2000);
     
-    // 7. Verificar que os providers NÃO sumiram após seleção
+    // 7. Verificar que os providers Nï¿½O sumiram apï¿½s seleï¿½ï¿½o
     const providerCountAfterSelect = await providerOptions.count();
     console.log("Provider count after select:", providerCountAfterSelect);
     expect(providerCountAfterSelect).toBe(initialProviderCount);
@@ -76,7 +77,7 @@ test.describe("Chat Provider Integration Tests", () => {
     const providerSelect = page.locator("#provider-select");
     const modelSelect = page.locator("#model-select");
     
-    // Obter os providers disponíveis
+    // Obter os providers disponï¿½veis
     const providerOptions = providerSelect.locator("option");
     const providerCount = await providerOptions.count();
     
@@ -101,7 +102,7 @@ test.describe("Chat Provider Integration Tests", () => {
       const modelCount2 = await modelOptions2.count();
       console.log("Models for second provider:", modelCount2);
       
-      // ambos devem ter mais de 1 opção
+      // ambos devem ter mais de 1 opï¿½ï¿½o
       expect(modelCount1).toBeGreaterThan(1);
       expect(modelCount2).toBeGreaterThan(1);
       
@@ -137,7 +138,7 @@ test.describe("Chat Provider Integration Tests", () => {
       expect(currentCount).toBe(initialCount);
     }
     
-    // Verificar que ainda tem o mesmo número de providers
+    // Verificar que ainda tem o mesmo nï¿½mero de providers
     const finalCount = await providerOptions.count();
     expect(finalCount).toBe(initialCount);
   });

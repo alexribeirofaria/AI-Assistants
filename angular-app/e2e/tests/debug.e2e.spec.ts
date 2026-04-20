@@ -1,6 +1,6 @@
-﻿import { test, expect } from "@playwright/test";
+﻿import { expect, test } from "@playwright/test";
+import { environment } from "../environments/environment";
 import { ApiHelper } from "../helpers/api.helper";
-import { environment } from "../../src/environments/environment";
 
 test.describe("Debug DOM Tests", () => {
   test("should show full page content", async ({ page }) => {
@@ -9,7 +9,7 @@ test.describe("Debug DOM Tests", () => {
     );
     page.on("pageerror", (err) => console.log("PAGE ERROR:", err.message));
 
-    await page.goto(environment.BASE_URL);
+    await page.goto(environment.API_URL);
 
     // Wait for page to load
     await page.waitForLoadState("domcontentloaded");

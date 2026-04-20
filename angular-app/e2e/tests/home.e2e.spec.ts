@@ -1,7 +1,8 @@
 ﻿import { test, expect } from "@playwright/test";
-import { HomePage } from "../pages/home.page";
-import { ApiHelper } from "../helpers/api.helper";
+
 import { environment } from "../environments/environment";
+import { ApiHelper } from "../helpers/api.helper";
+import { HomePage } from "../pages/home.page";
 
 test.describe("HomePage E2E Tests", () => {
   let homePage: HomePage;
