@@ -1,4 +1,5 @@
 ﻿import { Page, Locator } from "@playwright/test";
+
 import { environment } from "../environments/environment";
 
 export class HomePage {
