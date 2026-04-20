@@ -8,11 +8,14 @@ import unusedImports from "eslint-plugin-unused-imports";
 import tseslint from "typescript-eslint";
 
 export default [
+  {
+    ignores: ["coverage/**", "node_modules/**", "**/*.html"]
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
 
   {
-    files: ["**/*.ts"],
+    files: ["**/*.ts", "!**/*.html"],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
