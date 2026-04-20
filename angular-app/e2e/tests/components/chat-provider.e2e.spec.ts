@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+
 import { environment } from "../../environments/environment";
 
 test.describe("ChatProviderComponent E2E Tests", () => {
@@ -25,7 +26,7 @@ test.describe("ChatProviderComponent E2E Tests", () => {
     const providerSelect = page.locator("#provider-select");
     const firstOption = providerSelect.locator("option").first();
     
-    // A opção padrão existe no DOM - pode estar visível ou oculta dependendo do provider selecionado
+    // A opï¿½ï¿½o padrï¿½o existe no DOM - pode estar visï¿½vel ou oculta dependendo do provider selecionado
     const count = await providerSelect.locator("option").count();
     expect(count).toBeGreaterThan(0);
     
@@ -43,7 +44,7 @@ test.describe("ChatProviderComponent E2E Tests", () => {
 
     console.log("Provider options count:", count);
 
-    // Deve ter mais de 1 opção (padrão + providers)
+    // Deve ter mais de 1 opï¿½ï¿½o (padrï¿½o + providers)
     expect(count).toBeGreaterThan(1);
   });
 
@@ -55,7 +56,7 @@ test.describe("ChatProviderComponent E2E Tests", () => {
     const count = await options.count();
 
     if (count > 1) {
-      // Verificar que há providers específicos
+      // Verificar que hï¿½ providers especï¿½ficos
       const secondOption = options.nth(1);
       const value = await secondOption.getAttribute("value");
       expect(value).toBeTruthy();
@@ -74,7 +75,7 @@ test.describe("ChatProviderComponent E2E Tests", () => {
       const firstProvider = await options.nth(1).getAttribute("value");
       await providerSelect.selectOption(firstProvider!);
 
-      // Verificar que a seleção mudou
+      // Verificar que a seleï¿½ï¿½o mudou
       const selectedValue = await providerSelect.evaluate(
         (el) => (el as HTMLSelectElement).value,
       );
