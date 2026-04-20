@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "lint": "npx eslint \"angular-app/**/*.ts\" --fix && python -m ruff check python-app --fix",
-    "lint:check": "npx eslint -c \"eslint.config.mjs\" angular-app; if ($LASTEXITCODE -eq 0) { python -m ruff check python-app }"
+    "lint:check": "npx eslint -c \"eslint.config.json\" angular-app; if ($LASTEXITCODE -eq 0) { python -m ruff check python-app }"
   },
   "devDependencies": {
     "@angular-eslint/eslint-plugin": "^19.0.0",

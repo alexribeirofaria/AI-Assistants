@@ -4,7 +4,7 @@
   "scripts": {
     "start": "ng serve ",
     "start:dev": "ng serve --configuration=development",
-    "start:silent": "ng serve --proxy-config proxy.conf.json --open=false",
+    "start:silent": "ng serve --open=false  --no-live-reload ",
     "lint": "npx eslint src/**/*.ts --fix",
     "lint:check": "npx eslint src/**/*.ts",
     "build": "ng build",
