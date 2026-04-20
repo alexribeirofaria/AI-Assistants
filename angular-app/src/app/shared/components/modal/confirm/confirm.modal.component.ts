@@ -10,7 +10,7 @@ import { NgbModalConfig, NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-boots
 export class ModalConfirmComponent {
   header = 'Mensagem';
   message = '';
-  onClickConfirm: Function = () => { };
+  onClickConfirm: () => void = () => { };
 
   constructor(config: NgbModalConfig, public modalService: NgbModal, public activeModal: NgbActiveModal) {
     config.backdrop = 'static';
@@ -27,7 +27,7 @@ export class ModalConfirmComponent {
     this.modalService.dismissAll();
   }
 
-  setConfirmButton(_confirm: Function) {
+  setConfirmButton(_confirm: () => void) {
     this.onClickConfirm = () => {
       _confirm();
       this.activeModal.close();
