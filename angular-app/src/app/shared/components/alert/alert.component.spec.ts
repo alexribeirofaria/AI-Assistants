@@ -32,7 +32,7 @@ describe('AlertComponent', () => {
   });
 
   it('should have alertTypeClass with success type', () => {
-    expect(component.alertTypeClass).toBe('alert alert-success mt-2 bi bi-emoji-smile');
+    expect(component.alertTypeClass).toBe('alert alert-success mt-2');
   });
 
   it('should expose AlertType enum', () => {
@@ -62,3 +62,4 @@ describe('AlertComponent', () => {
     expect(result.componentInstance.alertTypeClass).toContain('alert-danger');
   });
 });
+
