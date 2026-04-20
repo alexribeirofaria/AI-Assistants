@@ -1,5 +1,6 @@
-﻿import { execSync, spawn } from "child_process";
-import path from "path";
+﻿import { execFileSync, execSync, spawn } from "child_process";
+import { existsSync } from "fs";
+import path, { join } from "path";
 
 // ================================
 // CONFIG
@@ -18,6 +19,28 @@ const isWin = process.platform === "win32";
 // ================================
 function bin(win: string, unix: string) {
   return isWin ? win : unix;
+}
+
+// ================================
+// SAFE Ensure Npm Dependencies
+// ================================
+
+function ensureDependencies(): void {
+  const nodeModulesPath = join(frontendPath, "node_modules");
+  const packageLock = join(frontendPath, "package-lock.json");
+
+  if (!existsSync(nodeModulesPath) || !existsSync(packageLock)) {
+    console.log("📦 Instalando dependências (estado inconsistente)...");
+
+    execFileSync("npm", ["install"], {
+      cwd: frontendPath,
+      stdio: "inherit"
+    });
+
+    return;
+  }
+
+  console.log("✔ Dependências OK");
 }
 
 // ================================
@@ -89,12 +112,11 @@ function waitForHttp(url: string, timeoutSeconds = 120): Promise<void> {
 // ================================
 async function main() {
   console.log("🧹 Pre-cleanup: freeing ports...");
-
   stopPortProcess(4200);
   stopPortProcess(5000);
-
   await new Promise((r) => setTimeout(r, 2000));
 
+  ensureDependencies();
   console.log("🚀 Starting E2E...");
 
   // ================================
@@ -129,12 +151,15 @@ async function main() {
 
     console.log("🧪 Running E2E tests...");
 
-    execSync("npx playwright test", {
-      stdio: "inherit",
-      cwd: frontendPath,
-      shell: "true",
-    });
-
+    
+    execSync(
+      "npx playwright test",
+      {
+        cwd: frontendPath,
+        stdio: "inherit"
+      }
+    );
+    
     console.log("✅ Tests finished successfully");
   } catch (err: any) {
     console.error("❌ ERROR:", err.message);
