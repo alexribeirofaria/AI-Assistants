@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+
 import { environment } from "../../environments/environment";
 
 test.describe("ChatListModelsComponent E2E Tests", () => {
@@ -18,7 +19,7 @@ test.describe("ChatListModelsComponent E2E Tests", () => {
   test("should have default option in model select", async ({ page }) => {
     const modelSelect = page.locator("#model-select");
     
-    // A opção padrão existe no DOM - pode estar visível ou oculta dependendo do model selecionado
+    // A opï¿½ï¿½o padrï¿½o existe no DOM - pode estar visï¿½vel ou oculta dependendo do model selecionado
     const count = await modelSelect.locator("option").count();
     expect(count).toBeGreaterThan(0);
     
@@ -119,7 +120,7 @@ test.describe("ChatListModelsComponent E2E Tests", () => {
           await providerSelect.selectOption(secondProvider!);
           await page.waitForTimeout(1000);
 
-          // Model deve ser resetado para a opção padrão
+          // Model deve ser resetado para a opï¿½ï¿½o padrï¿½o
           const selectedModel = await modelSelect.evaluate(
             (el) => (el as HTMLSelectElement).value,
           );
