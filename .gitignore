@@ -202,3 +202,5 @@ copilot/
 .claude/
 .openclaude/
 *mypy.ini
+.opencode/
+.blackbox/
