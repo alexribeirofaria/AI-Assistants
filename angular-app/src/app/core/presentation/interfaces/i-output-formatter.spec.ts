@@ -1,4 +1,5 @@
-import { IOutputFormatter } from './i_output_formatter';
+import { IOutputFormatter } from './i-output-formatter';
+
 
 describe('IOutputFormatter', () => {
   it('should be instantiated', () => {
