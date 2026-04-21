@@ -1,5 +1,5 @@
-import { OutputPresenterFactory } from './output_presenter_factory';
-import { IOutputPresenter } from '../interfaces/i_output_presenter';
+import { OutputPresenterFactory } from './output-presenter-factory';
+import { IOutputPresenter } from '../interfaces/i-output-presenter';
 
 export class PresenterFactory {
   static createConsolePresenter(): IOutputPresenter {
