@@ -1,4 +1,5 @@
-// Auto‑generated from python-app\infrastructure\repository\repository.py
+import { Registry } from './registry';
+
 export class Repository {
-  // TODO: implement conversion logic
+  constructor(public readonly registry: Registry = new Registry()) {}
 }
