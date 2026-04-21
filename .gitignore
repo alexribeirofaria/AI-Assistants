@@ -204,3 +204,4 @@ copilot/
 *mypy.ini
 .opencode/
 .blackbox/
+!coverage_test_check.ts
