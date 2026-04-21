@@ -1,0 +1,40 @@
+
+import { IServer, ModelDescriptor, TextCompletionResponse } from '../infrastructure/servers';
+import { BaseDomain } from './abstracts/base-domain';
+
+export class ClaudeDomain extends BaseDomain {
+  override readonly model = 'claude-haiku-4-5-20251001';
+
+  constructor(server: IServer, modelName: string) {
+    super(server, modelName);
+  }
+
+  override buildResponseMessages(response: unknown): string {
+    const completion = response as TextCompletionResponse;
+    if (Array.isArray(completion.content)) {
+      return completion.content.map((chunk) => chunk.text || chunk.content || '').join('\n');
+    }
+    return String(completion.content ?? '');
+  }
+
+  override async sendMessage(prompt: string): Promise<string> {
+    return this.send(() => this.server.messages!.create({
+      model: this.model,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: this.maxTokens,
+    }));
+  }
+
+  override listModels(): string[] {
+    try {
+      return this._fetchDomainNames();
+    } catch (e) {
+      return [`[ERROR] ${String(e)}`];
+    }
+  }
+
+  protected _fetchDomainNames(): string[] {
+    const models = this.server.models!.list();
+    return models.data.map((model: ModelDescriptor) => model.id);
+  }
+}
