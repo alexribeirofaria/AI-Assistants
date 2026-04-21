@@ -4,53 +4,40 @@
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
   "eslint.run": "onType",
-  "editor.tabSize": 2,
-  "editor.insertSpaces": true,
   "editor.detectIndentation": false,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always",
     "source.organizeImports": "always"
   },
-
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "HookyQR.beautify"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "HookyQR.beautify"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "HookyQR.beautify"
+  },
   "eslint.validate": ["typescript", "javascript", "html"],
-
   "github.copilot.enable": { "*": false },
   "codeium.enable": false,
-
   "editor.inlineSuggest.enabled": false,
   "editor.codeActions.triggerOnFocusChange": false,
-
   "editor.lightbulb.enabled": "onCode",
-
   "editor.quickSuggestions": {
     "other": true,
     "comments": false,
     "strings": false
   },
-
   "editor.experimental.useCodeActionsOnSave": false,
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[scss]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
   "js/ts.updateImportsOnFileMove.enabled": "always",
   "prettier.requireConfig": true,
   "editor.tabSize": 2,
@@ -60,7 +47,5 @@
   "js/ts.suggest.autoImports": true,
   "editor.codeActions": false,
   "editor.experimental.useAI": false,
-  "[jsonc]": {
-    "editor.defaultFormatter": "HookyQR.beautify"
-  }
+
 }
