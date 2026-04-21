@@ -1,4 +1,4 @@
-﻿import { execFileSync, execSync, spawn } from "child_process";
+import { execFileSync, execSync, spawn } from "child_process";
 import { existsSync } from "fs";
 import path, { join } from "path";
 
