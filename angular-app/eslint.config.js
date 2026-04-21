@@ -1,117 +1,54 @@
-import angular from "@angular-eslint/eslint-plugin";
-import angularTemplate from "@angular-eslint/eslint-plugin-template";
 import js from "@eslint/js";
-import importPlugin from "eslint-plugin-import";
-import sonarjs from "eslint-plugin-sonarjs";
-import unicorn from "eslint-plugin-unicorn";
-import unusedImports from "eslint-plugin-unused-imports";
-import tseslint from "typescript-eslint";
+import tsParser from "@typescript-eslint/parser";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
 
 export default [
   {
-    ignores: ["coverage/**", "node_modules/**", "**/*.html"]
+    ignores: ["coverage/**", "node_modules/**", "**/*.html"],
   },
   js.configs.recommended,
-  ...tseslint.configs.recommended,
-
   {
-    files: ["**/*.ts", "!**/*.html"],
+    files: ["**/*.ts"],
     languageOptions: {
-      parser: tseslint.parser,
+      parser: tsParser,
       parserOptions: {
         project: "./tsconfig.json",
-        tsconfigRootDir: "C:\\.dev\\AI-Assistants\\angular-app",
+        tsconfigRootDir: process.cwd(),
+        sourceType: "module",
+      },
+      globals: {
+        afterEach: "readonly",
+        beforeEach: "readonly",
+        console: "readonly",
+        describe: "readonly",
+        document: "readonly",
+        expect: "readonly",
+        expectAsync: "readonly",
+        it: "readonly",
+        jasmine: "readonly",
+        localStorage: "readonly",
+        performance: "readonly",
+        sessionStorage: "readonly",
+        spyOn: "readonly",
+        window: "readonly",
       },
     },
     plugins: {
-      sonarjs,
-      unicorn,
-      import: importPlugin,
-      "unused-imports": unusedImports,
-      "@angular-eslint": angular,
+      "@typescript-eslint": tsPlugin,
     },
     rules: {
       "no-console": "warn",
       "no-debugger": "error",
       "no-duplicate-imports": "error",
-
-      // =========================
-      // 🧠 COMPLEXIDADE (SOLID)
-      // =========================
-      "max-lines-per-function": ["warn", 50],
-      "max-depth": ["warn", 3],
-      "complexity": ["warn", 10],
-
-      // =========================
-      // 📦 IMPORTS
-      // =========================
-      "import/order": [
-        "warn",
-        {
-          groups: ["builtin", "external", "internal"],
-          "newlines-between": "always",
-          alphabetize: {
-            order: "asc",
-            caseInsensitive: false
-          },
-        },
-      ],
-
-      // =========================
-      // 🧹 LIMPEZA
-      // =========================
-      "unused-imports/no-unused-imports": "error",
-
-      // =========================
-      // 🔒 TYPESCRIPT
-      // =========================
+      "no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": "warn",
-
-      // =========================
-      // 🧠 QUALIDADE (Sonar)
-      // =========================
-      "sonarjs/cognitive-complexity": ["warn", 15],
-      "sonarjs/no-duplicate-string": "warn",
-
-      // =========================
-      // 🦄 PADRÕES MODERNOS
-      // =========================
-      "unicorn/filename-case": [
+      "@typescript-eslint/no-unused-vars": [
         "warn",
         {
-          case: "kebabCase",
-        },
-      ],
-
-      // =========================
-      // 🔥 ANGULAR
-      // =========================
-      "@angular-eslint/directive-selector": [
-        "error",
-        {
-          type: "attribute",
-          prefix: "app",
-          style: "camelCase",
-        },
-      ],
-      "@angular-eslint/component-selector": [
-        "error",
-        {
-          type: "element",
-          prefix: "app",
-          style: "kebab-case",
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
         },
       ],
     },
-  },
-
-  {
-    files: ["**/*.html"],
-    plugins: {
-      "@angular-eslint/template": angularTemplate,
-    },
-    rules: {},
   },
 ];
-

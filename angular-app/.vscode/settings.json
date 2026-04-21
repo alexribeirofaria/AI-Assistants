@@ -1,6 +1,15 @@
 {
   "files.autoSave": "afterDelay",
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
   "eslint.run": "onType",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always",
     "source.organizeImports": "always"
@@ -49,7 +58,9 @@
   "explorer.compactFolders": false,
   "angular.enable-strict-mode-prompt": false,
   "js/ts.suggest.autoImports": true,
-  "ts/js.suggest.autoImports": true,
   "editor.codeActions": false,
-  "editor.experimental.useAI": false
+  "editor.experimental.useAI": false,
+  "[jsonc]": {
+    "editor.defaultFormatter": "HookyQR.beautify"
+  }
 }
