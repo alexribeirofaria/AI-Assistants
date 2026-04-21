@@ -1,6 +1,7 @@
 {
   "name": "ai-assistants",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "start": "ng serve ",
     "start:dev": "ng serve --configuration=development",
@@ -45,13 +46,14 @@
     "@angular/compiler-cli": "21.2.7",
     "@angular/localize": "21.2.7",
     "@eslint/js": "^9.17.0",
-    "eslint": "^9.39.4",
     "@playwright/test": "^1.59.1",
     "@types/bootstrap": "^5.2.10",
     "@types/jasmine": "~6.0.0",
     "@types/jquery": "^3.5.32",
     "@typescript-eslint/eslint-plugin": "^8.58.2",
     "@typescript-eslint/parser": "^8.58.2",
+    "eslint": "^9.39.4",
+    "jasmine": "^6.2.0",
     "jasmine-core": "~6.2.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
@@ -60,7 +62,14 @@
     "karma-jasmine-html-reporter": "~2.2.0",
     "playwright-ng-schematics": "^21.0.9",
     "ts-evaluator": "^2.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "autoprefixer": "10.4.5",
+    "@eslint/eslintrc": {
+      "ajv": "^6.12.6",
+      "ajv-keywords": "^3.5.2"
+    }
   }
 }
-
