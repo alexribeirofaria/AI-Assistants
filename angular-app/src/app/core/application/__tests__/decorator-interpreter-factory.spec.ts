@@ -1,4 +1,4 @@
-import { DecoratorInterpreterFactory } from '../decorator/helpers/interpreter/decorator-interpreter-factory';
+import { DecoratorInterpreterFactory } from '../decorator/interpreter/decorator-interpreter-factory';
 
 describe('DecoratorInterpreterFactory', () => {
   it('should be instantiated', () => {
