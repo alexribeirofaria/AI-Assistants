@@ -6,7 +6,7 @@ export abstract class BaseServer {
 
   constructor() {
     const factory = this.createFactory();
-    this.server = factory.buildServer();
+    this.server = factory.createServer();
   }
 
   abstract createFactory(): BaseServerFactory;
