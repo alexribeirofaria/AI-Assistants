@@ -1,9 +1,10 @@
 import { CachedDomainListMixin } from '../cache/domain-list-cache';
-import { ApiResponse } from './api-response';
+import type { ApiResponse } from './api-response';
 import { IServer } from '../../infrastructure/servers/abstracts/i-server';
 
 export abstract class BaseDomain extends CachedDomainListMixin {
   readonly model: string;
+  protected readonly modelName: string;
   protected maxTokens = 2048;
 
   protected constructor(
@@ -11,6 +12,7 @@ export abstract class BaseDomain extends CachedDomainListMixin {
     modelName: string
   ) {
     super();
+    this.modelName = modelName;
     this.model = modelName;
   }
 
@@ -22,11 +24,22 @@ export abstract class BaseDomain extends CachedDomainListMixin {
 
   abstract sendMessage(prompt: string): Promise<string>;
 
-  abstract listModels(): string[];
+  abstract listModels(): Promise<string[]>;
 
   protected async send(request: () => Promise<unknown>): Promise<string> {
-    const response = await request();
-    return this.buildResponseMessages(response);
+    try {
+      const response = await request();
+      if (response == null) {
+        return '[EMPTY RESPONSE]';
+      }
+      return this.buildResponseMessages(response);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message.toLowerCase().includes('quota')) {
+        return '[QUOTA ERROR] Limite de cota atingido';
+      }
+      return `[UNKNOWN ERROR] ${message}`;
+    }
   }
 
   protected toApiResponse(response: ApiResponse): ApiResponse {
