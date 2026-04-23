@@ -16,7 +16,7 @@ export class SwitchModelStrategy extends BaseHelperStrategy {
     const registry = new Registry();
 
     for (const domainName of registry.availableDomains()) {
-      const domainCls = registry.create(domainName).domainClass ?? null;
+      const domainCls = registry.getEntry(domainName).domainClass ?? null;
       if (domainCls) {
         aliases[DecoratorTextHelper.normalizeText(domainCls.name).replace(/ /g, '')] = domainCls;
         const domainDisplay = domainCls.getDomainName?.();
