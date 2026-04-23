@@ -1,5 +1,6 @@
 import { IOutputStream } from '../interfaces/i-output-stream';
 
+ 
 export class OutputStream implements IOutputStream {
   private inlineActive = false;
   private lastInlineLength = 0;
