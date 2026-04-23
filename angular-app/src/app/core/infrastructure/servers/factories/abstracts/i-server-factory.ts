@@ -1,7 +1,9 @@
-import { IServer } from '../../abstracts/i-server';
+import type { IServer } from '../../abstracts/i-server';
 
 export interface IServerFactory {
   buildServer(): IServer;
+
+  createServer(): IServer;
 
   requireEnv(key: string, errorMessage: string): string;
 
