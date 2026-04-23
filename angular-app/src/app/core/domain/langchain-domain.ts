@@ -3,6 +3,18 @@ import { BaseDomain } from './abstracts/base-domain';
 
 export class LangChainDomain extends BaseDomain {
   override readonly model = 'gpt-3.5-turbo';
+  private readonly availableModels = [
+    'gpt-4o-mini',
+    'gpt-4o',
+    'gpt-4.1',
+    'gpt-3.5-turbo',
+    'llama3-70b-8192',
+    'mixtral-8x7b',
+    'gemini-1.5-flash',
+    'gemini-1.5-pro',
+    'claude-3-haiku',
+    'claude-3-sonnet',
+  ];
 
   constructor(server: IServer, modelName: string) {
     super(server, modelName);
@@ -22,16 +34,15 @@ export class LangChainDomain extends BaseDomain {
     });
   }
 
-  override listModels(): string[] {
+  override async listModels(): Promise<string[]> {
     try {
-      return this._fetchDomainNames();
+      return await this.getDomainNamesCached();
     } catch (e) {
       return [`[ERROR] ${String(e)}`];
     }
   }
 
-  protected _fetchDomainNames(): string[] {
-    const models = this.server.models!.list();
-    return models.data.map((model: ModelDescriptor) => model.id);
+  protected async _fetchDomainNames(): Promise<string[]> {
+    return this.availableModels;
   }
 }
