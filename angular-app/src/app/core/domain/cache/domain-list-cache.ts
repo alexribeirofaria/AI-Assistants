@@ -5,16 +5,32 @@ export abstract class CachedDomainListMixin {
   protected readonly _domainCacheMaxItems: number = 50;
 
   private readonly _domainCache: ExpiringValueCache<readonly string[]> = new ExpiringValueCache<readonly string[]>(this._domainCacheTtlSeconds);
+  private _pendingDomainNames: Promise<readonly string[]> | null = null;
 
-  protected abstract _fetchDomainNames(): string[];
+  protected abstract _fetchDomainNames(): string[] | Promise<string[]>;
 
-  protected getDomainNamesCached(): string[] {
-    const cachedNames = this._domainCache.getOrSet(() => this._fetchDomainNamesSnapshot());
-    return Array.from(cachedNames);
+  protected async getDomainNamesCached(): Promise<string[]> {
+    const cachedNames = this._domainCache.get();
+    if (cachedNames !== null) {
+      return Array.from(cachedNames);
+    }
+
+    if (!this._pendingDomainNames) {
+      this._pendingDomainNames = this._fetchDomainNamesSnapshot()
+        .then((snapshot) => {
+          this._domainCache.set(snapshot);
+          return snapshot;
+        })
+        .finally(() => {
+          this._pendingDomainNames = null;
+        });
+    }
+
+    return Array.from(await this._pendingDomainNames);
   }
 
-  private _fetchDomainNamesSnapshot(): readonly string[] {
-    const names = this._fetchDomainNames();
+  private async _fetchDomainNamesSnapshot(): Promise<readonly string[]> {
+    const names = await this._fetchDomainNames();
     const sanitized = new Set(names.map(name => this._cleanName(name.trim())).filter(Boolean));
     const ordered = Array.from(sanitized).sort().slice(0, this._domainCacheMaxItems);
     return ordered as readonly string[];
@@ -27,13 +43,14 @@ export abstract class CachedDomainListMixin {
     return name;
   }
 
-  getDomainView(prefix: string = '- '): string[] {
-    const names = this.getDomainNamesCached();
+  async getDomainView(prefix: string = '- '): Promise<string[]> {
+    const names = await this.getDomainNamesCached();
     return names.map(name => `${prefix}${this._cleanName(name)}`);
   }
 
   clearDomainCache(): void {
     this._domainCache.clear();
+    this._pendingDomainNames = null;
   }
 
   getDomainCacheStats(): {
