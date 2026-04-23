@@ -41,9 +41,9 @@ export class ThreadController {
       let response = '';
       if (task.kind === 'message') {
         response = await strategy.execute(task.payload);
-        this.presenter.showResponse(strategy.domainClass.name, response);
+        this.presenter.showResponse(strategy.domainClass.getDomainName(), response);
       } else if (task.kind === 'list_models') {
-        const { header, names, prefix } = strategy.listDomains();
+        const { header, names, prefix } = await strategy.listDomains();
         this.presenter.showModelList(header, names, prefix);
       }
     } catch (error) {
@@ -76,4 +76,3 @@ export class ThreadController {
     });
   }
 }
-
