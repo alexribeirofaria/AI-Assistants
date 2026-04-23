@@ -1,4 +1,4 @@
-import { InterfaceApplicationFactory } from '../../strategies/factories/abstracts/interface-application-factory';
+import type { InterfaceApplicationFactory } from '../../strategies/factories/abstracts/interface-application-factory';
 import { BaseApplicationStrategy } from '../../strategies/abstracts/base-application-strategy';
 import { BaseDomain } from '../../../domain/abstracts/base-domain';
 
