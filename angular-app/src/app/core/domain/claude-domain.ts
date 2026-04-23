@@ -25,16 +25,16 @@ export class ClaudeDomain extends BaseDomain {
     }));
   }
 
-  override listModels(): string[] {
+  override async listModels(): Promise<string[]> {
     try {
-      return this._fetchDomainNames();
+      return await this.getDomainNamesCached();
     } catch (e) {
       return [`[ERROR] ${String(e)}`];
     }
   }
 
-  protected _fetchDomainNames(): string[] {
-    const models = this.server.models!.list();
+  protected async _fetchDomainNames(): Promise<string[]> {
+    const models = await this.server.models!.list();
     return models.data.map((model: ModelDescriptor) => model.id);
   }
 }
