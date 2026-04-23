@@ -1,4 +1,4 @@
-import { DecoratorInterpreter } from '../decorator/helpers/interpreter/decorator-interpreter';
+import { DecoratorInterpreter } from '../decorator/interpreter/decorator-interpreter';
 import { BaseHelperStrategy } from '../decorator/helpers/strategies/abstracts/base-helper-strategy';
 import { UserAction } from '../enums/user-action';
 import { BaseDomain } from '../../domain/abstracts/base-domain';
