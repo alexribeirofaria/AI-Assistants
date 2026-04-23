@@ -6,3 +6,5 @@ export class LangChainStrategy extends BaseApplicationStrategy {
     super(LangChainDomain);
   }
 }
+
+export const LangchainStrategy = LangChainStrategy;
