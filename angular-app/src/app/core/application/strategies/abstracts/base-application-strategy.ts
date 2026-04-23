@@ -1,5 +1,6 @@
 import { IServer } from '../../../infrastructure/servers';
 import { BaseDomain } from '../../../domain/abstracts/base-domain';
+import { Repository } from '../../../infrastructure/repository';
 
 export interface DomainConstructor<T extends BaseDomain = BaseDomain> {
   new (
@@ -17,17 +18,30 @@ export interface DomainListView {
 }
 
 export abstract class BaseApplicationStrategy {
-  protected constructor(public readonly domainClass: DomainConstructor) {}
+  private domainInstance: BaseDomain | null = null;
 
-  async execute(task: string): Promise<string> {
-    return Promise.resolve(task);
+  protected constructor(
+    public readonly domainClass: DomainConstructor,
+    private readonly repository: Repository = new Repository()
+  ) {}
+
+  protected ensureDomain(): BaseDomain {
+    if (!this.domainInstance) {
+      this.domainInstance = this.repository.buildDomain(this.domainClass);
+    }
+    return this.domainInstance;
   }
 
-  listDomains(): DomainListView {
+  async execute(task: string): Promise<string> {
+    return this.ensureDomain().sendMessage(task);
+  }
+
+  async listDomains(): Promise<DomainListView> {
+    const names = await this.ensureDomain().listModels();
     return {
-      header: `${this.domainClass.getDomainName()} models`,
-      names: [],
-      prefix: '- ',
+      header: `=== ${this.domainClass.getDomainName()} Models ===`,
+      names,
+      prefix: '',
     };
   }
 }
