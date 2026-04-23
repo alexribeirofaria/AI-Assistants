@@ -18,16 +18,16 @@ export class GeminiDomain extends BaseDomain {
     return this.send(geminiCall);
   }
 
-  override listModels(): string[] {
+  override async listModels(): Promise<string[]> {
     try {
-      return this._fetchDomainNames();
+      return await this.getDomainNamesCached();
     } catch (e) {
       return [`[ERROR] ${String(e)}`];
     }
   }
 
-  protected _fetchDomainNames(): string[] {
-    const models = this.server.models!.list().data;
+  protected async _fetchDomainNames(): Promise<string[]> {
+    const models = (await this.server.models!.list()).data;
     return models.map((model: ModelDescriptor) => model.name || model.id);
   }
 }
