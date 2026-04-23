@@ -1,4 +1,4 @@
-export { ApiResponse } from './abstracts/api-response';
+export type { ApiResponse } from './abstracts/api-response';
 export { BaseDomain } from './abstracts/base-domain';
 export { DomainType } from './abstracts/domain-type';
 export { CachedDomainListMixin } from './cache/domain-list-cache';
