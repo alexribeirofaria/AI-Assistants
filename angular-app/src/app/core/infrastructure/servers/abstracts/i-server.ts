@@ -51,6 +51,6 @@ export interface IServer {
   };
   invoke?: (messages: ChatMessage[]) => Promise<TextCompletionResponse>;
   models: {
-    list: () => { data: ModelDescriptor[] };
+    list: () => Promise<{ data: ModelDescriptor[] }>;
   };
 }
