@@ -47,5 +47,8 @@
   "js/ts.suggest.autoImports": true,
   "editor.codeActions": false,
   "editor.experimental.useAI": false,
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
 
 }
