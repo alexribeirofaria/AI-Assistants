@@ -6,7 +6,7 @@ import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 
-const minCoverage: number = 80;
+const minCoverage: number = 85;
 const projectRoot: string = process.cwd();
 
 
