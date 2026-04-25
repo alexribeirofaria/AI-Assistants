@@ -1,4 +1,5 @@
 export interface IOutputFormatter {
+  formatInputPrompt(providerName: string, modelName: string): string;
   formatHelp(): string;
   formatWelcome(): string;
   formatModelSwitched(prompt: string): string;
