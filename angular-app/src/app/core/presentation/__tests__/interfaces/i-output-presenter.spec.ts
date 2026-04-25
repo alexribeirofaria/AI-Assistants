@@ -4,6 +4,10 @@ class MockOutputPresenter implements IOutputPresenter {
   interpretedCalls: string[] = [];
   showCalls: string[] = [];
 
+  getInputPrompt(providerName: string, modelName: string): string {
+    return `[${providerName}(${modelName})] > `;
+  }
+
   showUI(): void {}
   showModelSwitched(prompt: string): void { this.showCalls.push(prompt); }
   showInterpretedInput(userInput: string, expected: string): void { this.interpretedCalls.push(`${userInput} -> ${expected}`); }
