@@ -26,7 +26,7 @@ class TestDomain extends BaseDomain {
     return Promise.resolve('');
   }
 
-  listModels(): string[] {
+  async listModels(): Promise<string[]> {
     return [];
   }
 }
@@ -36,7 +36,7 @@ class ConcreteStrategy extends BaseHelperStrategy {
     return normalized === 'test';
   }
 
-  handle(normalized: string, tokens: string[]): [UserAction, string | typeof TestDomain | null] {
+  handle(normalized: string, tokens: string[]): [UserAction, string | import('../strategies/abstracts/base-application-strategy').DomainConstructor | null] {
     void normalized;
     void tokens;
     return [UserAction.MESSAGE, TestDomain];
