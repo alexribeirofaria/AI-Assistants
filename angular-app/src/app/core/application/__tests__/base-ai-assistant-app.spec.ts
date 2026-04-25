@@ -4,9 +4,9 @@ import { StrategyApplicationFactory } from '../strategies/factories/strategy-app
 import { DomainConstructor } from '../strategies/abstracts/base-application-strategy';
 
 class TestApp extends BaseAIAssistantApp {
-  runConsoleApp(): void {}
+  runApp(): void {}
 
-  override _handleAction(_action: string, _value: string | DomainConstructor | null): boolean {
+  override async _handleAction(_action: string, _value: string | DomainConstructor | null): Promise<boolean> {
     return false;
   }
 }
@@ -23,5 +23,13 @@ describe('BaseAIAssistantApp', () => {
     expect(app.presenterInstance).toBe(presenter);
     app.clearScreen();
     expect(console.clear).toHaveBeenCalled();
+  });
+
+  it('reuses the presenter instance when provided directly', () => {
+    const presenter = jasmine.createSpyObj<OutputPresenter>('OutputPresenter', ['showUI']);
+    const app = new TestApp(new StrategyApplicationFactory(), presenter, null);
+
+    expect(app.presenterInstance).toBe(presenter);
+    expect(app.presenterInstance).toBe(presenter);
   });
 });
