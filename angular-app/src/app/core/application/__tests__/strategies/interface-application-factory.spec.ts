@@ -26,7 +26,7 @@ class TestDomain extends BaseDomain {
     return Promise.resolve('');
   }
 
-  listModels(): string[] {
+  async listModels(): Promise<string[]> {
     return [];
   }
 }
