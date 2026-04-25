@@ -38,6 +38,13 @@ class RouteRegistry:
             self._controller.get_current_provider,
             methods=["GET"],
         )
+        
+        self._app.add_url_rule(
+            "/default-model",
+            "get_default-mnodel",
+            self._controller.get_default_model,
+            methods=["GET"],
+        )
 
         self._app.add_url_rule(
             "/change-provider",

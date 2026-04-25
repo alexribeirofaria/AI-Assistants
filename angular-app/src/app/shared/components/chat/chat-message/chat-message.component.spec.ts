@@ -29,6 +29,11 @@ describe('ChatMessageComponent', () => {
     expect(component.isUser).toBe(false);
   });
 
+  it('should show provider name for assistant messages when available', () => {
+    component.message = { id: '1', role: 'assistant', content: 'test', provider: 'OpenAI' };
+    expect(component.assistantLabel).toBe('Assistente · OpenAI');
+  });
+
   it('should set isStreaming true when streaming is true', () => {
     component.message = { id: '1', role: 'user', content: 'test', streaming: true };
     expect(component.isStreaming).toBe(true);

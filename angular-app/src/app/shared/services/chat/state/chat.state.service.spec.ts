@@ -68,13 +68,14 @@ describe('ChatStateService Unit Test', () => {
 
   describe('startStreaming', () => {
     it('should add streaming assistant message, set loading true and error empty', () => {
-      const msg = service.startStreaming();
+      const msg = service.startStreaming('openai');
 
       expect(msg).toEqual({
         id: jasmine.any(String),
         role: 'assistant',
         content: '',
-        streaming: true
+        streaming: true,
+        provider: 'openai'
       });
       expect(service.messages()).toContain(msg);
       expect(service.isLoading()).toBe(true);
@@ -84,7 +85,7 @@ describe('ChatStateService Unit Test', () => {
 
   describe('appendChunk', () => {
     it('should append chunk to last assistant message', () => {
-      service.startStreaming();
+      service.startStreaming('openai');
       service.appendChunk('hello');
 
       const lastMsg = service.messages()[service.messages().length - 1];
@@ -103,7 +104,7 @@ describe('ChatStateService Unit Test', () => {
 
   describe('stopStreaming', () => {
     it('should stop streaming on last assistant and set loading false', () => {
-      service.startStreaming();
+      service.startStreaming('openai');
       service.stopStreaming();
 
       const lastMsg = service.messages()[service.messages().length - 1];

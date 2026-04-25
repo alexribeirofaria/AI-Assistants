@@ -34,18 +34,31 @@ describe('HttpChatGateway Unit Tests', () => {
   it('should fetch models with encoded provider', async () => {
     const promise = gateway.getModels('open ai');
 
-    const req = httpMock.expectOne('http://localhost:5000/models?provider=open%20ai');
+    const changeProviderReq = httpMock.expectOne('http://localhost:5000/change-provider');
+    expect(changeProviderReq.request.method).toBe('POST');
+    expect(changeProviderReq.request.body).toEqual({ provider: 'open ai' });
+    changeProviderReq.flush({ status: 'ok' });
+
+    const req = httpMock.expectOne('http://localhost:5000/models');
     expect(req.request.method).toBe('GET');
-    req.flush({ models: [{ id: 'gpt-4o', modelName: 'GPT-4o', provider: 'openai' }] });
+    req.flush({
+      defaultModel: 'gpt-4o',
+      models: [{ id: 'gpt-4o', modelName: 'GPT-4o', provider: 'openai' }],
+    });
 
     await expectAsync(promise).toBeResolvedTo({
-      defaultModel: undefined,
+      defaultModel: 'gpt-4o',
       models: [{ id: 'gpt-4o', modelName: 'GPT-4o', provider: 'openai' }],
     });
   });
 
   it('should fetch models without provider and fallback to empty list', async () => {
     const promise = gateway.getModels();
+
+    const changeProviderReq = httpMock.expectOne('http://localhost:5000/change-provider');
+    expect(changeProviderReq.request.method).toBe('POST');
+    expect(changeProviderReq.request.body).toEqual({ provider: undefined });
+    changeProviderReq.flush({ status: 'ok' });
 
     const req = httpMock.expectOne('http://localhost:5000/models');
     expect(req.request.method).toBe('GET');
@@ -55,11 +68,11 @@ describe('HttpChatGateway Unit Tests', () => {
   });
 
   it('should return default model', async () => {
-    const promise = gateway.getDefaultModel();
+    const promise = gateway.getDefaultModel('openai');
 
-    const req = httpMock.expectOne('http://localhost:5000/models');
+    const req = httpMock.expectOne('http://localhost:5000/default-model');
     expect(req.request.method).toBe('GET');
-    req.flush({ models: [], defaultModel: 'gpt-4o' });
+    req.flush({ defaultModel: ['gpt-4o'] });
 
     await expectAsync(promise).toBeResolvedTo('gpt-4o');
   });
@@ -67,9 +80,9 @@ describe('HttpChatGateway Unit Tests', () => {
   it('should return provider-scoped default model', async () => {
     const promise = gateway.getDefaultModel('open ai');
 
-    const req = httpMock.expectOne('http://localhost:5000/models?provider=open%20ai');
+    const req = httpMock.expectOne('http://localhost:5000/default-model');
     expect(req.request.method).toBe('GET');
-    req.flush({ defaultModel: 'gpt-4o-mini' });
+    req.flush({ defaultModel: ['gpt-4o-mini'] });
 
     await expectAsync(promise).toBeResolvedTo('gpt-4o-mini');
   });

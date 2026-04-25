@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AIAssistantApp } from '../../../../../core/application';
 import { IChatAssistantApp } from '../../../../../core/application/interfaces';
+import { ChatErrorHandlerService } from '../../error-handler/chat-error-handler.service';
 import { ChatStateService } from '../../state/chat.state.service';
 import { CoreChatGateway } from './core-chat-gateway';
 
@@ -24,6 +25,7 @@ describe('CoreChatGateway Unit Tests', () => {
       providers: [
         CoreChatGateway,
         ChatStateService,
+        ChatErrorHandlerService,
         { provide: AIAssistantApp, useValue: app },
       ],
     });

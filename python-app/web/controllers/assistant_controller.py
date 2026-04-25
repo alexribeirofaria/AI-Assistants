@@ -57,6 +57,13 @@ class AssistantController(StaticController):
         except Exception as exc:
             return jsonify({"error": str(exc)}), 500
 
+    def get_default_model(self):
+        try:
+            default_model = self._assistant_app.get_default_model()
+            return jsonify({"default_model": default_model})
+        except Exception as exc:
+            return jsonify({"error": str(exc)}), 500
+
     def list_providers(self):
         try:
             available = self._assistant_app.get_available_providers()

@@ -59,7 +59,7 @@ describe('BaseApplicationStrategy Unit Tests', () => {
     } as unknown as Repository);
 
     await expectAsync(strategy.listDomains()).toBeResolvedTo({
-      header: '=== Fake Models ===',
+      header: '=== FakeDomain Models ===',
       names: ['m1', 'm2'],
       prefix: '',
     });

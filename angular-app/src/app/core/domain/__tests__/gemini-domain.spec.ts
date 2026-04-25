@@ -31,7 +31,7 @@ describe('Gemini Unit Tests', () => {
   });
 
   it('should have correct model and maxTokens', () => {
-    expect(domain.model).toBe('gemini-1.5-flash');
+    expect(domain.model).toBe('gemini-2.0-flash');
     expect((domain as unknown as { maxTokens: number }).maxTokens).toBe(4096);
   });
 
@@ -46,7 +46,7 @@ describe('Gemini Unit Tests', () => {
 
   it('should sendMessage', async () => {
     const result = await domain.sendMessage('prompt');
-    expect(createChatSpy).toHaveBeenCalledOnceWith({ model: 'gemini-1.5-flash' });
+    expect(createChatSpy).toHaveBeenCalledOnceWith({ model: 'gemini-2.0-flash' });
     expect(sendMessageSpy).toHaveBeenCalledOnceWith('prompt', { max_output_tokens: 4096 });
     expect(result).toBe('response text');
   });
@@ -68,7 +68,7 @@ describe('Gemini Unit Tests', () => {
     listModelsSpy.and.throwError('gemini list failed');
     const result = await domain.listModels();
 
-    expect(result[0]).toContain('[ERROR]');
+    expect(result[0]).toContain('[error]');
     expect(result[0]).toContain('gemini list failed');
   });
 });

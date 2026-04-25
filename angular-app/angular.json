@@ -110,10 +110,10 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
+            "proxyConfig": "proxy.conf.cjs",
             "headers": {
               "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
-              "Cross-Origin-Embedder-Policy": "unsafe-none",
-              "proxyConfig": "proxy.conf.json"
+              "Cross-Origin-Embedder-Policy": "unsafe-none"
             }
           },
           "configurations": {

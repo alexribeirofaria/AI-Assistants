@@ -1,14 +1,15 @@
 <div class="chat-container">
-  <div class="chat-header">
-    <app-chat-provider [providers]="providers()" [selectedProvider]="selectedProvider()"
-      (providerChange)="onProviderChange($event)"></app-chat-provider>
-    <app-chat-list-models [models]="models()" [selectedModel]="selectedModel()" (modelChange)="onModelChange($event)">
-    </app-chat-list-models>
-  </div>
   <app-chat-list [messages]="messages()"></app-chat-list>
   @if (error()) {
   <div class="alert alert-danger">{{ error() }}</div>
   }
-  <app-chat-input [disabled]="isLoading()" (messageSend)="onMessageSend($event)">
-  </app-chat-input>
+  <div class="chat-wrapper-container ">
+    <div class="container-wrapper">
+      <app-chat-provider [providers]="providers()" [selectedProvider]="selectedProvider()"
+        (providerChange)="onProviderChange($event)"></app-chat-provider>
+      <app-chat-list-models [models]="models()" [selectedModel]="selectedModel()" (modelChange)="onModelChange($event)">
+      </app-chat-list-models>
+      <app-chat-input [disabled]="isLoading()" (messageSend)="onMessageSend($event)"></app-chat-input>
+    </div>
+  </div>
 </div>

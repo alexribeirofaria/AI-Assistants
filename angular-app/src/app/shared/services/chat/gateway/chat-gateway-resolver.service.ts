@@ -16,7 +16,7 @@ export class ChatGatewayResolverService {
   ) {}
 
   public resolveChain(): IChatGateway {
-    return this.isCliRuntime() ? this.coreGateway : this.httpGateway;
+    return this.isCliRuntime() ? this.httpGateway : this.coreGateway;
   }
 
   private isCliRuntime(): boolean {

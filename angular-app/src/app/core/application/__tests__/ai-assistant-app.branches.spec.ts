@@ -96,7 +96,12 @@ describe('AIAssistantApp Branch Unit Tests', () => {
       },
     });
 
-    await expectAsync(app.listModels('openai')).toBeRejectedWithError('[ERROR] provider down');
+    await expectAsync(app.listModels('openai')).toBeResolvedTo({
+      defaultModel: 'gpt-4o-mini',
+      models: [
+        { id: '[ERROR] provider down', modelName: '[ERROR] provider down', provider: 'openai' },
+      ],
+    });
     expect(strategy.listDomains).toHaveBeenCalled();
   });
 
@@ -139,18 +144,24 @@ describe('AIAssistantApp Branch Unit Tests', () => {
 
     await expectAsync(app.listModels('openai')).toBeResolvedTo({
       defaultModel: 'm1',
-      models: [{ id: 'm1', modelName: 'm1', provider: 'openai' }],
+      models: [{ id: 'm1', modelName: 'm1', provider: 'fd' }],
     });
   });
 
-  it('throws when sending message receives a domain error marker', async () => {
+  it('returns the domain response payload even when it contains an error marker', async () => {
     const { app } = createApp({
       strategy: {
         execute: jasmine.createSpy('execute').and.resolveTo('[ERROR] execution failed'),
       },
     });
 
-    await expectAsync(app.sendMessage('hello')).toBeRejectedWithError('[ERROR] execution failed');
+    await expectAsync(app.sendMessage('hello')).toBeResolvedTo({
+      input: 'hello',
+      response: {
+        model: 'gpt-4o-mini',
+        response: '[ERROR] execution failed',
+      },
+    });
   });
 
   it('throws when provider is not supported', async () => {
@@ -180,14 +191,10 @@ describe('AIAssistantApp Branch Unit Tests', () => {
     const { app, factory, strategy } = createApp();
     factory.parseDomain.and.returnValue(null);
 
-    await expectAsync(app.listModels('unknown')).toBeResolvedTo({
-      defaultModel: 'gpt-4o-mini',
-      models: [
-        { id: 'gpt-4o-mini', modelName: 'gpt-4o-mini', provider: 'openai' },
-        { id: 'gpt-4o', modelName: 'gpt-4o', provider: 'openai' },
-      ],
-    });
-    expect(strategy.listDomains).toHaveBeenCalled();
+    await expectAsync(app.listModels('unknown')).toBeRejectedWithError(
+      'Provider não suportado: unknown'
+    );
+    expect(strategy.listDomains).not.toHaveBeenCalled();
   });
 
   it('returns first model when current and selected models are not present', async () => {
