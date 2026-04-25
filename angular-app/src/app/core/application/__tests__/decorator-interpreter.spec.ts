@@ -27,7 +27,7 @@ class TestDomain extends BaseDomain {
     return Promise.resolve('');
   }
 
-  listModels(): string[] {
+  async listModels(): Promise<string[]> {
     return [];
   }
 }
@@ -37,7 +37,7 @@ class MessageStrategy extends BaseHelperStrategy {
     return normalized === 'message';
   }
 
-  handle(): [UserAction, string | typeof TestDomain | null] {
+  handle(): [UserAction, string | import('../strategies/abstracts/base-application-strategy').DomainConstructor | null] {
     return [UserAction.MESSAGE, 'hello'];
   }
 }
@@ -47,7 +47,7 @@ class ClearStrategy extends BaseHelperStrategy {
     return normalized === 'cls';
   }
 
-  handle(): [UserAction, string | typeof TestDomain | null] {
+  handle(): [UserAction, string | import('../strategies/abstracts/base-application-strategy').DomainConstructor | null] {
     return [UserAction.CLEAR, null];
   }
 }
