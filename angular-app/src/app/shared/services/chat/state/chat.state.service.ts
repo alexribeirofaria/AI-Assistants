@@ -85,22 +85,11 @@ export class ChatStateService {
 
   setSelectedProvider(provider: string): void {
     this._selectedProvider.set(provider);
-    this.autoSelectModelForProvider(provider);
+    this._selectedModel.set('');
   }
 
   setProvider(provider: string): void {
     this.setSelectedProvider(provider);
-  }
-
-  private autoSelectModelForProvider(provider: string): void {
-    if (!provider) return;
-    const models = this._models();
-    if (!models.length) return;
-    
-    const providerModels = models.filter(m => m.provider === provider);
-    if (providerModels.length > 0) {
-      this._selectedModel.set(providerModels[0].id);
-    }
   }
 
   setModel(model: string): void {
@@ -109,12 +98,6 @@ export class ChatStateService {
 
   setModels(models: IHomeModel[]): void {
     this._models.set(models);
-    const currentProviders = this._providers();
-    if (currentProviders.length === 0) {
-      const providers = [...new Set(models.map(m => m.provider))];
-      this._providers.set(providers);
-    }
-    this.autoSelectModelForProvider(this._selectedProvider());
   }
 
   setProviders(providers: string[]): void {
@@ -125,4 +108,3 @@ export class ChatStateService {
     this._error.set('');
   }
 }
-
