@@ -1,7 +1,7 @@
-import { IServer, ModelDescriptor, TextCompletionResponse } from '../infrastructure/servers/abstracts';
+import { IServer, TextCompletionResponse } from '../infrastructure/servers/abstracts';
 import { BaseDomain } from './abstracts/base-domain';
 
-export class LangChainDomain extends BaseDomain {
+export class LangChain extends BaseDomain {
   override readonly model = 'gpt-3.5-turbo';
   private readonly availableModels = [
     'gpt-4o-mini',
