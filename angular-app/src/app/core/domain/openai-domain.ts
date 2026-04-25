@@ -2,7 +2,7 @@
 import { IServer, ModelDescriptor, TextCompletionResponse } from '../infrastructure/servers';
 import { BaseDomain } from './abstracts/base-domain';
 
-export class OpenAIDomain extends BaseDomain {
+export class OpenAI extends BaseDomain {
   override readonly model = 'gpt-3.5-turbo';
 
   constructor(server: IServer, modelName: string) {
