@@ -4,16 +4,16 @@ import { BaseApplicationStrategy, DomainConstructor } from '../abstracts/base-ap
 
 export class StrategyApplicationFactory {
   private creators: Record<string, () => BaseApplicationStrategy> = {
-    GroqDomain: () => new GroqStrategy(),
-    GeminiDomain: () => new GeminiStrategy(),
-    OpenAIDomain: () => new OpenAIStrategy(),
-    ClaudeDomain: () => new ClaudeStrategy(),
-    LangChainDomain: () => new LangChainStrategy(),
+    Groq: () => new GroqStrategy(),
+    Gemini: () => new GeminiStrategy(),
+    OpenAI: () => new OpenAIStrategy(),
+    Claude: () => new ClaudeStrategy(),
+    LangChain: () => new LangChainStrategy(),
   };
 
 constructor(
     creators: Record<string, () => BaseApplicationStrategy> | null = null,
-    public readonly defaultDomain: string = 'GroqDomain'
+    public readonly defaultDomain: string = 'Groq'
   ) {
     if (creators) {
       Object.assign(this.creators, creators);
@@ -27,17 +27,40 @@ constructor(
     return value.trim().toLowerCase().replace(/_/g, '').replace(/ /g, '');
   }
 
+  public availableDomainKeys(): string[] {
+    return Object.keys(this.creators);
+  }
+
+  public getDomainKey(value: string | DomainConstructor<BaseDomain> | null): string | null {
+    const parsed = this.parseDomain(value);
+    if (!parsed) return null;
+
+    for (const [key, creator] of Object.entries(this.creators)) {
+      const domainCtor = creator().domainClass as DomainConstructor<BaseDomain>;
+      if (domainCtor === parsed) {
+        return key;
+      }
+    }
+
+    return null;
+  }
+
   parseDomain(value: string | DomainConstructor<BaseDomain> | null): DomainConstructor<BaseDomain> | null {
     if (!value) return null;
 
     if (typeof value === 'function' && 'prototype' in value) {
-      return Object.keys(this.creators).includes(value.name)
-        ? value as DomainConstructor<BaseDomain>
-        : null;
+      for (const creator of Object.values(this.creators)) {
+        const domainCtor = creator().domainClass as DomainConstructor<BaseDomain>;
+        if (domainCtor === value) {
+          return domainCtor;
+        }
+      }
+      return null;
     }
 
     const normalized = StrategyApplicationFactory._sanitize(value);
-    for (const domainCtor of this.available()) {
+    for (const creator of Object.values(this.creators)) {
+      const domainCtor = creator().domainClass;
       const aliases = [
         StrategyApplicationFactory._sanitize(domainCtor.name),
         StrategyApplicationFactory._sanitize(BaseDomain.getDomainName.call(domainCtor)),
@@ -70,9 +93,9 @@ constructor(
   }
 
   getCreator(value: string | DomainConstructor<BaseDomain> | null): () => BaseApplicationStrategy {
-    const domain = this.parseDomain(value) ?? this.available().find((candidate) => candidate.name === this.defaultDomain);
+    const domain = this.parseDomain(value);
     if (!domain) {
-      throw new Error('Default strategy must exist in creators');
+      throw new Error(`Provider não suportado: ${String(value)}`);
     }
     return this._resolveCreator(domain);
   }
