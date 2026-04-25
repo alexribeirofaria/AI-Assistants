@@ -5,7 +5,7 @@ class ConcreteMixin extends CachedDomainListMixin {
     return ['model1', 'model2 / sub', '  model3'];
   }
 
-  fetchCachedNames(): string[] {
+  async fetchCachedNames(): Promise<string[]> {
     return this.getDomainNamesCached();
   }
 
@@ -29,8 +29,8 @@ describe('CachedDomainListMixin', () => {
     expect(mixin).toBeTruthy();
   });
 
-  it('should fetch and cache domain names', () => {
-    const names = mixin.fetchCachedNames();
+  it('should fetch and cache domain names', async () => {
+    const names = await mixin.fetchCachedNames();
     expect(names).toContain('model1');
     expect(names).toContain('sub');
     expect(names).toContain('model3');
@@ -42,21 +42,48 @@ describe('CachedDomainListMixin', () => {
     expect(mixin['_cleanName']('model')).toBe('model');
   });
 
-  it('should get domain view with prefix', () => {
-    const view = mixin.getDomainView('> ');
+  it('should get domain view with prefix', async () => {
+    const view = await mixin.getDomainView('> ');
     expect(view).toEqual(['> model1', '> model3', '> sub']);
   });
 
-  it('should clear cache', () => {
-    mixin.fetchCachedNames();
+  it('should clear cache', async () => {
+    await mixin.fetchCachedNames();
     mixin.clearDomainCache();
     expect(mixin.readCacheValue()).toBeNull();
   });
 
-  it('should limit cache items', () => {
+  it('should limit cache items', async () => {
     const manyNames = Array(60).fill(0).map((_, i) => `model${i}`);
     mixin.overrideFetchDomainNames(() => manyNames);
-    const cached = mixin.fetchCachedNames();
+    const cached = await mixin.fetchCachedNames();
     expect(cached.length).toBe(50);
+  });
+
+  it('should reuse a pending request and sanitize duplicated names', async () => {
+    let resolveFetch: ((value: string[]) => void) | null = null;
+    const fetchPromise = new Promise<string[]>((resolve) => {
+      resolveFetch = resolve;
+    });
+    const fetchSpy = jasmine.createSpy('fetchSpy').and.returnValue(fetchPromise);
+    mixin.overrideFetchDomainNames(fetchSpy as unknown as () => string[]);
+
+    const first = mixin.fetchCachedNames();
+    const second = mixin.fetchCachedNames();
+
+    resolveFetch!([' models/a ', 'a', 'b', 'b']);
+    await expectAsync(first).toBeResolvedTo(['a', 'b']);
+    await expectAsync(second).toBeResolvedTo(['a', 'b']);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should expose cache stats after hits and misses', async () => {
+    expect(mixin.getDomainCacheStats().misses).toBe(0);
+    await mixin.fetchCachedNames();
+    await mixin.fetchCachedNames();
+
+    const stats = mixin.getDomainCacheStats();
+    expect(stats.hits).toBeGreaterThan(0);
+    expect(stats.hasValue).toBeTrue();
   });
 });
