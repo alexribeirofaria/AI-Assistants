@@ -29,4 +29,12 @@ describe('OutputFormatter', () => {
   it('formats model lists with custom prefix', () => {
     expect(formatter.formatModelList('header', ['one', 'two'], '> ')).toBe('header\n> one\n> two');
   });
+
+  it('formats model lists with default prefix', () => {
+    expect(formatter.formatModelList('header', ['one'])).toBe('header\n- one');
+  });
+
+  it('formats input prompt with provider and model', () => {
+    expect(formatter.formatInputPrompt('Groq', 'llama-3.1-8b-instant')).toBe('[Groq(llama-3.1-8b-instant)] > ');
+  });
 });
