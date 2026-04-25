@@ -1,10 +1,10 @@
-import { OutputPresenter } from '../../presentation';
-import { StrategyApplicationFactory } from '../../application/strategies/factories/strategy-application-factory';
-import { AIAssistantApp } from '../ai-assistant-app';
-import { BaseApplicationStrategy } from '../strategies/abstracts/base-application-strategy';
-import { OpenAIDomain } from '../../domain/openai-domain';
 import { fakeAsync, tick } from '@angular/core/testing';
+import { StrategyApplicationFactory } from '../../application/strategies/factories/strategy-application-factory';
+import { OpenAI } from '../../domain/openai-domain';
+import { OutputPresenter } from '../../presentation';
+import { AIAssistantApp } from '../ai-assistant-app';
 import { UserAction } from '../enums/user-action';
+import { BaseApplicationStrategy } from '../strategies/abstracts/base-application-strategy';
 
 describe('AIAssistantApp', () => {
   const mockServer = {
@@ -12,7 +12,7 @@ describe('AIAssistantApp', () => {
     models: { list: jasmine.createSpy('list').and.returnValue({ data: [] }) },
   } as never;
 
-  class TestDomain extends OpenAIDomain {
+  class TestDomain extends OpenAI {
     constructor() {
       super(mockServer, 'test');
     }
@@ -23,15 +23,27 @@ describe('AIAssistantApp', () => {
   }
 
   class TestStrategy extends BaseApplicationStrategy {
+    private currentModel = 'm1';
+
     constructor() {
       super(TestDomain);
     }
 
-    override async execute(task: string): Promise<string> {
-      return `done:${task}`;
+    override useModel(model: string | undefined): void {
+      if (model?.trim()) {
+        this.currentModel = model;
+      }
     }
 
-    override listDomains() {
+    override getCurrentModel(): string {
+      return this.currentModel;
+    }
+
+    override async execute(task: string): Promise<string> {
+      return `done:${this.getCurrentModel()}:${task}`;
+    }
+
+    override async listDomains() {
       return { header: 'header', names: ['m1', 'm2'], prefix: '> ' };
     }
   }
@@ -50,61 +62,82 @@ describe('AIAssistantApp', () => {
     app = new AIAssistantApp(new TestFactory(), presenter);
   });
 
-  it('returns model lists and runs message prompts', async () => {
-    const list = app.listModels(undefined, undefined, 'TestDomain');
-    expect(list).toEqual(['m1', 'm2']);
+  it('filters models by prefix and search query', async () => {
+    await expectAsync(app.listModels('TestDomain', undefined, 'm1')).toBeResolvedTo({
+      defaultModel: 'm1',
+      models: [{ id: 'm1', modelName: 'm1', provider: 'test' }],
+    });
 
-    const result = app.runWebApp('hello');
-    expect(await result.response).toBe('done:hello');
+    await expectAsync(app.listModels('TestDomain', '2')).toBeResolvedTo({
+      defaultModel: 'm2',
+      models: [{ id: 'm2', modelName: 'm2', provider: 'test' }],
+    });
   });
 
-  it('filters models by prefix and search query', () => {
-    expect(app.listModels(undefined, 'm1', 'TestDomain')).toEqual(['m1']);
-    expect(app.listModels('2', undefined, 'TestDomain')).toEqual(['m2']);
+  it('exposes providers, models and the current default model for the chat gateway flow', async () => {
+    const providers = await app.getProviders();
+    expect(providers).toContain('test');
+    expect(await app.listModels('test')).toEqual({
+      defaultModel: 'm1',
+      models: [
+        { id: 'm1', modelName: 'm1', provider: 'test' },
+        { id: 'm2', modelName: 'm2', provider: 'test' },
+      ],
+    });
+    expect(await app.getDefaultModel('test')).toBe('m1');
+
+    app.selectModel('m2');
+    expect(await app.getDefaultModel('test')).toBe('m2');
   });
 
-  it('returns the list models view and switches the active model through runWebApp', () => {
-    const listResult = app.runWebApp('list models');
-    expect(listResult).toEqual({ header: 'header', names: ['m1', 'm2'], prefix: '> ' });
+  it('changes provider and sends messages using the selected model', async () => {
+    await expectAsync(app.changeProvider('test')).toBeResolvedTo({ status: 'ok' });
 
-    expect(app._handleAction('switch_model', TestDomain)).toBeFalse();
+    app.selectModel('m2');
+    await expectAsync(app.sendMessage('hello')).toBeResolvedTo({
+      input: 'hello',
+      response: {
+        model: 'm2',
+        response: 'done:m2:hello',
+      },
+    });
+  });
+
+  it('switches models, clears the UI and exits cleanly', async () => {
+    expect(await app._handleAction('switch_model', TestDomain)).toBeFalse();
     expect(presenter.showModelSwitched).toHaveBeenCalledWith('Test');
-  });
 
-  it('switches models, clears the UI and exits cleanly', () => {
-    expect(app._handleAction('switch_model', TestDomain)).toBeFalse();
-    expect(presenter.showModelSwitched).toHaveBeenCalledWith('Test');
-
-    expect(app._handleAction('clear', null)).toBeFalse();
+    expect(await app._handleAction('clear', null)).toBeFalse();
     expect(presenter.showUI).toHaveBeenCalled();
 
-    expect(app._handleAction('exit', null)).toBeTrue();
+    expect(await app._handleAction('exit', null)).toBeTrue();
     expect(presenter.showGoodbye).toHaveBeenCalled();
   });
 
   it('handles invalid switches, list models and message queueing', fakeAsync(() => {
-    expect(app._handleAction('switch_model', 'missing')).toBeFalse();
-    expect(presenter.showWarning).toHaveBeenCalled();
+    void app._handleAction('switch_model', 'missing').then((result) => {
+      expect(result).toBeFalse();
+      expect(presenter.showWarning).toHaveBeenCalled();
+    });
 
-    const listResult = app.runWebApp('list models');
-    expect(listResult.header).toBe('header');
-
-    app._handleAction('message', 'queued');
+    void app._handleAction('message', 'queued');
     tick(0);
     expect(presenter.showResponse).toBeDefined();
   }));
 
   it('queues message tasks without changing the active strategy', fakeAsync(() => {
-    expect(app._handleAction(UserAction.MESSAGE, 'queued')).toBeFalse();
+    void app._handleAction(UserAction.MESSAGE, 'queued').then((result) => {
+      expect(result).toBeFalse();
+    });
     expect(app.defaultModelAgent).toBe('TestDomain');
     tick(0);
-    expect(presenter.showResponse).toHaveBeenCalledWith('TestDomain', 'done:queued');
+    expect(presenter.showResponse).toHaveBeenCalledWith('Test', 'done:m1:queued');
   }));
 
-  it('runs the console app and respects explicit actions', () => {
-    app.runConsoleApp();
+  it('runs the console app and respects explicit actions', async () => {
+    app.runApp();
     expect(presenter.showUI).toHaveBeenCalled();
 
-    expect(app._handleAction(UserAction.LIST_MODELS, TestDomain)).toBeFalse();
+    expect(await app._handleAction(UserAction.LIST_MODELS, TestDomain)).toBeFalse();
   });
 });
