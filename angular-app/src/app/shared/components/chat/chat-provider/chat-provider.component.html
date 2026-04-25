@@ -5,7 +5,7 @@
     (ngModelChange)="onProviderSelected($event)">
     <option value="" disabled>Selecione um provider</option>
     @for (provider of providers; track provider) {
-      <option [value]="provider">{{ provider }}</option>
+      <option [value]="provider">{{ capitalizeProvider(provider) }}</option>
     }
   </select>
 </div>
