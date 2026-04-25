@@ -2,7 +2,6 @@ import { OutputPresenter, OutputPresenterFactory } from '../../presentation';
 import { DomainConstructor } from '../strategies/abstracts/base-application-strategy';
 import { StrategyApplicationFactory } from '../strategies/factories/strategy-application-factory';
 
-/* eslint-disable no-console */
 export abstract class BaseAIAssistantApp {
   protected readonly strategyFactory: StrategyApplicationFactory;
   protected presenter: OutputPresenter | null = null;
@@ -37,7 +36,7 @@ export abstract class BaseAIAssistantApp {
     console.clear();
   }
 
-  abstract runConsoleApp(): void;
+  abstract runApp(): void;
 
   abstract _handleAction(action: string, value: string | DomainConstructor | null): Promise<boolean>;
 }
