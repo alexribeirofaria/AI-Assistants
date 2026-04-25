@@ -47,9 +47,9 @@ export class ChatContainerComponent implements OnInit {
   private async loadModels(provider?: string): Promise<void> {
     try {
       const modelsData = await this.chatService.getModels(provider);
-      this.chatState.setModels(modelsData);
+      this.chatState.setModels(modelsData.models);
       
-      const defaultModel = await this.chatService.getDefaultModel(provider);
+      const defaultModel = modelsData.defaultModel ?? await this.chatService.getDefaultModel(provider);
       if (defaultModel) {
         this.chatState.setModel(defaultModel);
       }
