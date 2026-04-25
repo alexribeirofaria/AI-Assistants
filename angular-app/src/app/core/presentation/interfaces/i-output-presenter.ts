@@ -1,4 +1,5 @@
 export interface IOutputPresenter {
+  getInputPrompt(providerName: string, modelName: string): string;
   showUI(): void;
   showModelSwitched(prompt: string): void;
   showInterpretedInput(raw: string, interpreted: string): void;
@@ -11,4 +12,3 @@ export interface IOutputPresenter {
   showError(message: string): void;
   showGoodbye(): void;
 }
-
