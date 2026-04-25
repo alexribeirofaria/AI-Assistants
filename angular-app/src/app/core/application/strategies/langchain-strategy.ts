@@ -1,10 +1,8 @@
-import { LangChainDomain } from "../../domain";
+import { LangChain } from "../../domain";
 import { BaseApplicationStrategy } from "./abstracts/base-application-strategy";
 
 export class LangChainStrategy extends BaseApplicationStrategy {
   constructor() {
-    super(LangChainDomain);
+    super(LangChain);
   }
 }
-
-export const LangchainStrategy = LangChainStrategy;
