@@ -4,7 +4,7 @@ import { BaseServerFactory } from './abstracts/base-server-factory';
 
 export class GeminiServerFactory extends BaseServerFactory {
   private readonly fallbackModels: ModelDescriptor[] = [
-    { id: 'gemini-2.5-flash', name: 'gemini-2.5-flash' },
+    { id: 'gemini-1.5-flash', name: 'gemini-1.5-flash' },
   ];
 
   buildServer(): IServer {
