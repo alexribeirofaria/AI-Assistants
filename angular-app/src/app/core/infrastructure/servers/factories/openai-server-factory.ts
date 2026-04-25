@@ -1,6 +1,10 @@
 import OpenAI from 'openai';
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import type { IServer, ModelDescriptor, TextCompletionResponse } from '../abstracts/i-server';
 import { BaseServerFactory } from './abstracts/base-server-factory';
+
+type SupportedChatRole = 'system' | 'user' | 'assistant' | 'developer';
+type SupportedChatMessage = Extract<ChatCompletionMessageParam, { role: SupportedChatRole }>;
 
 export class OpenAIServerFactory extends BaseServerFactory {
   private readonly fallbackModels: ModelDescriptor[] = [
@@ -14,6 +18,7 @@ export class OpenAIServerFactory extends BaseServerFactory {
     const maxRetries = this.optionalIntEnv('LLM__OPENAI_MAX_RETRIES', 1);
     const client = new OpenAI({
       apiKey,
+      dangerouslyAllowBrowser: true,
       timeout: timeoutSeconds * 1000,
       maxRetries,
     });
@@ -21,7 +26,22 @@ export class OpenAIServerFactory extends BaseServerFactory {
     return {
       chat: {
         completions: {
-          create: async (params): Promise<TextCompletionResponse> => client.chat.completions.create(params),
+          create: async (params): Promise<TextCompletionResponse> => {
+            const response = await client.chat.completions.create({
+              model: params.model,
+              messages: params.messages.map((message): SupportedChatMessage => this.toChatMessage(message.role, message.content)),
+              max_tokens: params.max_tokens,
+            });
+
+            return {
+              model: response.model,
+              choices: response.choices.map((choice) => ({
+                message: {
+                  content: this.normalizeMessageContent(choice.message.content),
+                },
+              })),
+            };
+          },
         },
       },
       models: {
@@ -33,5 +53,38 @@ export class OpenAIServerFactory extends BaseServerFactory {
         },
       },
     };
+  }
+
+  private toChatMessage(role: string, content: string): SupportedChatMessage {
+    const normalizedRole: SupportedChatRole = this.isSupportedRole(role) ? role : 'user';
+    return { role: normalizedRole, content };
+  }
+
+  private isSupportedRole(role: string): role is SupportedChatRole {
+    return role === 'system' || role === 'user' || role === 'assistant' || role === 'developer';
+  }
+
+  private normalizeMessageContent(content: unknown): string {
+    if (typeof content === 'string') {
+      return content;
+    }
+
+    if (Array.isArray(content)) {
+      return content
+        .map((part) => {
+          if (typeof part === 'string') {
+            return part;
+          }
+          if (part && typeof part === 'object' && 'text' in part) {
+            const text = (part as { text?: unknown }).text;
+            return typeof text === 'string' ? text : '';
+          }
+          return '';
+        })
+        .filter(Boolean)
+        .join('\n');
+    }
+
+    return '';
   }
 }
