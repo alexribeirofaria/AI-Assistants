@@ -1,9 +1,9 @@
 import { IServer } from '../../infrastructure/servers';
-import { OpenAIDomain } from '../openai-domain';
+import { OpenAI } from '../openai-domain';
 
-describe('OpenAIDomain', () => {
+describe('OpenAI', () => {
   let mockServer: jasmine.SpyObj<IServer>;
-  let domain: OpenAIDomain;
+  let domain: OpenAI;
 
   beforeEach(() => {
     mockServer = {
@@ -16,7 +16,7 @@ describe('OpenAIDomain', () => {
         list: jasmine.createSpy('list'),
       },
     } as unknown as jasmine.SpyObj<IServer>;
-    domain = new OpenAIDomain(mockServer, 'openai');
+    domain = new OpenAI(mockServer, 'openai');
   });
 
   it('should create instance', () => {
