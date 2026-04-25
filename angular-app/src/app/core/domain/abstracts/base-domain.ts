@@ -1,9 +1,9 @@
+import { IServer } from '../../infrastructure/servers/abstracts/i-server';
 import { CachedDomainListMixin } from '../cache/domain-list-cache';
 import type { ApiResponse } from './api-response';
-import { IServer } from '../../infrastructure/servers/abstracts/i-server';
 
 export abstract class BaseDomain extends CachedDomainListMixin {
-  readonly model: string;
+  model: string;
   protected readonly modelName: string;
   protected maxTokens = 2048;
 
@@ -16,8 +16,16 @@ export abstract class BaseDomain extends CachedDomainListMixin {
     this.model = modelName;
   }
 
-  static getDomainName(this: { name: string }): string {
-    return this.name.replace(/Domain$/, '');
+  useModel(model: string | undefined): this {
+    if (model?.trim()) {
+      this.model = model;
+    }
+
+    return this;
+  }
+
+  static getDomainName(): string {
+    return this.name;
   }
 
   abstract buildResponseMessages(response: unknown): string;
