@@ -1,4 +1,4 @@
-import { DecoratorHelperStrategy } from '../decorator/helpers/decorator/decorator-helper-strategy';
+import { DecoratorHelperStrategy } from '../decorator/helpers/decorator-helper-strategy';
 
 describe('DecoratorHelperStrategy', () => {
   it('creates the default strategy chain', () => {
