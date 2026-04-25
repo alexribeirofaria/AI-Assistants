@@ -2,7 +2,7 @@ import { OutputPresenter } from '../../presentation';
 import { StrategyApplicationFactory } from '../../application/strategies/factories/strategy-application-factory';
 import { ThreadController } from '../controller/thread-controller';
 import { BaseApplicationStrategy } from '../strategies/abstracts/base-application-strategy';
-import { OpenAIDomain } from '../../domain/openai-domain';
+import { OpenAI } from '../../domain/openai-domain';
 import { fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 
 describe('ThreadController', () => {
@@ -11,7 +11,7 @@ describe('ThreadController', () => {
     models: { list: jasmine.createSpy('list').and.returnValue({ data: [] }) },
   } as never;
 
-  class TestDomain extends OpenAIDomain {
+  class TestDomain extends OpenAI {
     constructor() {
       super(mockServer, 'test');
     }
@@ -30,7 +30,7 @@ describe('ThreadController', () => {
       return `echo:${task}`;
     }
 
-    override listDomains() {
+    override async listDomains() {
       return { header: 'header', names: ['m1'], prefix: '> ' };
     }
   }
@@ -59,7 +59,7 @@ describe('ThreadController', () => {
     controller.enqueueTask('message', TestDomain, 'hello');
     tick(0);
     flushMicrotasks();
-    expect(presenter.showResponse).toHaveBeenCalledWith('TestDomain', 'echo:hello');
+    expect(presenter.showResponse).toHaveBeenCalledWith('Test', 'echo:hello');
   }));
 
   it('processes list model tasks and stops threads safely', fakeAsync(() => {
@@ -85,5 +85,22 @@ describe('ThreadController', () => {
     tick(0);
     flushMicrotasks();
     expect(presenter.showWarning).toHaveBeenCalled();
+  }));
+
+  it('updates elapsed time while queue still has tasks and completes threads', fakeAsync(() => {
+    controller = new ThreadController(presenter, factory);
+    spyOn<any>(controller as any, 'processTask').and.returnValue(new Promise<void>(() => {}));
+    controller.enqueueTask('message', TestDomain, 'wait');
+
+    controller.showElapsedTimeUntilQueueFinishes();
+    tick(1000);
+    expect(presenter.showElapsedTime).toHaveBeenCalled();
+
+    (controller as any).queue.next([]);
+    tick(1000);
+    expect(presenter.clearElapsedTime).toHaveBeenCalled();
+
+    controller.stopThreads(true);
+    expect(true).toBeTrue();
   }));
 });
