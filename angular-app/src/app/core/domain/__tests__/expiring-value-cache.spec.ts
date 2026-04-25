@@ -47,6 +47,22 @@ describe('ExpiringValueCache', () => {
     expect(cache.get()).toBeNull();
   });
 
+  it('should return cached value in getOrSet without invoking fetch function', () => {
+    cache.set('cached');
+    const fetchFn = jasmine.createSpy('fetchFn').and.returnValue('new');
+
+    expect(cache.getOrSet(fetchFn)).toBe('cached');
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it('should report hasValue false after expiration via stats', () => {
+    cache.set('value');
+    now = (ttl * 1000) + 10;
+
+    const stats = cache.getStats();
+    expect(stats.hasValue).toBeFalse();
+  });
+
   it('should track stats correctly', () => {
     cache.getOrSet(() => 'value1');
     cache.get(); // hit
