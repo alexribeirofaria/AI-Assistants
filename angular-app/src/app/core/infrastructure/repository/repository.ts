@@ -8,18 +8,18 @@ export class Repository {
 
   constructor(public readonly registry: Registry = new Registry()) {}
 
-  buildDomain(domain: DomainConstructor): BaseDomain {
+  public buildDomain(domain: DomainConstructor): BaseDomain {
     return this.getProvider(domain).buildDomain();
   }
 
   private getProvider(domain: DomainConstructor): BaseRepositoryStrategy {
-    const key = domain.name;
+    const key = this.registry.getEntry(domain).domainClass.name;
     const cached = this.providers.get(key);
     if (cached) {
       return cached;
     }
 
-    const provider = this.registry.create(key);
+    const provider = this.registry.create(domain);
     this.providers.set(key, provider);
     return provider;
   }
