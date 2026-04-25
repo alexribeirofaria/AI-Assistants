@@ -14,7 +14,6 @@
     "test:backend": "concurrently \"npm run start:python\" \"wait-on http://localhost:5000 && npm run test:load\"",
     "test:frontend": "concurrently \"npm run start:angular\" \"wait-on http://localhost:4200 && npm run test:lighthouse\"",
     "test:all": "npm run test:backend && npm run test:frontend"
-
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
