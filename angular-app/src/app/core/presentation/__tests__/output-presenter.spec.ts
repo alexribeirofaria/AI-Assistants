@@ -2,7 +2,7 @@ import { OutputFormatter } from '../formatters/output-formatter';
 import { OutputPresenter } from '../presenters/output-presenter';
 import { OutputStream } from '../streams/output-stream';
 
-describe('OutputPresenter', () => {
+describe('OutputPresenter Unit Tests', () => {
   let formatter: OutputFormatter;
   let stream: jasmine.SpyObj<OutputStream>;
   let presenter: OutputPresenter;
@@ -33,5 +33,34 @@ describe('OutputPresenter', () => {
     expect(stream.writeInline).toHaveBeenCalled();
     expect(stream.clearInline).toHaveBeenCalled();
     expect(stream.write).toHaveBeenCalledWith('[ERROR] boom');
+  });
+
+  it('should render model switched, interpreted input, response and loading states', () => {
+    presenter.showModelSwitched('openai');
+    presenter.showInterpretedInput('raw', 'interpreted');
+    presenter.showResponse('OpenAI', 'hello');
+    presenter.showLoadingModels();
+
+    expect(stream.write).toHaveBeenCalledWith('\nSwitched to openai');
+    expect(stream.write).toHaveBeenCalledWith("[info] Interpretei 'raw' como 'interpreted'.");
+    expect(stream.write).toHaveBeenCalledWith('\n[OpenAI]: hello\n');
+    expect(stream.write).toHaveBeenCalledWith('\n[info] Buscando modelos...\n');
+  });
+
+  it('should render warning and goodbye messages', () => {
+    presenter.showWarning('careful');
+    presenter.showGoodbye();
+
+    expect(stream.write).toHaveBeenCalledWith('\n[warn] careful\n');
+    expect(stream.write).toHaveBeenCalledWith('AI Assistant: Goodbye!');
+  });
+
+  it('creates default formatter and stream when constructor args are omitted', () => {
+    const defaultPresenter = new OutputPresenter();
+    expect(defaultPresenter).toBeTruthy();
+  });
+
+  it('returns formatted input prompt', () => {
+    expect(presenter.getInputPrompt('Groq', 'llama')).toBe('[Groq(llama)] > ');
   });
 });
