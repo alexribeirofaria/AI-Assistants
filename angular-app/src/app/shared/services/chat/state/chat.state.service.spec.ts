@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ChatStateService } from './chat.state.service';
 import { IHomeModel } from '../../../models';
 
-describe('ChatStateService', () => {
+describe('ChatStateService Unit Test', () => {
   let service: ChatStateService;
 
   beforeEach(() => {
@@ -136,6 +136,15 @@ describe('ChatStateService', () => {
 
       expect(service.selectedProvider()).toBe('openai');
     });
+
+    it('should clear selected model when provider changes', () => {
+      service.setModel('gpt-4');
+
+      service.setProvider('openai');
+
+      expect(service.selectedProvider()).toBe('openai');
+      expect(service.selectedModel()).toBe('');
+    });
   });
 
   describe('setModel', () => {
@@ -147,7 +156,7 @@ describe('ChatStateService', () => {
   });
 
   describe('setModels', () => {
-    it('should set models and derive unique providers', () => {
+    it('should set models without mutating providers', () => {
       const models: IHomeModel[] = [
         { id: '1', modelName: 'Model1', provider: 'openai' },
         { id: '2', modelName: 'Model2', provider: 'openai' },
@@ -156,7 +165,16 @@ describe('ChatStateService', () => {
       service.setModels(models);
 
       expect(service.models()).toEqual(models);
-      expect(service.providers()).toEqual(['openai', 'groq']);
+      expect(service.providers()).toEqual([]);
+    });
+
+    it('should preserve existing providers when models are updated', () => {
+      service.setProviders(['openai']);
+      service.setModels([
+        { id: '1', modelName: 'Model1', provider: 'fd' },
+      ]);
+
+      expect(service.providers()).toEqual(['openai']);
     });
 
     it('should handle empty models', () => {
@@ -164,6 +182,15 @@ describe('ChatStateService', () => {
 
       expect(service.models()).toEqual([]);
       expect(service.providers()).toEqual([]);
+    });
+
+    it('should not auto select a model when models are updated', () => {
+      service.setProvider('openai');
+      service.setModels([
+        { id: '1', modelName: 'Model1', provider: 'openai' },
+      ]);
+
+      expect(service.selectedModel()).toBe('');
     });
   });
 
