@@ -2,8 +2,8 @@
 import { IServer, ModelDescriptor, TextCompletionResponse } from '../infrastructure/servers';
 import { BaseDomain } from './abstracts/base-domain';
 
-export class ClaudeDomain extends BaseDomain {
-  override readonly model = 'claude-haiku-4-5-20251001';
+export class Claude extends BaseDomain {
+  override readonly model = 'claude-3-5-haiku-20241022';
 
   constructor(server: IServer, modelName: string) {
     super(server, modelName);
