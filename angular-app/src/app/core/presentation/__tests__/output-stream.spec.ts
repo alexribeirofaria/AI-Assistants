@@ -28,4 +28,9 @@ describe('OutputStream', () => {
     expect(console.log).toHaveBeenCalledWith('');
     expect(console.log).toHaveBeenCalledWith('done');
   });
+
+  it('ignores clearInline when no inline output is active', () => {
+    stream.clearInline();
+    expect(console.log).not.toHaveBeenCalled();
+  });
 });
