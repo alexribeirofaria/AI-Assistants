@@ -11,6 +11,10 @@ export class OutputPresenter implements IOutputPresenter {
     this.stream = stream;
   }
 
+  getInputPrompt(providerName: string, modelName: string): string {
+    return this.formatter.formatInputPrompt(providerName, modelName);
+  }
+
   showUI(): void {
     this.stream.write(this.formatter.formatWelcome());
     this.stream.write(this.formatter.formatHelp());
