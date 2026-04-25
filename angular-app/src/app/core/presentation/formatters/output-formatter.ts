@@ -1,8 +1,12 @@
 import { IOutputFormatter } from '../interfaces/i-output-formatter';
 
 export class OutputFormatter implements IOutputFormatter {
+  formatInputPrompt(providerName: string, modelName: string): string {
+    return `[${providerName}(${modelName})] > `;
+  }
+
   formatHelp(): string {
-    return "Digite: claude | openai | gemini | groq | list models | cls -> limpar tela | exit\n";
+    return "Digite: Claude | OpenAI | Gemini | Groq | list models | cls -> limpar tela | exit\n";
   }
 
   formatWelcome(): string {
