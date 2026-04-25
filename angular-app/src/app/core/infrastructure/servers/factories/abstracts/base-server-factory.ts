@@ -1,10 +1,11 @@
+import { environment } from '../../../../../../environments/environment';
 import type { IServer } from '../../abstracts/i-server';
 
 export abstract class BaseServerFactory {
   private static getEnv(name: string): string | undefined {
     return typeof globalThis !== 'undefined' && 'process' in globalThis
       ? (globalThis as typeof globalThis & { process?: { env?: Record<string, string | undefined> } }).process?.env?.[name]
-      : undefined;
+      : (environment as any)[name];
   }
 
   createServer(): IServer {
