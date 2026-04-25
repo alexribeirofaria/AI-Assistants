@@ -5,6 +5,7 @@ import { DecoratorTextHelper } from '../decorator-text-helper';
 import { BaseHelperStrategy } from './abstracts/base-helper-strategy';
 
 export class SwitchModelStrategy extends BaseHelperStrategy {
+  override priority = 8;
   private aliases: Record<string, DomainConstructor> = this.buildAliases();
 
   constructor() {
