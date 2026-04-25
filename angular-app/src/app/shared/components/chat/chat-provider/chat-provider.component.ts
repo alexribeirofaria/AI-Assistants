@@ -14,6 +14,14 @@ export class ChatProviderComponent {
   @Input() selectedProvider = "";
   @Output() providerChange = new EventEmitter<string>();
   
+  capitalizeProvider(provider: string): string {
+    if (!provider) {
+      return '';
+    }
+
+    return provider.charAt(0).toUpperCase() + provider.slice(1);
+  }
+
   onProviderSelected(value: string): void {
     if (value) {
       this.providerChange.emit(value);
