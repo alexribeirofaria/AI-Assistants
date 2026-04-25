@@ -1,6 +1,6 @@
-import { IServer } from '../../../infrastructure/servers';
 import { BaseDomain } from '../../../domain/abstracts/base-domain';
 import { Repository } from '../../../infrastructure/repository';
+import { IServer } from '../../../infrastructure/servers';
 
 export interface DomainConstructor<T extends BaseDomain = BaseDomain> {
   new (
@@ -30,6 +30,14 @@ export abstract class BaseApplicationStrategy {
       this.domainInstance = this.repository.buildDomain(this.domainClass);
     }
     return this.domainInstance;
+  }
+
+  useModel(model: string | undefined): void {
+    this.ensureDomain().useModel(model);
+  }
+
+  getCurrentModel(): string {
+    return this.ensureDomain().model;
   }
 
   async execute(task: string): Promise<string> {
