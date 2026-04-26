@@ -99,7 +99,7 @@ describe('AIAssistantApp Branch Unit Tests', () => {
     await expectAsync(app.listModels('openai')).toBeResolvedTo({
       defaultModel: 'gpt-4o-mini',
       models: [
-        { id: '[ERROR] provider down', modelName: '[ERROR] provider down', provider: 'openai' },
+        { id: '[ERROR] provider down', modelName: '[ERROR] provider down', provider: 'OpenAI' },
       ],
     });
     expect(strategy.listDomains).toHaveBeenCalled();
