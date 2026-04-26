@@ -4,4 +4,5 @@ export interface IMessage {
   content: string;
   streaming?: boolean;
   provider?: string;
+  type?: 'default' | 'error';
 }
