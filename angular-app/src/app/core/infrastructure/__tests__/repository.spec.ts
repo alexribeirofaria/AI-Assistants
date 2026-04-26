@@ -32,4 +32,17 @@ describe('Repository Unit Tests', () => {
     expect(createSpy).toHaveBeenCalledTimes(1);
     expect(strategy.buildDomain).toHaveBeenCalledTimes(2);
   });
+
+  it('should support registries without getEntry by falling back to the domain name', () => {
+    const builtDomain = { kind: 'fallback-domain' };
+    const createSpy = jasmine.createSpy('create').and.returnValue({
+      buildDomain: jasmine.createSpy('buildDomain').and.returnValue(builtDomain),
+    });
+    const repository = new Repository({ create: createSpy } as never);
+
+    const result = repository.buildDomain({ name: 'FallbackDomain' } as never);
+
+    expect(result).toBe(builtDomain as never);
+    expect(createSpy).toHaveBeenCalledOnceWith('FallbackDomain');
+  });
 });
