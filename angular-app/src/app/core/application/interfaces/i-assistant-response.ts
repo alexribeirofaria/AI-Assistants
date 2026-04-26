@@ -8,5 +8,6 @@ export interface IAssistantResponseData {
 
 export interface IAssistantResponse {
   input: string;
+  statusCode?: number;
   response?: IAssistantResponseData;
 }
