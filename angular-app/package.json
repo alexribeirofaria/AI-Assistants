@@ -6,7 +6,7 @@
     "start": "ng serve",
     "start:dev": "ng serve --configuration=development",
     "start:silent": "ng serve --open=false  --no-live-reload ",
-    "prompt": "tsx --env-file=.env src/app/core/app-cli-node/console.app.ts",
+    "prompt": "tsx --env-file=../.env src/app/core/app-cli-node/console.app.ts",
     "lint": "npx eslint src --ext .ts --fix",
     "lint:check": "npx eslint src --ext .ts",
     "build": "ng build",
