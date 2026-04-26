@@ -22,5 +22,6 @@
   "editor.insertSpaces": true,
   "explorer.compactFolders": false,
   "js/ts.suggest.autoImports": true,
-
+  "python.terminal.activateEnvironment": true,
+  "python.defaultInterpreterPath": ".venv/bin"
 }
