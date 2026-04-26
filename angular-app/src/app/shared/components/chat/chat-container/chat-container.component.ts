@@ -94,16 +94,18 @@ export class ChatContainerComponent implements OnInit {
   async onMessageSend(message: string): Promise<void> {
     if (this.isLoading()) return;
 
+    const provider = this.selectedProvider() || undefined;
+
     this.addUserMessage(message);
-    this.startAssistantStreaming();
+    this.startAssistantStreaming(provider);
 
     try {
       const result = await this.chatService.sendMessage(message, {
-        provider: this.selectedProvider() || undefined,
+        provider,
         model: this.selectedModel() || undefined,
       });
 
-      this.finishAssistantStreaming(result.content);
+      this.finishAssistantStreaming(result.content, provider);
       this._gatewayStatus.set(result.gatewayStatus);
     } catch {
       this.stopAssistantStreaming();
@@ -120,19 +122,20 @@ export class ChatContainerComponent implements OnInit {
     }]);
   }
 
-  private startAssistantStreaming(): void {
+  private startAssistantStreaming(provider?: string): void {
     this._messages.update((messages) => [...messages, {
       id: (Date.now() + 1).toString(),
       role: 'assistant',
       content: '',
       streaming: true,
+      provider,
     }]);
     this._isLoading.set(true);
     this._error.set('');
     this._gatewayStatus.set('');
   }
 
-  private finishAssistantStreaming(content: string): void {
+  private finishAssistantStreaming(content: string, provider?: string): void {
     this._messages.update((messages) => {
       const updated = [...messages];
       const last = updated[updated.length - 1];
@@ -141,6 +144,7 @@ export class ChatContainerComponent implements OnInit {
           ...last,
           content,
           streaming: false,
+          provider,
         };
       }
       return updated;
