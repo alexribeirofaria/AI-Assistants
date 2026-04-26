@@ -49,9 +49,9 @@ describe('BaseDomain Unit Tests', () => {
     expect(domain.model).toBe('custom-model');
   });
 
-  it('should strip the Domain suffix from the class name', () => {
+  it('should return the class name as the domain name', () => {
     class DemoDomain {}
-    expect(BaseDomain.getDomainName.call(DemoDomain)).toBe('Demo');
+    expect(BaseDomain.getDomainName.call(DemoDomain)).toBe('DemoDomain');
   });
 
   it('should map successful send responses using buildResponseMessages', async () => {
