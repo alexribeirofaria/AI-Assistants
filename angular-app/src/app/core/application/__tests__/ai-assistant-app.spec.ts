@@ -125,6 +125,32 @@ describe('AIAssistantApp', () => {
     expect(presenter.showResponse).toBeDefined();
   }));
 
+  it('keeps the current model as default when the provider list returns only error markers', async () => {
+    class ErrorStrategy extends TestStrategy {
+      override async listDomains() {
+        return { header: 'header', names: ['[ERROR] provider down'], prefix: '> ' };
+      }
+    }
+
+    class ErrorFactory extends StrategyApplicationFactory {
+      constructor() {
+        super({ TestDomain: () => new ErrorStrategy() } as never, 'TestDomain');
+      }
+    }
+
+    const errorApp = new AIAssistantApp(new ErrorFactory(), presenter);
+
+    await expectAsync(errorApp.listModels('test')).toBeResolvedTo({
+      defaultModel: 'm1',
+      models: [{ id: '[ERROR] provider down', modelName: '[ERROR] provider down', provider: 'Test' }],
+    });
+  });
+
+  it('warns instead of throwing when switch action receives an unknown provider', async () => {
+    await expectAsync(app._handleAction(UserAction.SWITCH_MODEL, 'missing' as never)).toBeResolvedTo(false);
+    expect(presenter.showWarning).toHaveBeenCalledWith('Modelo invalido: missing');
+  });
+
   it('queues message tasks without changing the active strategy', fakeAsync(() => {
     void app._handleAction(UserAction.MESSAGE, 'queued').then((result) => {
       expect(result).toBeFalse();
