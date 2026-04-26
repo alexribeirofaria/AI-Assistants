@@ -207,3 +207,5 @@ copilot/
 !coverage_test_check.ts
 environments/*.ts
 **/.log_erros/*.md
+.pyvenv
+..docs/
