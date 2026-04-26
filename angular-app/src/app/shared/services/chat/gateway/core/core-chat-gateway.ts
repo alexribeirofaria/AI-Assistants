@@ -7,42 +7,60 @@ import {
   IChatAssistantApp,
   IModelsListResponse,
 } from '../../../../../core/application/interfaces';
+import { BaseService } from '../../../base/base.service';
+import { ServiceErrorHandlerService } from '../../../error-handler';
 import { ChatMessageContext, IChatGateway } from '../i-chat-gateway';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CoreChatGateway implements IChatGateway {
+export class CoreChatGateway extends BaseService implements IChatGateway {
   constructor(
     @Inject(AIAssistantApp)
-    private readonly app: IChatAssistantApp
-  ) {}
+    private readonly app: IChatAssistantApp,
+    errorHandler: ServiceErrorHandlerService
+  ) {
+    super({ errorHandler });
+  }
 
   async getProviders(): Promise<string[]> {
-    return this.app.getProviders();
+    return this.run('getProviders', () => this.app.getProviders());
   }
 
   async getModels(provider?: string): Promise<IModelsListResponse> {
-    return this.app.listModels(provider);
+    return this.run('getModels', () => this.app.listModels(provider));
   }
 
   async getDefaultModel(provider?: string): Promise<string | undefined> {
-    return this.app.getDefaultModel(provider);
+    return this.run('getDefaultModel', () => this.app.getDefaultModel(provider));
   }
 
   async changeProvider(provider: string): Promise<IChangeProviderResponse> {
-    return this.app.changeProvider(provider);
+    return this.run('changeProvider', () => this.app.changeProvider(provider));
   }
 
   async sendMessage(content: string, context?: ChatMessageContext): Promise<IAssistantResponse> {
-    if (context?.provider) {
-      await this.app.changeProvider(context.provider);
-    }
+    return this.run('sendMessage', async () => {
+      if (context?.provider) {
+        await this.app.changeProvider(context.provider);
+      }
 
-    if (context?.model) {
-      this.app.selectModel(context.model);
-    }
+      if (context?.model) {
+        this.app.selectModel(context.model);
+      }
 
-    return this.app.sendMessage(content);
+      return this.app.sendMessage(content);
+    });
+  }
+
+  private async run<T>(operation: string, action: () => Promise<T>): Promise<T> {
+    try {
+      return await action();
+    } catch (error) {
+      throw this.buildServiceError(
+        operation,
+        error instanceof Error ? error.message : String(error)
+      );
+    }
   }
 }
