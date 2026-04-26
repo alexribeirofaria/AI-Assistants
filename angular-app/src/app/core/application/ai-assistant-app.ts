@@ -46,8 +46,8 @@ export class AIAssistantApp extends BaseAIAssistantApp implements IChatAssistant
     return this.resolveStrategy();
   }
 
-  private getProviderKey(provider?: string | DomainConstructor | null): string {
-    return this.resolveStrategy(provider).domainClass.getDomainName().trim().toLowerCase().replace(/ /g, '');
+  private getProviderLabel(provider?: string | DomainConstructor | null): string {
+    return this.resolveStrategy(provider).domainClass.getDomainName().trim();
   }
 
   private async listModelNames(
@@ -189,14 +189,14 @@ export class AIAssistantApp extends BaseAIAssistantApp implements IChatAssistant
   async getProviders(): Promise<string[]> {
     return this.strategyFactory
       .available()
-      .map((domain) => domain.getDomainName().trim().toLowerCase().replace(/ /g, ''));
+      .map((domain) => domain.getDomainName().trim());
   }
 
   async listModels(provider?: string, searchQuery?: string, prefix?: string): Promise<IModelsListResponse> {
     const models = (await this.listModelNames(provider, searchQuery, prefix)).map((modelName) => ({
       id: modelName,
       modelName,
-      provider: this.getProviderKey(provider),
+      provider: this.getProviderLabel(provider),
     }));
 
     return {
