@@ -13,8 +13,8 @@ import {
   CoreChatGateway,
   HttpChatGateway
 } from './gateway';
-import { ChatMessageContext } from './gateway/i-chat-gateway';
 import { GatewayChainObserver } from './gateway/chain/interfaces';
+import { ChatMessageContext } from './gateway/i-chat-gateway';
 
 export interface SendMessageResult {
   content: string;
@@ -33,7 +33,7 @@ export class ChatService extends BaseService {
     errorHandler: ServiceErrorHandlerService
   ) {
     super({ errorHandler });
-    this.gatewayChain = ChatGatewayChainFactory.create([httpGateway, coreGateway]);
+    this.gatewayChain = ChatGatewayChainFactory.create([coreGateway, httpGateway]);
   }
 
   async getProviders(): Promise<string[]> {
@@ -41,6 +41,8 @@ export class ChatService extends BaseService {
       operation: (gateway) => gateway.getProviders(),
       validate: (result) => Array.isArray(result),
       invalidResultMessage: 'Gateway retornou providers invalidos',
+      operationName: 'getProviders',
+      observer: this.buildLoggingObserver(),
     });
 
     return this.normalizeProviders(providers);
@@ -51,6 +53,8 @@ export class ChatService extends BaseService {
       operation: (gateway) => gateway.getModels(provider),
       validate: (result) => Array.isArray(result?.models),
       invalidResultMessage: 'Gateway retornou models invalidos',
+      operationName: 'getModels',
+      observer: this.buildLoggingObserver(),
     });
   }
 
@@ -68,6 +72,8 @@ export class ChatService extends BaseService {
         },
         validate: (result) => typeof result === 'string' && result.trim().length > 0,
         invalidResultMessage: 'Gateway retornou default model invalido',
+        operationName: 'getDefaultModel',
+        observer: this.buildLoggingObserver(),
       });
 
       return this.normalizeDefaultModel(model);
@@ -82,6 +88,8 @@ export class ChatService extends BaseService {
   async changeProvider(provider: string): Promise<IChangeProviderResponse> {
     return this.gatewayChain.handle({
       operation: (gateway) => gateway.changeProvider(provider),
+      operationName: 'changeProvider',
+      observer: this.buildLoggingObserver(),
     });
   }
 
@@ -90,9 +98,10 @@ export class ChatService extends BaseService {
     let gatewayStatus = '';
 
     const observer: GatewayChainObserver = {
-      onFallback: ({ fromGateway, toGateway }) => {
+      onFallback: ({ operation, fromGateway, toGateway, error }) => {
         usedFallback = true;
         gatewayStatus = `Falha em ${fromGateway}. Alternando para ${toGateway}...`;
+        this.registerGatewayFailure(error, fromGateway, operation, { toGateway });
       },
       onSuccess: ({ gatewayName }) => {
         if (!usedFallback) {
@@ -102,8 +111,9 @@ export class ChatService extends BaseService {
 
         gatewayStatus = `Resposta recebida via ${gatewayName}.`;
       },
-      onFailure: () => {
+      onFailure: ({ operation, gatewayName, error }) => {
         gatewayStatus = '';
+        this.registerGatewayFailure(error, gatewayName, operation);
       },
     };
 
@@ -141,8 +151,18 @@ export class ChatService extends BaseService {
   }
 
   private isValidAssistantResponse(result: IAssistantResponse): boolean {
+    const status = (result as unknown as { status?: unknown })?.status;
+    if (typeof status === 'number' && status >= 400) {
+      return false;
+    }
+
     const statusCode = result.statusCode;
     if (typeof statusCode === 'number' && statusCode !== 200) {
+      return false;
+    }
+
+    const response = result?.response as unknown as { error?: unknown } | undefined;
+    if (response && typeof response.error === 'string' && response.error.trim().length > 0) {
       return false;
     }
 
@@ -166,5 +186,29 @@ export class ChatService extends BaseService {
 
     const normalized = model.trim();
     return normalized || undefined;
+  }
+
+  private registerGatewayFailure(
+    error: unknown,
+    gatewayName: string,
+    operation: string,
+    details?: Record<string, unknown>
+  ): void {
+    this.errorHandler?.handle(error, {
+      source: gatewayName,
+      operation,
+      details,
+    });
+  }
+
+  private buildLoggingObserver(): GatewayChainObserver {
+    return {
+      onFallback: ({ operation, fromGateway, toGateway, error }) => {
+        this.registerGatewayFailure(error, fromGateway, operation, { toGateway });
+      },
+      onFailure: ({ operation, gatewayName, error }) => {
+        this.registerGatewayFailure(error, gatewayName, operation);
+      },
+    };
   }
 }
