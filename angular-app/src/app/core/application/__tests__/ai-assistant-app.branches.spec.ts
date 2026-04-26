@@ -148,6 +148,22 @@ describe('AIAssistantApp Branch Unit Tests', () => {
     });
   });
 
+  it('applies the selected model before execution and returns the current strategy model in the payload', async () => {
+    const { app, strategy } = createApp();
+
+    app.selectModel('gpt-4o');
+
+    await expectAsync(app.sendMessage('hello')).toBeResolvedTo({
+      input: 'hello',
+      response: {
+        model: 'gpt-4o-mini',
+        response: 'ok',
+      },
+    });
+
+    expect(strategy.useModel).toHaveBeenCalledWith('gpt-4o');
+  });
+
   it('returns the domain response payload even when it contains an error marker', async () => {
     const { app } = createApp({
       strategy: {
