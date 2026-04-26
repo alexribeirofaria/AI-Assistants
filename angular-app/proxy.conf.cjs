@@ -7,7 +7,8 @@ const TARGET = 'http://localhost:5000';
 const LOG_DIR = path.resolve(__dirname, '.log_erros');
 
 const DEFAULT_ERROR_MESSAGE = 'Serviço indisponível no momento';
-const SOURCE = 'AngularDevServerProxy';
+const SOURCE = 'angular_dev';
+const CLIENT_ERROR_LOG_PATH = '/__client-error-log';
 
 // ---------- Utils ----------
 
@@ -46,9 +47,12 @@ const getNextSequence = (filePath) => {
   return String(next).padStart(4, '0');
 };
 
-// ---------- Logging ----------
 
 const writeErrorLog = ({ endpoint, method, error, statusCode, reqUrl }) => {
+  if (String(endpoint || '').includes('__client-error-log')) {
+    return;
+  }
+
   ensureLogDir();
 
   const now = new Date();
@@ -95,6 +99,25 @@ const writeErrorLog = ({ endpoint, method, error, statusCode, reqUrl }) => {
   fs.writeFileSync(filePath, mergedContent, 'utf8');
 };
 
+const readJsonBody = (req) =>
+  new Promise((resolve) => {
+    let body = '';
+
+    req.on('data', (chunk) => {
+      body += chunk.toString('utf8');
+    });
+
+    req.on('end', () => {
+      try {
+        resolve(JSON.parse(body || '{}'));
+      } catch {
+        resolve({});
+      }
+    });
+
+    req.on('error', () => resolve({}));
+  });
+
 // ---------- Response Helpers ----------
 
 const createErrorPayload = (req, error, statusCode = 503) => {
@@ -124,6 +147,12 @@ const sendJsonResponse = (res, payload) => {
   res.end(toJsonBuffer(payload));
 };
 
+const isClientLogRequest = (req) => {
+  const url = String(req.url || '');
+  const originalUrl = String(req.originalUrl || '');
+  return url.includes(CLIENT_ERROR_LOG_PATH) || originalUrl.includes(CLIENT_ERROR_LOG_PATH);
+};
+
 module.exports = {
   '/api': {
     target: TARGET,
@@ -134,6 +163,37 @@ module.exports = {
     timeout: 5000,
     pathRewrite: {
       '^/api': '',
+    },
+    bypass(req, res) {
+      if (!isClientLogRequest(req)) {
+        return null;
+      }
+
+      if (req.method !== 'POST') {
+        sendJsonResponse(res, { status: 405, error: 'Método não suportado' });
+        return '/';
+      }
+
+      void readJsonBody(req).then((payload) => {
+        const endpoint = payload?.endpoint || payload?.operation || '/core';
+        const statusCode = Number(payload?.statusCode ?? payload?.status ?? 500);
+
+        writeErrorLog({
+          endpoint,
+          method: payload?.method || 'CLIENT',
+          reqUrl: payload?.reqUrl || endpoint,
+          statusCode: Number.isFinite(statusCode) ? statusCode : 500,
+          error: {
+            name: payload?.source || 'ClientGateway',
+            code: payload?.code || 'CLIENT_ERROR',
+            message: payload?.message || `Falha na requisição ${endpoint}`,
+          },
+        });
+
+        sendJsonResponse(res, { status: 200, ok: true });
+      });
+
+      return '/';
     },
     selfHandleResponse: true,
     onError(err, req, res) {
