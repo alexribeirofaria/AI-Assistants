@@ -63,7 +63,7 @@ constructor(
       const domainCtor = creator().domainClass;
       const aliases = [
         StrategyApplicationFactory._sanitize(domainCtor.name),
-        StrategyApplicationFactory._sanitize(BaseDomain.getDomainName.call(domainCtor)),
+        StrategyApplicationFactory._sanitize(domainCtor.getDomainName()),
       ];
       if (aliases.includes(normalized)) {
         return domainCtor;
