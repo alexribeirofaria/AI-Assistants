@@ -13,14 +13,26 @@ export class Repository {
   }
 
   private getProvider(domain: DomainConstructor): BaseRepositoryStrategy {
-    const key = this.registry.getEntry(domain).domainClass.name;
+    const key = this.resolveProviderKey(domain);
     const cached = this.providers.get(key);
     if (cached) {
       return cached;
     }
 
-    const provider = this.registry.create(domain);
+    const provider = this.registry.create(key);
     this.providers.set(key, provider);
     return provider;
+  }
+
+  private resolveProviderKey(domain: DomainConstructor): string {
+    const registryWithEntry = this.registry as Registry & {
+      getEntry?: (domainName: string | DomainConstructor) => { domainClass: DomainConstructor };
+    };
+
+    if (typeof registryWithEntry.getEntry === 'function') {
+      return registryWithEntry.getEntry(domain).domainClass.name;
+    }
+
+    return domain.name;
   }
 }
