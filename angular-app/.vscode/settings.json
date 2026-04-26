@@ -21,13 +21,19 @@
     "editor.defaultFormatter": "HookyQR.beautify"
   },
   "[json]": {
-    "editor.defaultFormatter": "HookyQR.beautify"
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[scss]": {
     "editor.defaultFormatter": "HookyQR.beautify"
   },
-  "eslint.validate": ["typescript", "javascript", "html"],
-  "github.copilot.enable": { "*": false },
+  "eslint.validate": [
+    "typescript",
+    "javascript",
+    "html"
+  ],
+  "github.copilot.enable": {
+    "*": false
+  },
   "codeium.enable": false,
   "editor.inlineSuggest.enabled": false,
   "editor.codeActions.triggerOnFocusChange": false,
@@ -50,5 +56,4 @@
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
-
 }
