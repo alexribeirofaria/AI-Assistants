@@ -107,7 +107,11 @@ export class AIAssistantApp extends BaseAIAssistantApp implements IChatAssistant
       return;
     }
 
-    this.switchProvider(value, true);
+    try {
+      this.switchProvider(value, true);
+    } catch {
+      this.presenterInstance.showWarning(`Modelo invalido: ${String(value)}`);
+    }
   }
 
   private enqueueMessage(value: string): void {
@@ -151,7 +155,12 @@ export class AIAssistantApp extends BaseAIAssistantApp implements IChatAssistant
       return currentModel;
     }
 
-    return models[0]?.id ?? currentModel;
+    const firstModel = models[0]?.id;
+    if (firstModel?.startsWith('[ERROR]')) {
+      return currentModel;
+    }
+
+    return firstModel ?? currentModel;
   }
 
   private isHelpCommand(input: string): boolean {
@@ -219,11 +228,13 @@ export class AIAssistantApp extends BaseAIAssistantApp implements IChatAssistant
   }
 
   async sendMessage(content: string): Promise<IAssistantResponse> {
+    const responseText = await this.executeMessage(content);
+
     return {
       input: content,
       response: {
         model: this.getCurrentStrategy().getCurrentModel(),
-        response: await this.executeMessage(content),
+        response: responseText,
       },
     };
   }
