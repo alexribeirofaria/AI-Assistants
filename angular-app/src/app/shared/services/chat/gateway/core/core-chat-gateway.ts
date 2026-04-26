@@ -7,46 +7,42 @@ import {
   IChatAssistantApp,
   IModelsListResponse,
 } from '../../../../../core/application/interfaces';
-import { ChatStateService } from '../../state/chat.state.service';
-import { IChatGateway } from '../i-chat-gateway';
+import { ChatMessageContext, IChatGateway } from '../i-chat-gateway';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CoreChatGateway implements IChatGateway {
   constructor(
-    private readonly chatState: ChatStateService,
     @Inject(AIAssistantApp)
     private readonly app: IChatAssistantApp
   ) {}
-
-  private get selectedProvider(): string | undefined {
-    return this.chatState.selectedProvider() || undefined;
-  }
 
   async getProviders(): Promise<string[]> {
     return this.app.getProviders();
   }
 
   async getModels(provider?: string): Promise<IModelsListResponse> {
-    return this.app.listModels(provider ?? this.selectedProvider);
+    return this.app.listModels(provider);
   }
 
   async getDefaultModel(provider?: string): Promise<string | undefined> {
-    this.app.selectModel(this.chatState.selectedModel());
-    return this.app.getDefaultModel(provider ?? this.selectedProvider);
+    return this.app.getDefaultModel(provider);
   }
 
   async changeProvider(provider: string): Promise<IChangeProviderResponse> {
     return this.app.changeProvider(provider);
   }
 
-  async sendMessage(content: string): Promise<IAssistantResponse> {
-    if (this.selectedProvider) {
-      await this.app.changeProvider(this.selectedProvider);
+  async sendMessage(content: string, context?: ChatMessageContext): Promise<IAssistantResponse> {
+    if (context?.provider) {
+      await this.app.changeProvider(context.provider);
     }
 
-    this.app.selectModel(this.chatState.selectedModel());
+    if (context?.model) {
+      this.app.selectModel(context.model);
+    }
+
     return this.app.sendMessage(content);
   }
 }
