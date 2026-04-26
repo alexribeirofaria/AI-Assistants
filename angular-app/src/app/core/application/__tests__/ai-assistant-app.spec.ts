@@ -65,23 +65,23 @@ describe('AIAssistantApp', () => {
   it('filters models by prefix and search query', async () => {
     await expectAsync(app.listModels('TestDomain', undefined, 'm1')).toBeResolvedTo({
       defaultModel: 'm1',
-      models: [{ id: 'm1', modelName: 'm1', provider: 'test' }],
+      models: [{ id: 'm1', modelName: 'm1', provider: 'Test' }],
     });
 
     await expectAsync(app.listModels('TestDomain', '2')).toBeResolvedTo({
       defaultModel: 'm2',
-      models: [{ id: 'm2', modelName: 'm2', provider: 'test' }],
+      models: [{ id: 'm2', modelName: 'm2', provider: 'Test' }],
     });
   });
 
   it('exposes providers, models and the current default model for the chat gateway flow', async () => {
     const providers = await app.getProviders();
-    expect(providers).toContain('test');
+    expect(providers).toContain('Test');
     expect(await app.listModels('test')).toEqual({
       defaultModel: 'm1',
       models: [
-        { id: 'm1', modelName: 'm1', provider: 'test' },
-        { id: 'm2', modelName: 'm2', provider: 'test' },
+        { id: 'm1', modelName: 'm1', provider: 'Test' },
+        { id: 'm2', modelName: 'm2', provider: 'Test' },
       ],
     });
     expect(await app.getDefaultModel('test')).toBe('m1');
