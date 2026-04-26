@@ -1,44 +1,48 @@
 import { Injectable } from '@angular/core';
 
-export interface ServiceErrorContext {
-  source: string;
-  operation: string;
-  details?: Record<string, unknown>;
-}
+import { ErrorFormatterService } from './formatter/error-formatter.service';
+import { ErrorLoggerService } from './logger/error-logger.service';
+import { UIErrorPresenterService } from './presenter/ui-error-presenter.service';
+import { ServiceErrorContext } from './contracts/service-error-context.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServiceErrorHandlerService {
+  private static readonly HANDLED_ERROR_FLAG = '__globalErrorHandled';
+
+  constructor(
+    private readonly formatter: ErrorFormatterService,
+    private readonly logger: ErrorLoggerService,
+    private readonly presenter: UIErrorPresenterService
+  ) {}
+
   handle(error: unknown, context: ServiceErrorContext): Error {
-    this.normalizeError(error);
-    void context;
-
-    return new Error(this.getPublicMessage(context.operation));
-  }
-
-  private normalizeError(error: unknown): {
-    name: string;
-    message: string;
-    status?: unknown;
-    statusText?: unknown;
-  } {
-    if (error && typeof error === 'object') {
-      return {
-        name: 'name' in error ? String((error as { name?: unknown }).name ?? 'Error') : 'Error',
-        message: 'message' in error ? String((error as { message?: unknown }).message ?? '') : String(error),
-        status: 'status' in error ? (error as { status?: unknown }).status : undefined,
-        statusText: 'statusText' in error ? (error as { statusText?: unknown }).statusText : undefined,
-      };
+    if (this.isHandledError(error)) {
+      return error;
     }
 
-    return {
-      name: 'Error',
-      message: String(error),
-    };
+    const formattedError = this.formatter.format(error, context);
+    this.logger.log(formattedError);
+    if (context.presentToUser !== false) {
+      this.presenter.present({
+        message: formattedError.publicMessage,
+        channel: formattedError.channel,
+      });
+    }
+
+    return this.createHandledError(formattedError.publicMessage);
   }
 
-  private getPublicMessage(operation: string): string {
-    return `Falha ao executar ${operation}`;
+  private isHandledError(error: unknown): error is Error & Record<string, unknown> {
+    return error instanceof Error
+      && ServiceErrorHandlerService.HANDLED_ERROR_FLAG in error
+      && error[ServiceErrorHandlerService.HANDLED_ERROR_FLAG] === true;
+  }
+
+  private createHandledError(message: string): Error {
+    const handledError = new Error(message) as Error & Record<string, unknown>;
+    handledError[ServiceErrorHandlerService.HANDLED_ERROR_FLAG] = true;
+    return handledError;
   }
 }
