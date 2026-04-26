@@ -1,8 +1,5 @@
 <div class="chat-container">
   <app-chat-list [messages]="messages()"></app-chat-list>
-  @if (error()) {
-  <div class="alert alert-danger">{{ error() }}</div>
-  }
   @if (gatewayStatus()) {
   <div class="alert alert-info">{{ gatewayStatus() }}</div>
   }
