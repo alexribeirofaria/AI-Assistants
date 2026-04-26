@@ -11,8 +11,8 @@ export interface ServiceErrorContext {
 })
 export class ServiceErrorHandlerService {
   handle(error: unknown, context: ServiceErrorContext): Error {
-    const normalized = this.normalizeError(error);
-    this.reportClientError(normalized, context);
+    this.normalizeError(error);
+    void context;
 
     return new Error(this.getPublicMessage(context.operation));
   }
@@ -40,44 +40,5 @@ export class ServiceErrorHandlerService {
 
   private getPublicMessage(operation: string): string {
     return `Falha ao executar ${operation}`;
-  }
-
-  private reportClientError(
-    normalizedError: {
-      name: string;
-      message: string;
-      status?: unknown;
-      statusText?: unknown;
-    },
-    context: ServiceErrorContext
-  ): void {
-    if (typeof fetch !== 'function') {
-      return;
-    }
-
-    const statusCode = typeof normalizedError.status === 'number'
-      ? normalizedError.status
-      : 500;
-
-    const payload = {
-      source: context.source,
-      operation: context.operation,
-      endpoint: context.operation,
-      method: 'CLIENT',
-      reqUrl: '/api/__client-error-log',
-      statusCode,
-      code: normalizedError.statusText ?? normalizedError.name,
-      message: normalizedError.message,
-      details: context.details ?? null,
-      timestamp: new Date().toISOString(),
-    };
-
-    void fetch('/api/__client-error-log', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    }).catch(() => undefined);
   }
 }
