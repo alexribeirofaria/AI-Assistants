@@ -3,95 +3,150 @@ import { Injectable } from '@angular/core';
 import {
   IAssistantResponse,
   IChangeProviderResponse,
-  IModelsListResponse,
+  IModelsListResponse
 } from '../../../core/application/interfaces';
-import { CoreChatGateway, HttpChatGateway, IChatGateway } from './gateway';
-import { ChatStateService } from './state/chat.state.service';
+import { BaseService } from '../base/base.service';
+import { ServiceErrorHandlerService } from '../error-handler';
+import {
+  ChatGatewayChainFactory,
+  ChatGatewayChainHandler,
+  CoreChatGateway,
+  HttpChatGateway
+} from './gateway';
+import { ChatMessageContext } from './gateway/i-chat-gateway';
+import { GatewayChainObserver } from './gateway/chain/interfaces';
+
+export interface SendMessageResult {
+  content: string;
+  gatewayStatus: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
-export class ChatService {
+export class ChatService extends BaseService {
+  private readonly gatewayChain: ChatGatewayChainHandler;
+
   constructor(
-    private readonly chatState: ChatStateService,
-    private readonly primaryGateway: CoreChatGateway,
-    private readonly secondaryGateway: HttpChatGateway
-  ) {}
+    httpGateway: HttpChatGateway,
+    coreGateway: CoreChatGateway,
+    errorHandler: ServiceErrorHandlerService
+  ) {
+    super({ errorHandler });
+    this.gatewayChain = ChatGatewayChainFactory.create([httpGateway, coreGateway]);
+  }
 
   async getProviders(): Promise<string[]> {
-    return this.executeWithChain((gateway) => this.getValidatedProviders(gateway));
+    const providers = await this.gatewayChain.handle({
+      operation: (gateway) => gateway.getProviders(),
+      validate: (result) => Array.isArray(result),
+      invalidResultMessage: 'Gateway retornou providers invalidos',
+    });
+
+    return this.normalizeProviders(providers);
   }
 
   async getModels(provider?: string): Promise<IModelsListResponse> {
-    return this.executeWithCoreFallback(
-      () => this.primaryGateway.getModels(provider),
-      () => this.secondaryGateway.getModels(provider),
-      (response) => Array.isArray(response?.models),
-      'Core gateway retornou models invalidos'
-    );
+    return this.gatewayChain.handle({
+      operation: (gateway) => gateway.getModels(provider),
+      validate: (result) => Array.isArray(result?.models),
+      invalidResultMessage: 'Gateway retornou models invalidos',
+    });
   }
 
   async getDefaultModel(provider?: string): Promise<string | undefined> {
-    const model = await this.executeWithCoreFallback(
-      () => this.primaryGateway.getDefaultModel(provider),
-      () => this.secondaryGateway.getDefaultModel(provider),
-      (value) => Boolean(this.normalizeDefaultModel(value)),
-      'Core gateway retornou default model invalido'
-    );
+    let hasMissingModel = false;
 
-    return this.normalizeDefaultModel(model);
+    try {
+      const model = await this.gatewayChain.handle({
+        operation: async (gateway) => {
+          const value = await gateway.getDefaultModel(provider);
+          if (typeof value !== 'string') {
+            hasMissingModel = true;
+          }
+          return value;
+        },
+        validate: (result) => typeof result === 'string' && result.trim().length > 0,
+        invalidResultMessage: 'Gateway retornou default model invalido',
+      });
+
+      return this.normalizeDefaultModel(model);
+    } catch (error) {
+      if (hasMissingModel) {
+        return undefined;
+      }
+      throw error;
+    }
   }
 
   async changeProvider(provider: string): Promise<IChangeProviderResponse> {
-    this.chatState.setProvider(provider);
-    return this.executeWithChain((gateway) => gateway.changeProvider(provider));
+    return this.gatewayChain.handle({
+      operation: (gateway) => gateway.changeProvider(provider),
+    });
   }
 
-  async sendMessage(content: string): Promise<void> {
-    this.chatState.addUserMessage(content);
-    this.chatState.startStreaming();
+  async sendMessage(content: string, context?: ChatMessageContext): Promise<SendMessageResult> {
+    let usedFallback = false;
+    let gatewayStatus = '';
 
-    try {
-      const data = await this.executeWithCoreFallback(
-        () => this.primaryGateway.sendMessage(content),
-        () => this.secondaryGateway.sendMessage(content),
-        (response) => Boolean(this.extractResponseText(response).trim()),
-        'Core gateway retornou resposta invalida'
-      );
+    const observer: GatewayChainObserver = {
+      onFallback: ({ fromGateway, toGateway }) => {
+        usedFallback = true;
+        gatewayStatus = `Falha em ${fromGateway}. Alternando para ${toGateway}...`;
+      },
+      onSuccess: ({ gatewayName }) => {
+        if (!usedFallback) {
+          gatewayStatus = '';
+          return;
+        }
 
-      const text = this.extractResponseText(data);
+        gatewayStatus = `Resposta recebida via ${gatewayName}.`;
+      },
+      onFailure: () => {
+        gatewayStatus = '';
+      },
+    };
 
-      this.chatState.appendChunk(text);
-      this.chatState.stopStreaming();
-    } catch (err) {
-      this.chatState.setError('Erro ao comunicar com o servidor');
-      this.chatState.stopStreaming();
-      throw err;
-    }
+    const data = await this.gatewayChain.handle({
+      operation: (gateway) => gateway.sendMessage(content, context),
+      validate: (result) => this.isValidAssistantResponse(result),
+      invalidResultMessage: 'Gateway retornou resposta invalida',
+      operationName: 'sendMessage',
+      observer,
+    });
+
+    return {
+      content: this.extractResponseText(data),
+      gatewayStatus,
+    };
   }
 
   private extractResponseText(data: IAssistantResponse): string {
     const response = data?.response;
-    if (response?.response) {
+    if (!response) {
+      return '';
+    }
+
+    if (Object.prototype.hasOwnProperty.call(response, 'response')
+      && typeof response.response === 'string') {
       return response.response;
     }
 
-    if (response?.message) {
+    if (Object.prototype.hasOwnProperty.call(response, 'message')
+      && typeof response.message === 'string') {
       return response.message;
     }
 
-    return response ? JSON.stringify(response) : '';
+    return JSON.stringify(response);
   }
 
-  private async getValidatedProviders(gateway: IChatGateway): Promise<string[]> {
-    const providers = await gateway.getProviders();
-    const normalized = this.normalizeProviders(providers);
-
-    if (!Array.isArray(providers) && normalized.length === 0) {
-      throw new Error('Gateway retornou providers invalidos');
+  private isValidAssistantResponse(result: IAssistantResponse): boolean {
+    const statusCode = result.statusCode;
+    if (typeof statusCode === 'number' && statusCode !== 200) {
+      return false;
     }
 
-    return normalized;
+    return this.extractResponseText(result).trim().length > 0;
   }
 
   private normalizeProviders(providers: string[] | null | undefined): string[] {
@@ -111,38 +166,5 @@ export class ChatService {
 
     const normalized = model.trim();
     return normalized || undefined;
-  }
-
-  private async executeWithCoreFallback<TResult>(
-    coreOperation: () => Promise<TResult>,
-    fallbackOperation: () => Promise<TResult>,
-    isValidCoreResult: (value: TResult) => boolean,
-    coreInvalidMessage: string
-  ): Promise<TResult> {
-    try {
-      const coreResult = await coreOperation();
-      if (!isValidCoreResult(coreResult)) {
-        throw new Error(coreInvalidMessage);
-      }
-      return coreResult;
-    } catch {
-      return fallbackOperation();
-    }
-  }
-
-  private async executeWithChain<TResult>(
-    operation: (gateway: IChatGateway) => Promise<TResult>
-  ): Promise<TResult> {
-    let lastError: unknown;
-
-    for (const gateway of [this.primaryGateway, this.secondaryGateway]) {
-      try {
-        return await operation(gateway);
-      } catch (error) {
-        lastError = error;
-      }
-    }
-
-    throw lastError instanceof Error ? lastError : new Error('Nenhum gateway disponivel');
   }
 }
