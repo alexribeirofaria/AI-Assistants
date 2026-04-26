@@ -30,7 +30,8 @@ export class ChatContainerComponent implements OnInit {
     if (!provider) {
       return models;
     }
-    return models.filter((model) => model.provider === provider);
+    const selected = this.normalizeProvider(provider);
+    return models.filter((model) => this.normalizeProvider(model.provider) === selected);
   });
   readonly selectedModel = this._selectedModel.asReadonly();
   readonly messages = this._messages.asReadonly();
@@ -157,5 +158,9 @@ export class ChatContainerComponent implements OnInit {
       return updated;
     });
     this._isLoading.set(false);
+  }
+
+  private normalizeProvider(provider: string | null | undefined): string {
+    return (provider ?? '').trim().toLowerCase().replace(/\s+/g, '');
   }
 }
