@@ -5,6 +5,7 @@ import { ServiceErrorHandlerService } from './service-error-handler.service';
 
 describe('ServiceErrorHandlerService Unit Tests', () => {
   let service: ServiceErrorHandlerService;
+  let fetchSpy: jasmine.Spy;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -12,6 +13,7 @@ describe('ServiceErrorHandlerService Unit Tests', () => {
     });
 
     service = TestBed.inject(ServiceErrorHandlerService);
+    fetchSpy = spyOn(window, 'fetch').and.returnValue(Promise.resolve({} as Response));
   });
 
   it('should be created', () => {
@@ -32,6 +34,7 @@ describe('ServiceErrorHandlerService Unit Tests', () => {
 
     expect(result).toEqual(jasmine.any(Error));
     expect(result.message).toBe('Falha ao executar sendMessage');
+    expect(fetchSpy).toHaveBeenCalled();
   });
 
   it('should return a public error message for Core errors', () => {
@@ -44,6 +47,7 @@ describe('ServiceErrorHandlerService Unit Tests', () => {
 
     expect(result).toEqual(jasmine.any(Error));
     expect(result.message).toBe('Falha ao executar sendMessage');
+    expect(fetchSpy).toHaveBeenCalled();
   });
 
   it('should handle unknown primitive errors safely', () => {
@@ -54,5 +58,6 @@ describe('ServiceErrorHandlerService Unit Tests', () => {
 
     expect(result).toEqual(jasmine.any(Error));
     expect(result.message).toBe('Falha ao executar getData');
+    expect(fetchSpy).toHaveBeenCalled();
   });
 });
