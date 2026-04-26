@@ -6,90 +6,177 @@ import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 
-const minCoverage: number = 85;
-const projectRoot: string = process.cwd();
+const MIN_COVERAGE = 85;
+const PROJECT_ROOT = process.cwd();
 
+process.env['NODE_OPTIONS'] = "--max_old_space_size=4096";
 
-console.log("Starting Angular Coverage + Test Pipeline...");
-console.log("Project:", projectRoot);
+console.log("🚀 Starting Angular Coverage + Test Pipeline...");
+console.log("📁 Project:", PROJECT_ROOT);
 
-process.env["NODE_OPTIONS"] = "--max_old_space_size=4096";
-process.chdir(projectRoot);
+process.chdir(PROJECT_ROOT);
 
-const distPath = path.join(projectRoot, "dist");
-if (fs.existsSync(distPath)) {
-  console.log("Cleaning dist folder...");
-  fs.rmSync(distPath, { recursive: true, force: true });
-}
+// ================================
+// Utils
+// ================================
 
-let output: string;
-let didNotFail = true;
-try {
-  console.log("Running ng test with coverage...");
-
-
-  output = execSync(
-    "npx ng test --watch=false --browsers=ChromeHeadless --source-map=false --code-coverage",
-    { stdio: "pipe", env: { ...process.env, BROWSER: "ChromeHeadless" } }
-  ).toString();
-  fs.writeFileSync("karma-output.log", output);
-  console.log("Tests completed successfully");
-} catch (err: any) {
-  didNotFail = false;
-  // Capture both stdout and stderr
-  const stdout = err?.stdout?.toString() || "";
-  const stderr = err?.stderr?.toString() || "";
-  output = stdout + stderr;
-  fs.writeFileSync("karma-output.log", output);
-
-  // Check if tests passed despite the error (karma load warning)
-  if (output.includes("117 of 117") && output.includes("SUCCESS") && !output.includes(" FAILED")) {
-    console.log("Tests passed (117/117 SUCCESS) - ignoring Karma load warning");
-    didNotFail = true;
-  } else {
-    console.error("TESTS FAILED");
-    console.error("Check: karma-output.log");
+function removeDir(dir: string): void {
+  if (fs.existsSync(dir)) {
+    console.log(`🧹 Cleaning ${dir}...`);
+    fs.rmSync(dir, { recursive: true, force: true });
   }
 }
 
-if (!didNotFail) {
+function runTests(): { output: string; success: boolean } {
+  try {
+    console.log("🧪 Running Angular tests...");
+
+    const output = execSync(
+      "npx ng test --watch=false --browsers=ChromeHeadless --source-map=false --code-coverage",
+      {
+        stdio: "pipe",
+        env: { ...process.env, BROWSER: "ChromeHeadless" },
+      }
+    ).toString();
+
+    return { output, success: true };
+  } catch (err: any) {
+    const stdout = err?.stdout?.toString() || "";
+    const stderr = err?.stderr?.toString() || "";
+    const output = stdout + stderr;
+
+    return { output, success: false };
+  }
+}
+
+function saveLog(content: string): void {
+  fs.writeFileSync("karma-output.log", content);
+  console.log("📝 Log saved: karma-output.log");
+}
+
+// ================================
+// Coverage Parser
+// ================================
+
+interface CoverageResult {
+  lines: number;
+  hits: number;
+  coverage: number;
+}
+
+function parseLCOV(filePath: string): CoverageResult | null {
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+
+  let totalLines = 0;
+  let totalHits = 0;
+
+  const lines = fs.readFileSync(filePath, "utf-8").split("\n");
+
+  for (const line of lines) {
+    if (line.startsWith("LF:")) {
+      totalLines += Number(line.replace("LF:", ""));
+    }
+    if (line.startsWith("LH:")) {
+      totalHits += Number(line.replace("LH:", ""));
+    }
+  }
+
+  if (totalLines === 0) return null;
+
+  return {
+    lines: totalLines,
+    hits: totalHits,
+    coverage: Math.round((totalHits / totalLines) * 10000) / 100,
+  };
+}
+
+// ================================
+// Karma Summary Extractor
+// ================================
+
+function printKarmaSummary(output: string): void {
+  const lines = output.split("\n");
+
+  const summaryStart = lines.findIndex(l => l.includes("Coverage summary"));
+
+  if (summaryStart === -1) return;
+
+  const summary: string[] = [];
+
+  for (let i = summaryStart; i < lines.length; i++) {
+    const line = lines[i];
+
+    // para quando chegar na separação final
+    if (line.includes("=====") && summary.length > 1) break;
+
+    summary.push(line);
+  }
+
+  console.log("\n📊 =============================== Coverage summary ===============================");
+  console.log(summary.join("\n"));
+  console.log("================================================================================\n");
+}
+
+// ================================
+// Execution
+// ================================
+
+removeDir(path.join(PROJECT_ROOT, "dist"));
+
+const { output, success } = runTests();
+saveLog(output);
+
+printKarmaSummary(output);
+
+// Detect success even with Karma warning
+let testsPassed = success;
+
+if (
+  output.includes("SUCCESS") &&
+  output.includes("117 of 117") &&
+  !output.includes("FAILED")
+) {
+  console.log("⚠️ Karma warning ignored - tests considered successful");
+  testsPassed = true;
+}
+
+if (!testsPassed) {
+  console.error("❌ TESTS FAILED");
   process.exit(1);
 }
 
-const lcovFile: string = path.join(projectRoot, "coverage", "ai-assistants", "lcov.info");
-console.log("Checking coverage file...");
+// ================================
+// Coverage check
+// ================================
 
-if (!fs.existsSync(lcovFile)) {
-  console.error("ERROR: Coverage file not found");
+const lcovFile = path.join(
+  PROJECT_ROOT,
+  "coverage",
+  "ai-assistants",
+  "lcov.info"
+);
+
+console.log("📊 Checking coverage file...");
+
+const result = parseLCOV(lcovFile);
+
+if (!result) {
+  console.error("❌ ERROR: Coverage file not found or invalid");
   process.exit(1);
 }
 
-let totalLines: number = 0;
-let totalHits: number = 0;
+console.log(
+  `📈 Coverage: ${result.hits}/${result.lines} (${result.coverage}%)`
+);
 
-const lines: string[] = fs.readFileSync(lcovFile, "utf-8").split("\n");
-for (const line of lines) {
-  if (line.startsWith("LF:")) {
-    totalLines += Number(line.replace("LF:", ""));
-  }
-  if (line.startsWith("LH:")) {
-    totalHits += Number(line.replace("LH:", ""));
-  }
+if (result.coverage >= MIN_COVERAGE) {
+  console.log(`✅ SUCCESS: Coverage meets minimum (${MIN_COVERAGE}%)`);
+  process.exit(0);
+} else {
+  console.error(
+    `❌ FAILURE: Coverage below minimum (${MIN_COVERAGE}%)`
+  );
+  process.exit(1);
 }
-
-if (totalLines > 0) {
-  const coverage: number = Math.round((totalHits / totalLines) * 10000) / 100;
-
-  console.log("Coverage: " + totalHits + "/" + totalLines + " (" + coverage + "%)");
-
-  if (coverage >= minCoverage) {
-    console.log("SUCCESS: Coverage meets minimum (" + minCoverage + "%)");
-    process.exit(0);
-  } else {
-    console.error("FAILURE: Coverage below minimum (" + minCoverage + "%)");
-    process.exit(1);
-  }
-}
-
-console.error("ERROR: Could not parse LCOV data");
-process.exit(1);
