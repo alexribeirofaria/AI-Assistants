@@ -101,7 +101,7 @@ export class ChatService extends BaseService {
       onFallback: ({ operation, fromGateway, toGateway, error }) => {
         usedFallback = true;
         gatewayStatus = `Falha em ${fromGateway}. Alternando para ${toGateway}...`;
-        this.registerGatewayFailure(error, fromGateway, operation, { toGateway });
+        this.registerGatewayFailure(error, fromGateway, operation, { toGateway }, false);
       },
       onSuccess: ({ gatewayName }) => {
         if (!usedFallback) {
@@ -166,7 +166,16 @@ export class ChatService extends BaseService {
       return false;
     }
 
-    return this.extractResponseText(result).trim().length > 0;
+    const text = this.extractResponseText(result).trim();
+    if (!text.length) {
+      return false;
+    }
+
+    if (this.isTechnicalErrorText(text)) {
+      return false;
+    }
+
+    return true;
   }
 
   private normalizeProviders(providers: string[] | null | undefined): string[] {
@@ -192,13 +201,25 @@ export class ChatService extends BaseService {
     error: unknown,
     gatewayName: string,
     operation: string,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
+    presentToUser = true
   ): void {
     this.errorHandler?.handle(error, {
       source: gatewayName,
       operation,
       details,
+      channel: operation === 'sendMessage' ? 'chat' : 'global',
+      presentToUser,
     });
+  }
+
+  private isTechnicalErrorText(text: string): boolean {
+    const normalized = text.toLowerCase();
+    return normalized.startsWith('[unknown error]')
+      || normalized.startsWith('[quota error]')
+      || normalized.includes('decommissioned')
+      || normalized.includes('no longer supported')
+      || normalized.includes('api key');
   }
 
   private buildLoggingObserver(): GatewayChainObserver {
