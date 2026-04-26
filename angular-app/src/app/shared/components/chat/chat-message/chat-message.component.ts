@@ -19,7 +19,15 @@ export class ChatMessageComponent {
     return this.message?.streaming === true;
   }
 
+  get isError(): boolean {
+    return this.message?.type === 'error';
+  }
+
   get assistantLabel(): string {
+    if (this.isError) {
+      return 'Erro';
+    }
+
     if (this.isUser) {
       return 'Você';
     }
