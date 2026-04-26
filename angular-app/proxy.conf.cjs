@@ -1,3 +1,4 @@
+
 const fs = require('fs');
 const path = require('path');
 const { responseInterceptor } = require('http-proxy-middleware');
@@ -25,14 +26,19 @@ const sanitize = (value) =>
 const getDateStamp = (date) =>
   date.toISOString().slice(0, 10).replace(/-/g, '');
 
-const getNextSequence = (source, errorName, dateStamp) => {
+const getDailyFileName = (source, errorName, dateStamp) =>
+  `log_${source}_${errorName}_${dateStamp}.md`;
+
+const getNextSequence = (filePath) => {
   ensureLogDir();
 
-  const prefix = `log_${source}_${errorName}_${dateStamp}_`;
-  const matcher = new RegExp(`^${prefix}(\\d{4})\\.md$`);
+  if (!fs.existsSync(filePath)) {
+    return '0000';
+  }
 
-  const sequences = fs.readdirSync(LOG_DIR)
-    .map((file) => file.match(matcher)?.[1])
+  const content = fs.readFileSync(filePath, 'utf8');
+  const sequences = Array.from(content.matchAll(/^# Log de Erro (\d{4})$/gm))
+    .map((match) => match[1])
     .filter(Boolean)
     .map(Number);
 
@@ -53,13 +59,12 @@ const writeErrorLog = ({ endpoint, method, error, statusCode, reqUrl }) => {
     error?.name || error?.code || `http_${statusCode || 500}`
   );
 
-  const sequence = getNextSequence(safeSource, safeError, dateStamp);
-
-  const fileName = `log_${safeSource}_${safeError}_${dateStamp}_${sequence}.md`;
+  const fileName = getDailyFileName(safeSource, safeError, dateStamp);
   const filePath = path.join(LOG_DIR, fileName);
+  const sequence = getNextSequence(filePath);
 
   const content = [
-    '# Log de Erro',
+    `# Log de Erro ${sequence}`,
     '',
     `- Fonte: \`${SOURCE}\``,
     `- Endpoint: \`${endpoint}\``,
@@ -79,7 +84,15 @@ const writeErrorLog = ({ endpoint, method, error, statusCode, reqUrl }) => {
     .filter(Boolean)
     .join('\n');
 
-  fs.writeFileSync(filePath, content, 'utf8');
+  const currentContent = fs.existsSync(filePath)
+    ? fs.readFileSync(filePath, 'utf8').trimEnd()
+    : '';
+
+  const mergedContent = currentContent
+    ? `${currentContent}\n\n---\n\n${content}`
+    : content;
+
+  fs.writeFileSync(filePath, mergedContent, 'utf8');
 };
 
 // ---------- Response Helpers ----------
