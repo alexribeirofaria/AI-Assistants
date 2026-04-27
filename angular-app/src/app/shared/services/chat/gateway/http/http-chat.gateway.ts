@@ -2,15 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, timeout } from 'rxjs';
 
-import {
-  IAssistantResponse,
-  IChangeProviderResponse,
-  IModelsListResponse,
-  IProviderListResponse,
-} from '../../../../../core/application/interfaces';
+import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse, IProviderListResponse } from '../../../../../ddd-core/application/interfaces';
 import { BaseService } from '../../../base/base.service';
 import { ServiceErrorHandlerService } from '../../../error-handler';
-import { ChatMessageContext, IChatGateway } from '../i-chat-gateway';
+import { IChatGateway, IChatMessageContext } from '../interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -69,7 +64,7 @@ export class HttpChatGateway extends BaseService implements IChatGateway {
     return response;
   }
 
-  async sendMessage(content: string, _context?: ChatMessageContext): Promise<IAssistantResponse> {
+  async sendMessage(content: string, _context?: IChatMessageContext): Promise<IAssistantResponse> {
     if (!this.http) {
       throw this.buildServiceError('sendMessage', 'HttpClient não configurado para este serviço');
     }
