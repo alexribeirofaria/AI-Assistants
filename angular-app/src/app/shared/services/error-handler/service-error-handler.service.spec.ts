@@ -47,7 +47,7 @@ describe('ServiceErrorHandlerService Unit Tests', () => {
     });
 
     expect(result).toEqual(jasmine.any(Error));
-    expect(result.message).toBe('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.');
+    expect(result.message).toBe('Não foi possível enviar sua mensagem no chat durante a operação. O serviço está temporariamente indisponível. Tente mais tarde.');
   });
 
   it('should return a public error message for Core errors', () => {
@@ -60,7 +60,7 @@ describe('ServiceErrorHandlerService Unit Tests', () => {
     });
 
     expect(result).toEqual(jasmine.any(Error));
-    expect(result.message).toBe('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.');
+    expect(result.message).toBe('Não foi possível enviar sua mensagem no chat durante a operação. Ocorreu um erro inesperado. Tente novamente mais tarde.');
   });
 
   it('should handle unknown primitive errors safely', () => {
@@ -71,7 +71,7 @@ describe('ServiceErrorHandlerService Unit Tests', () => {
     });
 
     expect(result).toEqual(jasmine.any(Error));
-    expect(result.message).toBe('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.');
+    expect(result.message).toBe('Não foi possível concluir sua solicitação durante a operação. Ocorreu um erro inesperado. Tente novamente mais tarde.');
   });
 
   it('does not reprocess errors already marked as handled', () => {
