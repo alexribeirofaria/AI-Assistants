@@ -1,4 +1,4 @@
-import { IChatGateway } from '../../i-chat-gateway';
+import { IChatGateway } from '../../interfaces';
 import { GatewayChainObserver } from './i-gateway-chain-observer';
 
 export interface IGatewayChainContext<TResult> {
