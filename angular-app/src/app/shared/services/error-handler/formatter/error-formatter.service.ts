@@ -1,8 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { ErrorMessageChainService } from '../chain/error-message-chain.service';
+import { ErrorTypeClassifierService } from '../classifier/error-type-classifier.service';
 import { FormattedError } from '../contracts/formatted-error.interface';
 import { ServiceErrorContext } from '../contracts/service-error-context.interface';
+import { ErrorContextExtractorService } from '../context/error-context-extractor.service';
 
 interface NormalizedError {
   name: string;
@@ -16,13 +19,18 @@ interface NormalizedError {
   providedIn: 'root',
 })
 export class ErrorFormatterService {
-  private static readonly FRIENDLY_SUGGESTION_MESSAGE =
-    'Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.';
+  constructor(
+    private readonly classifier: ErrorTypeClassifierService,
+    private readonly contextExtractor: ErrorContextExtractorService,
+    private readonly messageChain: ErrorMessageChainService
+  ) {}
 
   format(error: unknown, context: ServiceErrorContext): FormattedError {
     const normalized = this.normalizeError(error);
     const timestamp = new Date().toISOString();
-    const publicMessage = this.resolvePublicMessage(context.channel);
+    const classifiedType = this.classifier.classify(error);
+    const contextSummary = this.contextExtractor.extract(context);
+    const publicMessage = this.messageChain.resolve(classifiedType, contextSummary).content;
 
     return {
       id: this.buildId(timestamp, context),
@@ -33,6 +41,8 @@ export class ErrorFormatterService {
       errorType: normalized.name,
       technicalMessage: normalized.message,
       publicMessage,
+      classifiedType,
+      contextSummary,
       statusCode: normalized.statusCode,
       statusText: normalized.statusText,
       stack: normalized.stack,
@@ -136,11 +146,6 @@ export class ErrorFormatterService {
     }
 
     return 'Erro sem detalhes tecnicos disponiveis';
-  }
-
-  private resolvePublicMessage(channel: ServiceErrorContext['channel']): string {
-    void channel;
-    return ErrorFormatterService.FRIENDLY_SUGGESTION_MESSAGE;
   }
 
   private buildId(timestamp: string, context: ServiceErrorContext): string {
