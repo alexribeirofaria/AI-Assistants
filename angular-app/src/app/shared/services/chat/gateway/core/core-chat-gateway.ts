@@ -1,15 +1,10 @@
 import { Inject, Injectable } from '@angular/core';
 
-import { AIAssistantApp } from '../../../../../core/application';
-import {
-  IAssistantResponse,
-  IChangeProviderResponse,
-  IChatAssistantApp,
-  IModelsListResponse,
-} from '../../../../../core/application/interfaces';
+import { AIAssistantApp } from '../../../../../ddd-core/application';
+import { IAssistantResponse, IChangeProviderResponse, IChatAssistantApp, IModelsListResponse } from '../../../../../ddd-core/application/interfaces';
 import { BaseService } from '../../../base/base.service';
 import { ServiceErrorHandlerService } from '../../../error-handler';
-import { ChatMessageContext, IChatGateway } from '../i-chat-gateway';
+import { IChatGateway, IChatMessageContext } from '../interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -39,7 +34,7 @@ export class CoreChatGateway extends BaseService implements IChatGateway {
     return this.run('changeProvider', () => this.app.changeProvider(provider));
   }
 
-  async sendMessage(content: string, context?: ChatMessageContext): Promise<IAssistantResponse> {
+  async sendMessage(content: string, context?: IChatMessageContext): Promise<IAssistantResponse> {
     return this.run('sendMessage', async () => {
       if (context?.provider) {
         await this.app.changeProvider(context.provider);
