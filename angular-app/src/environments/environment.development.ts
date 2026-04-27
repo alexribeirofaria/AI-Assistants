@@ -1,6 +1,6 @@
 import { environment as env } from './.env';
 
-const useEnv = true;
+const useEnv = false;
 
 export const environment = useEnv
   ? env
