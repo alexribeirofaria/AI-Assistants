@@ -31,7 +31,9 @@ describe('ErrorFormatterService Unit Tests', () => {
     expect(formatted.technicalMessage).toBe('technical detail');
     expect(formatted.statusCode).toBe(500);
     expect(formatted.destination).toContain('.log_erros/log_angular_dev_HttpChatGateway_');
-    expect(formatted.publicMessage).toBe('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.');
+    expect(formatted.classifiedType).toBe('api-server');
+    expect(formatted.contextSummary.module).toBe('chat');
+    expect(formatted.publicMessage).toBe('Não foi possível enviar sua mensagem no chat durante a operação. O serviço está temporariamente indisponível. Tente mais tarde.');
   });
 
   it('uses fallback technical message when message is missing', () => {
@@ -44,7 +46,8 @@ describe('ErrorFormatterService Unit Tests', () => {
     expect(formatted.errorType).toBe('CustomError');
     expect(formatted.technicalMessage).toBe('Erro sem detalhes tecnicos disponiveis');
     expect(formatted.stack).toBeUndefined();
-    expect(formatted.publicMessage).toBe('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.');
+    expect(formatted.classifiedType).toBe('unexpected');
+    expect(formatted.publicMessage).toBe('Não foi possível concluir sua solicitação durante a operação. Ocorreu um erro inesperado. Tente novamente mais tarde.');
   });
 
   it('creates readable log entries with optional fields', () => {
