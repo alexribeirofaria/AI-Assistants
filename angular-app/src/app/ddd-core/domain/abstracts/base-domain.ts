@@ -1,6 +1,5 @@
 import { IServer } from '../../infrastructure/servers/abstracts/i-server';
 import { CachedDomainListMixin } from '../cache/domain-list-cache';
-import type { ApiResponse } from './api-response';
 
 export abstract class BaseDomain extends CachedDomainListMixin {
   model: string;
@@ -50,7 +49,7 @@ export abstract class BaseDomain extends CachedDomainListMixin {
     }
   }
 
-  protected toApiResponse(response: ApiResponse): ApiResponse {
+  protected responseTokens(response: any): any {
     return {
       completion_tokens: response.completion_tokens,
       total_tokens: response.total_tokens,
