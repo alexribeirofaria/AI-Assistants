@@ -7,11 +7,12 @@ import { GlobalUiErrorStateService } from './global-ui-error-state.service';
 @Injectable({
   providedIn: 'root',
 })
+
 export class UIErrorPresenterService {
   constructor(
     private readonly globalUiErrorState: GlobalUiErrorStateService,
     private readonly chatUiErrorState: ChatUiErrorStateService
-  ) {}
+  ) { }
 
   present(presentation: ErrorPresentation): void {
     if (presentation.channel === 'chat') {
