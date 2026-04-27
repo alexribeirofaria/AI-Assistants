@@ -1,9 +1,5 @@
-import {
-  IAssistantResponse,
-  IChangeProviderResponse,
-  IModelsListResponse,
-} from '../../../../../core/application/interfaces';
-import { ChatMessageContext, IChatGateway } from '../i-chat-gateway';
+import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse, } from '../../../../../ddd-core/application/interfaces';
+import { IChatGateway, IChatMessageContext } from '../interfaces';
 
 export class ChatGatewayChain implements IChatGateway {
   private readonly gateways: IChatGateway[];
@@ -72,7 +68,7 @@ export class ChatGatewayChain implements IChatGateway {
     });
   }
 
-  sendMessage(content: string, context?: ChatMessageContext): Promise<IAssistantResponse> {
+  sendMessage(content: string, context?: IChatMessageContext): Promise<IAssistantResponse> {
     return this.executeWithFallback({
       operation: (gateway) => gateway.sendMessage(content, context),
       validate: (response) => this.isValidAssistantResponse(response),
