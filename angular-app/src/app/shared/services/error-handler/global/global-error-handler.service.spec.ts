@@ -1,22 +1,37 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ServiceErrorHandlerService } from '../service-error-handler.service';
+import { ServiceErrorContext } from '../contracts/service-error-context.interface';
 import { GlobalErrorHandlerService } from './global-error-handler.service';
+import { ServiceErrorHandlerService } from '../service-error-handler.service';
+import { GlobalErrorContextFactoryService } from './global-error-context-factory.service';
 
 describe('GlobalErrorHandlerService Unit Tests', () => {
   let service: GlobalErrorHandlerService;
-  let serviceErrorHandler: jasmine.SpyObj<ServiceErrorHandlerService>;
+  let errorHandler: jasmine.SpyObj<ServiceErrorHandlerService>;
+  let contextFactory: jasmine.SpyObj<GlobalErrorContextFactoryService>;
 
   beforeEach(() => {
-    serviceErrorHandler = jasmine.createSpyObj<ServiceErrorHandlerService>('ServiceErrorHandlerService', ['handle']);
-    serviceErrorHandler.handle.and.returnValue(new Error('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.'));
+    errorHandler = jasmine.createSpyObj<ServiceErrorHandlerService>('ServiceErrorHandlerService', ['handle']);
+    contextFactory = jasmine.createSpyObj<GlobalErrorContextFactoryService>(
+      'GlobalErrorContextFactoryService',
+      ['createRuntimeContext']
+    );
+    contextFactory.createRuntimeContext.and.returnValue({
+      source: 'GlobalErrorHandler',
+      operation: 'handleError',
+      channel: 'global',
+    });
 
     TestBed.configureTestingModule({
       providers: [
         GlobalErrorHandlerService,
         {
           provide: ServiceErrorHandlerService,
-          useValue: serviceErrorHandler,
+          useValue: errorHandler,
+        },
+        {
+          provide: GlobalErrorContextFactoryService,
+          useValue: contextFactory,
         },
       ],
     });
@@ -26,13 +41,15 @@ describe('GlobalErrorHandlerService Unit Tests', () => {
 
   it('delegates unexpected errors to the shared handler', () => {
     const error = new Error('runtime failure');
-
-    service.handleError(error);
-
-    expect(serviceErrorHandler.handle).toHaveBeenCalledOnceWith(error, {
+    const context: ServiceErrorContext = {
       source: 'GlobalErrorHandler',
       operation: 'handleError',
       channel: 'global',
-    });
+    };
+    contextFactory.createRuntimeContext.and.returnValue(context);
+
+    service.handleError(error);
+
+    expect(errorHandler.handle).toHaveBeenCalledOnceWith(error, context);
   });
 });
