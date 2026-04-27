@@ -1,21 +1,15 @@
-import { HttpClientModule } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import { ErrorHandler, NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { RouterModule } from "@angular/router";
 
 import { AppComponent } from "./app.component";
 import { AppRoutingModule } from "./route/app.routing.module";
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AlertModule } from "./shared/components/alert/alert.component.module";
 import { ChatModule } from "./shared/components/chat/chat.module";
 import { CookieConsentComponent } from "./shared/components/cookie-consent/cookie-consent.component";
 import { LayoutComponent } from "./shared/components/layout/layout.component";
-import {
-  ERROR_LOG_WRITER,
-  GlobalErrorHandlerService,
-  GlobalHttpErrorInterceptor,
-  LocalStorageErrorLogWriterService,
-} from "./shared/services/error-handler";
+import { ERROR_LOG_WRITER, GlobalErrorHandlerService, GlobalHttpErrorInterceptor, LocalStorageErrorLogWriterService } from "./ddd-core/shared/errors";
 
 @NgModule({
   declarations: [AppComponent],
@@ -27,7 +21,7 @@ import {
     ChatModule,
     AlertModule,
     LayoutComponent,
-    CookieConsentComponent,    
+    CookieConsentComponent,
   ],
   providers: [
     {
