@@ -2,11 +2,11 @@ import { Component, computed, inject, OnDestroy, OnInit, signal } from "@angular
 import { Subscription } from 'rxjs';
 
 import { IHomeModel, IMessage } from "../../../models";
-import { ChatService } from "../../../services/chat/chat.service";
+import { ChatService } from "../../../../ddd-core/application/services/chat/chat.service";
 import {
   ChatUiErrorStateService,
   GlobalUiErrorStateService,
-} from '../../../services/error-handler';
+} from '../../../../ddd-core/shared/errors';
 
 @Component({
   selector: "app-chat-container",
@@ -14,7 +14,7 @@ import {
   styleUrl: "./chat-container.component.scss",
   standalone: false,
 })
-  
+
 export class ChatContainerComponent implements OnInit, OnDestroy {
   private chatService = inject(ChatService);
   private readonly chatUiErrorState = inject(ChatUiErrorStateService);
@@ -44,7 +44,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   readonly messages = this._messages.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
   readonly gatewayStatus = this._gatewayStatus.asReadonly();
-  
+
   ngOnInit(): void {
     this.bindUiErrors();
     this.loadProviders();
@@ -58,7 +58,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
     try {
       const providers = await this.chatService.getProviders();
       this._providers.set(providers);
-      
+
       if (providers.length > 0) {
         const defaultProvider = providers[0];
         this._selectedProvider.set(defaultProvider);
@@ -76,7 +76,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
     try {
       const modelsData = await this.chatService.getModels(provider);
       this._models.set(modelsData.models);
-      
+
       const defaultModel = modelsData.defaultModel ?? await this.chatService.getDefaultModel(provider);
       if (defaultModel) {
         this._selectedModel.set(defaultModel);
@@ -85,7 +85,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
       // Mensagem já é apresentada pelo fluxo global.
     }
   }
-  
+
   async onProviderChange(provider: string): Promise<void> {
     this._selectedProvider.set(provider);
     this._selectedModel.set('');
@@ -96,7 +96,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
       // Mensagem já é apresentada pelo fluxo global.
     }
   }
-  
+
   onModelChange(modelId: string): void {
     this._selectedModel.set(modelId);
   }
