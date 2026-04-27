@@ -1,4 +1,5 @@
-export * from './chat-gateway-chain-handler';
-export * from './chat-gateway-chain.factory';
 export * from './chat-gateway-chain';
+export * from './factory';
+export * from './handler';
+export * from './observer';
 export * from './interfaces';
