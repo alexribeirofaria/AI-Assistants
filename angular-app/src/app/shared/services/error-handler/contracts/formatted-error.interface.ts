@@ -1,3 +1,4 @@
+import { ErrorContext, ErrorType } from '../interfaces';
 import { ErrorChannel } from './error-channel.type';
 
 export interface FormattedError {
@@ -9,6 +10,8 @@ export interface FormattedError {
   errorType: string;
   technicalMessage: string;
   publicMessage: string;
+  classifiedType: ErrorType;
+  contextSummary: ErrorContext;
   statusCode?: number;
   statusText?: string;
   stack?: string;
