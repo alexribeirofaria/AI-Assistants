@@ -65,7 +65,7 @@ describe('ChatContainerComponent Unit Tests', () => {
     expect(component.selectedModel()).toBe('gpt-4o');
   });
 
-  it('should set provider error and still try loading models when provider loading fails', async () => {
+  it('should keep flow and still try loading models when provider loading fails', async () => {
     chatService.getProviders.and.rejectWith(new Error('providers failure'));
     chatService.getModels.and.resolveTo({
       defaultModel: undefined,
@@ -75,9 +75,7 @@ describe('ChatContainerComponent Unit Tests', () => {
 
     await (component as any).loadProviders();
 
-    const lastMessage = component.messages()[component.messages().length - 1];
-    expect(lastMessage.content).toBe('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.');
-    expect(lastMessage.type).toBe('error');
+    expect(component.messages().length).toBe(0);
     expect(chatService.getModels).toHaveBeenCalledOnceWith(undefined);
   });
 
