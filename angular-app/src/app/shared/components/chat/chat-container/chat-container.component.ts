@@ -16,8 +16,6 @@ import {
 })
   
 export class ChatContainerComponent implements OnInit, OnDestroy {
-  private static readonly FRIENDLY_MESSAGE =
-    'Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.';
   private chatService = inject(ChatService);
   private readonly chatUiErrorState = inject(ChatUiErrorStateService);
   private readonly globalUiErrorState = inject(GlobalUiErrorStateService);
@@ -70,7 +68,6 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
         await this.loadModels();
       }
     } catch {
-      this.appendAssistantErrorMessage(ChatContainerComponent.FRIENDLY_MESSAGE);
       await this.loadModels();
     }
   }
@@ -85,7 +82,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
         this._selectedModel.set(defaultModel);
       }
     } catch {
-      this.appendAssistantErrorMessage(ChatContainerComponent.FRIENDLY_MESSAGE);
+      // Mensagem já é apresentada pelo fluxo global.
     }
   }
   
@@ -96,7 +93,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
       await this.chatService.changeProvider(provider);
       await this.loadModels(provider);
     } catch {
-      this.appendAssistantErrorMessage(ChatContainerComponent.FRIENDLY_MESSAGE);
+      // Mensagem já é apresentada pelo fluxo global.
     }
   }
   
@@ -183,7 +180,8 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.appendAssistantErrorMessage(message, this.selectedProvider() || undefined);
+        // Erros globais de infraestrutura não devem interromper a experiência do chat.
+        // A UI permanece íntegra; os detalhes já foram registrados no fluxo de log.
         this.globalUiErrorState.clear();
       })
     );
