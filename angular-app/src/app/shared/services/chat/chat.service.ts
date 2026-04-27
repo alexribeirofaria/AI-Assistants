@@ -1,31 +1,26 @@
 import { Injectable } from '@angular/core';
 
-import {
-  IAssistantResponse,
-  IChangeProviderResponse,
-  IModelsListResponse
-} from '../../../core/application/interfaces';
+import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse } from '../../../ddd-core/application/interfaces';
 import { BaseService } from '../base/base.service';
 import { ServiceErrorHandlerService } from '../error-handler';
-import {
-  ChatGatewayChainFactory,
-  ChatGatewayChainHandler,
-  CoreChatGateway,
-  HttpChatGateway
-} from './gateway';
-import { GatewayChainObserver } from './gateway/chain/interfaces';
-import { ChatMessageContext } from './gateway/i-chat-gateway';
+import { ChatGatewayObserverFactory, CoreChatGateway, HttpChatGateway } from './gateway';
+import { createChatGatewayChainHandler } from './gateway/chain/factory/create-chat-gateway-chain-handler';
+import { ChatGatewayChainHandler } from './gateway/chain/handler';
+import { IChatMessageContext } from './gateway/interfaces';
+import { SendMessageResult } from './interfaces';
 
-export interface SendMessageResult {
-  content: string;
-  gatewayStatus: string;
-}
 
 @Injectable({
   providedIn: 'root',
 })
+
 export class ChatService extends BaseService {
-  private readonly gatewayChain: ChatGatewayChainHandler;
+  private static readonly HANDLED_ERROR_FLAG = '__globalErrorHandled';
+
+  private gatewayChain: ChatGatewayChainHandler;
+  private readonly coreGateway: CoreChatGateway;
+  private readonly httpGateway: HttpChatGateway;
+  private readonly observerFactory: ChatGatewayObserverFactory;
 
   constructor(
     httpGateway: HttpChatGateway,
@@ -33,16 +28,27 @@ export class ChatService extends BaseService {
     errorHandler: ServiceErrorHandlerService
   ) {
     super({ errorHandler });
-    this.gatewayChain = ChatGatewayChainFactory.create([coreGateway, httpGateway]);
+    this.coreGateway = coreGateway;
+    this.httpGateway = httpGateway;
+    this.gatewayChain = createChatGatewayChainHandler([this.coreGateway, this.httpGateway]);
+    this.observerFactory = new ChatGatewayObserverFactory((report) => {
+      this.registerGatewayFailure(
+        report.error,
+        report.gatewayName,
+        report.operation,
+        report.details,
+        report.presentToUser
+      );
+    });
   }
 
   async getProviders(): Promise<string[]> {
-    const providers = await this.gatewayChain.handle({
+    const providers = await this.gatewayChain.handle<string[]>({
       operation: (gateway) => gateway.getProviders(),
       validate: (result) => Array.isArray(result),
       invalidResultMessage: 'Gateway retornou providers invalidos',
       operationName: 'getProviders',
-      observer: this.buildLoggingObserver(),
+      observer: this.observerFactory.createSilentObserver(),
     });
 
     return this.normalizeProviders(providers);
@@ -51,10 +57,10 @@ export class ChatService extends BaseService {
   async getModels(provider?: string): Promise<IModelsListResponse> {
     return this.gatewayChain.handle({
       operation: (gateway) => gateway.getModels(provider),
-      validate: (result) => Array.isArray(result?.models),
+      validate: (result: any) => Array.isArray(result?.models),
       invalidResultMessage: 'Gateway retornou models invalidos',
       operationName: 'getModels',
-      observer: this.buildLoggingObserver(),
+      observer: this.observerFactory.createSilentObserver(),
     });
   }
 
@@ -73,7 +79,7 @@ export class ChatService extends BaseService {
         validate: (result) => typeof result === 'string' && result.trim().length > 0,
         invalidResultMessage: 'Gateway retornou default model invalido',
         operationName: 'getDefaultModel',
-        observer: this.buildLoggingObserver(),
+        observer: this.observerFactory.createSilentObserver(),
       });
 
       return this.normalizeDefaultModel(model);
@@ -86,38 +92,32 @@ export class ChatService extends BaseService {
   }
 
   async changeProvider(provider: string): Promise<IChangeProviderResponse> {
-    return this.gatewayChain.handle({
+    const response = await this.gatewayChain.handle<IChangeProviderResponse>({
       operation: (gateway) => gateway.changeProvider(provider),
       operationName: 'changeProvider',
-      observer: this.buildLoggingObserver(),
+      observer: this.observerFactory.createSilentObserver(),
     });
+
+    // Reinicia a chain para garantir estado consistente após troca de provider.
+    this.gatewayChain = createChatGatewayChainHandler([this.coreGateway, this.httpGateway]);
+    return response;
   }
 
-  async sendMessage(content: string, context?: ChatMessageContext): Promise<SendMessageResult> {
+  async sendMessage(content: string, context?: IChatMessageContext): Promise<SendMessageResult> {
     let usedFallback = false;
     let gatewayStatus = '';
 
-    const observer: GatewayChainObserver = {
-      onFallback: ({ operation, fromGateway, toGateway, error }) => {
+    const observer = this.observerFactory.createInteractiveSendObserver({
+      markFallbackUsed: () => {
         usedFallback = true;
-        gatewayStatus = `Falha em ${fromGateway}. Alternando para ${toGateway}...`;
-        this.registerGatewayFailure(error, fromGateway, operation, { toGateway }, false);
       },
-      onSuccess: ({ gatewayName }) => {
-        if (!usedFallback) {
-          gatewayStatus = '';
-          return;
-        }
+      isFallbackUsed: () => usedFallback,
+      setGatewayStatus: (status: string) => {
+        gatewayStatus = status;
+      },
+    });
 
-        gatewayStatus = `Resposta recebida via ${gatewayName}.`;
-      },
-      onFailure: ({ operation, gatewayName, error }) => {
-        gatewayStatus = '';
-        this.registerGatewayFailure(error, gatewayName, operation);
-      },
-    };
-
-    const data = await this.gatewayChain.handle({
+    const data = await this.gatewayChain.handle<IAssistantResponse>({
       operation: (gateway) => gateway.sendMessage(content, context),
       validate: (result) => this.isValidAssistantResponse(result),
       invalidResultMessage: 'Gateway retornou resposta invalida',
@@ -166,16 +166,7 @@ export class ChatService extends BaseService {
       return false;
     }
 
-    const text = this.extractResponseText(result).trim();
-    if (!text.length) {
-      return false;
-    }
-
-    if (this.isTechnicalErrorText(text)) {
-      return false;
-    }
-
-    return true;
+    return this.extractResponseText(result).trim().length > 0;
   }
 
   private normalizeProviders(providers: string[] | null | undefined): string[] {
@@ -204,7 +195,7 @@ export class ChatService extends BaseService {
     details?: Record<string, unknown>,
     presentToUser = true
   ): void {
-    this.errorHandler?.handle(error, {
+    this.errorHandler?.handle(this.unwrapHandledError(error), {
       source: gatewayName,
       operation,
       details,
@@ -213,23 +204,19 @@ export class ChatService extends BaseService {
     });
   }
 
-  private isTechnicalErrorText(text: string): boolean {
-    const normalized = text.toLowerCase();
-    return normalized.startsWith('[unknown error]')
-      || normalized.startsWith('[quota error]')
-      || normalized.includes('decommissioned')
-      || normalized.includes('no longer supported')
-      || normalized.includes('api key');
-  }
+  private unwrapHandledError(error: unknown): unknown {
+    if (!(error instanceof Error)) {
+      return error;
+    }
 
-  private buildLoggingObserver(): GatewayChainObserver {
-    return {
-      onFallback: ({ operation, fromGateway, toGateway, error }) => {
-        this.registerGatewayFailure(error, fromGateway, operation, { toGateway });
-      },
-      onFailure: ({ operation, gatewayName, error }) => {
-        this.registerGatewayFailure(error, gatewayName, operation);
-      },
-    };
+    const maybeHandled = error as Error & Record<string, unknown>;
+    if (maybeHandled[ChatService.HANDLED_ERROR_FLAG] !== true) {
+      return error;
+    }
+
+    // Recria o erro para registrar no contexto atual do gateway/operation da chain.
+    const cloned = new Error(error.message);
+    cloned.name = error.name;
+    return cloned;
   }
 }
