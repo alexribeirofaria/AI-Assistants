@@ -1,4 +1,4 @@
-import { IChatGateway } from '../i-chat-gateway';
+import { IChatGateway } from '../interfaces';
 import { ChatGatewayChain } from './chat-gateway-chain';
 
 describe('ChatGatewayChain Unit Tests', () => {
