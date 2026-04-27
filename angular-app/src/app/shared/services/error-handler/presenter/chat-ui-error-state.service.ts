@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
+
 export class ChatUiErrorStateService {
   private readonly subject = new BehaviorSubject<string | null>(null);
   readonly error$ = this.subject.asObservable();
