@@ -28,7 +28,7 @@ class FakeDomain extends BaseDomain {
   }
 
   mapApiResponse(response: ApiResponse) {
-    return this.toApiResponse(response);
+    return this.responseTokens(response);
   }
 }
 
