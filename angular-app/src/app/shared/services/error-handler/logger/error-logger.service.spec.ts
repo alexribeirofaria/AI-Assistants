@@ -17,7 +17,13 @@ describe('ErrorLoggerService Unit Tests', () => {
     operation: 'sendMessage',
     errorType: 'Error',
     technicalMessage: 'boom',
-    publicMessage: 'Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.',
+    publicMessage: 'Não foi possível enviar sua mensagem no chat durante a operação. O serviço está temporariamente indisponível. Tente mais tarde.',
+    classifiedType: 'api-server',
+    contextSummary: {
+      module: 'chat',
+      action: 'enviar sua mensagem',
+      moment: 'durante a operação',
+    },
     channel: 'chat',
     signature: 'same-signature',
   });
