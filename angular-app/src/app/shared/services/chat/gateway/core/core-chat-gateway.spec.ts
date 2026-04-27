@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AIAssistantApp } from '../../../../../core/application';
-import { IChatAssistantApp } from '../../../../../core/application/interfaces';
+import { AIAssistantApp } from '../../../../../ddd-core/application';
+import { IChatAssistantApp } from '../../../../../ddd-core/application/interfaces';
 import { CoreChatGateway } from './core-chat-gateway';
 
 describe('CoreChatGateway Unit Tests', () => {
