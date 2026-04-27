@@ -1,4 +1,3 @@
-export type { ApiResponse } from './abstracts/api-response';
 export { BaseDomain } from './abstracts/base-domain';
 export { DomainType } from './abstracts/domain-type';
 export { CachedDomainListMixin } from './cache/domain-list-cache';
@@ -8,3 +7,7 @@ export { Gemini } from './gemini-domain';
 export { Groq } from './groq-domain';
 export { LangChain } from './langchain-domain';
 export { OpenAI } from './openai-domain';
+export { AssistantResponseValidator } from './services/assistant-response.validator';
+export { ResponseTextExtractor } from './services/response-text.extractor';
+export { ModelVo } from './value-objects/model.vo';
+export { ProviderVo } from './value-objects/provider.vo';
