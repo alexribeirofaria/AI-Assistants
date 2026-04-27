@@ -1,11 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 
-import {
-  IAssistantResponse,
-  IChangeProviderResponse,
-  IModelsListResponse,
-} from '../../../core/application/interfaces';
+import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse } from '../../../ddd-core/application/interfaces';
 import { ChatService } from './chat.service';
 import { CoreChatGateway, HttpChatGateway, IChatGateway } from './gateway';
 
@@ -190,6 +186,40 @@ describe('ChatService Unit Tests', () => {
 
     await expectAsync(service.sendMessage('hello')).toBeResolvedTo({
       content: JSON.stringify({ foo: 'bar' }),
+      gatewayStatus: '',
+    });
+  });
+
+  it('formats model list payloads into readable chat text', async () => {
+    coreGateway.sendMessage.and.resolveTo({
+      input: 'hello',
+      response: {
+        header: '=== Groq Models ===',
+        names: ['llama-3.3-70b-versatile', 'qwen3-32b'],
+        prefix: '',
+      } as never,
+    });
+
+    await expectAsync(service.sendMessage('hello')).toBeResolvedTo({
+      content: '=== Groq Models ===\n- llama-3.3-70b-versatile\n- qwen3-32b',
+      gatewayStatus: '',
+    });
+  });
+
+  it('formats nested model list payloads from response.response', async () => {
+    coreGateway.sendMessage.and.resolveTo({
+      input: 'hello',
+      response: {
+        response: {
+          header: '=== Groq Models ===',
+          names: ['gpt-oss-120b', 'gpt-oss-20b'],
+          prefix: '> ',
+        },
+      } as never,
+    });
+
+    await expectAsync(service.sendMessage('hello')).toBeResolvedTo({
+      content: '=== Groq Models ===\n> gpt-oss-120b\n> gpt-oss-20b',
       gatewayStatus: '',
     });
   });
