@@ -1,11 +1,11 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChatService } from '../../../../ddd-core/application/services/chat/chat.service';
+import { ChatService } from '../../../../../core/application/services/chat/chat.service';
 import {
   ChatUiErrorStateService,
   GlobalUiErrorStateService,
-} from '../../../../ddd-core/shared/errors';
+} from '../../../../../core/infrastructure/errors-handlers';
 import { ChatContainerComponent } from './chat-container.component';
 
 describe('ChatContainerComponent Unit Tests', () => {

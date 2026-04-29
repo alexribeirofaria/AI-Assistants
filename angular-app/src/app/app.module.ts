@@ -9,7 +9,7 @@ import { AlertModule } from "./shared/components/alert/alert.component.module";
 import { ChatModule } from "./shared/components/chat/chat.module";
 import { CookieConsentComponent } from "./shared/components/cookie-consent/cookie-consent.component";
 import { LayoutComponent } from "./shared/components/layout/layout.component";
-import { ERROR_LOG_WRITER, GlobalErrorHandlerService, GlobalHttpErrorInterceptor, LocalStorageErrorLogWriterService } from "./ddd-core/shared/errors";
+import { ERROR_LOG_WRITER, GlobalErrorHandlerService, GlobalHttpErrorInterceptor, LocalStorageErrorLogWriterService } from "../core/infrastructure/errors-handlers";
 
 @NgModule({
   declarations: [AppComponent],

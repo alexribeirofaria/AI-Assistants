@@ -2,11 +2,11 @@ import { Component, computed, inject, OnDestroy, OnInit, signal } from "@angular
 import { Subscription } from 'rxjs';
 
 import { IHomeModel, IMessage } from "../../../models";
-import { ChatService } from "../../../../ddd-core/application/services/chat/chat.service";
+import { ChatService } from "../../../../../core/application/services/chat/chat.service";
 import {
   ChatUiErrorStateService,
   GlobalUiErrorStateService,
-} from '../../../../ddd-core/shared/errors';
+} from '../../../../../core/infrastructure/errors-handlers';
 
 @Component({
   selector: "app-chat-container",

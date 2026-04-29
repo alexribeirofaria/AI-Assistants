@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { AIAssistantApp } from "../../../ddd-core/application";
+import { AIAssistantApp } from "../../../../core/application";
 import { ChatInputComponent } from "./chat-input/chat-input.component";
 import { ChatListComponent } from "./chat-list/chat-list.component";
 import { ChatListModelsComponent } from "./chat-list-models/chat-list-models.component";
