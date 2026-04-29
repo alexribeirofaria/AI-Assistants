@@ -129,8 +129,8 @@ module.exports = {
     changeOrigin: true,
     secure: false,
     logLevel: 'silent',
-    proxyTimeout: 5000,
-    timeout: 5000,
+    proxyTimeout: 10000,
+    timeout: 10000,
     pathRewrite: {
       '^/api': '',
     },
