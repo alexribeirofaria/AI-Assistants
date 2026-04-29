@@ -2,7 +2,7 @@ import { IServer, ModelDescriptor, TextCompletionResponse } from '../infrastruct
 import { BaseDomain } from './abstracts/base-domain';
 
 export class Gemini extends BaseDomain {
-  override readonly model = 'gemini-2.0-flash';
+  override readonly model = 'gemini-2.5-flash';
   override maxTokens = 4096;
 
   constructor(server: IServer, modelName: string) {
@@ -35,21 +35,21 @@ export class Gemini extends BaseDomain {
   }
 
   private normalizeModelName(name: string): string {
-  return name
-    // remove conteúdo entre () e []
-    .replace(/\(.*?\)|\[.*?\]/g, '')
+    return name
+      // remove conteúdo entre () e []
+      .replace(/\(.*?\)|\[.*?\]/g, '')
 
-    // remove palavras irrelevantes (opcional, pode ajustar)
-    .replace(/\b(preview|latest|fast|lite|pro|tts|clip|custom tools)\b/gi, '')
+      // remove palavras irrelevantes (opcional, pode ajustar)
+      .replace(/\b(preview|latest|fast|lite|pro|tts|clip|custom tools)\b/gi, '')
 
-    // remove caracteres especiais
-    .replace(/[^a-zA-Z0-9\s.-]/g, '')
+      // remove caracteres especiais
+      .replace(/[^a-zA-Z0-9\s.-]/g, '')
 
-    // normaliza espaços
-    .trim()
-    .replace(/\s+/g, '-')
+      // normaliza espaços
+      .trim()
+      .replace(/\s+/g, '-')
 
-    // lowercase
-    .toLowerCase();
-}
+      // lowercase
+      .toLowerCase();
+  }
 }
