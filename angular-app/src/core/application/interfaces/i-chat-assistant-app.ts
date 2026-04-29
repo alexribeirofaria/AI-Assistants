@@ -1,6 +1,6 @@
-import { IAssistantResponse } from '../dto/i-assistant-response';
+import { IAssistantResponse } from '../responses/i-assistant-response';
 import { IChangeProviderResponse } from './i-change-provider-response';
-import { IModelsListResponse } from '../dto/i-models-list-response';
+import { IModelsListResponse } from '../responses/i-models-list-response';
 
 export interface IChatAssistantApp {
   getInputPrompt(): string;

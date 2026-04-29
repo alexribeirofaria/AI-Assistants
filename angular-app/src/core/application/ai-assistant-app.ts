@@ -3,11 +3,11 @@ import { ThreadController } from './controller/thread-controller';
 import { DecoratorTextHelper } from './decorator/helpers/decorator-text-helper';
 import { DecoratorInterpreterFactory } from './decorator/interpreter/decorator-interpreter-factory';
 import { UserAction } from './enums/user-action';
-import { IAssistantResponse } from './dto/i-assistant-response';
+import { IAssistantResponse } from './responses/i-assistant-response';
 import { IChangeProviderResponse } from './interfaces/i-change-provider-response';
 import { IChatAssistantApp } from './interfaces/i-chat-assistant-app';
 import { IChatModel } from './interfaces/i-chat-model';
-import { IModelsListResponse } from './dto/i-models-list-response';
+import { IModelsListResponse } from './responses/i-models-list-response';
 import { QueueState } from './interfaces/i-queue-state';
 import { BaseApplicationStrategy, DomainConstructor } from './strategies/abstracts/base-application-strategy';
 

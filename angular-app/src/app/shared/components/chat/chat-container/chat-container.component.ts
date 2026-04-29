@@ -1,29 +1,30 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { Subscription } from 'rxjs';
+import { IMessage, IModelProvider } from "../../../../../core/application/responses";
+import { ChatService } from "../../../../../core/application/services/chat";
+import { ChatUiErrorStateService, GlobalUiErrorStateService } from '../../../../../core/infrastructure/errors-handlers';
 
-import { IHomeModel, IMessage } from "../../../models";
-import { ChatService } from "../../../../../core/application/services/chat/chat.service";
-import {
-  ChatUiErrorStateService,
-  GlobalUiErrorStateService,
-} from '../../../../../core/infrastructure/errors-handlers';
-
-@Component({
-  selector: "app-chat-container",
+@Component({ selector: "app-chat-container",
   templateUrl: "./chat-container.component.html",
   styleUrl: "./chat-container.component.scss",
   standalone: false,
 })
 
 export class ChatContainerComponent implements OnInit, OnDestroy {
-  private chatService = inject(ChatService);
+  private _chatService = inject(ChatService);
+  public get chatService() {
+    return this._chatService;
+  }
+  public set chatService(value) {
+    this._chatService = value;
+  }
   private readonly chatUiErrorState = inject(ChatUiErrorStateService);
   private readonly globalUiErrorState = inject(GlobalUiErrorStateService);
   private readonly subscriptions = new Subscription();
 
   private readonly _providers = signal<string[]>([]);
   private readonly _selectedProvider = signal<string>('');
-  private readonly _models = signal<IHomeModel[]>([]);
+  private readonly _models = signal<IModelProvider[]>([]);
   private readonly _selectedModel = signal<string>('');
   private readonly _messages = signal<IMessage[]>([]);
   private readonly _isLoading = signal<boolean>(false);

@@ -8,7 +8,7 @@ import { createChatGatewayChainHandler } from '../../../infrastructure/gateway/c
 import { ChatGatewayChainHandler } from '../../../infrastructure/gateway/chain/handler/chat-gateway-chain-handler';
 import { IChatMessageContext } from '../../../infrastructure/gateway/interfaces';
 import { ServiceErrorHandlerService } from '../../../infrastructure/errors-handlers';
-import { ISendMessageResponse } from '../../dto/i-send-message-response';
+import { ISendMessageResponse } from '../../responses/i-send-message-response';
 import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse } from '../../interfaces';
 import { BaseService } from '../abstract/base.service';
 
