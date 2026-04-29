@@ -1,6 +1,5 @@
-import { BaseDomain } from '../abstracts/base-domain';
 import { IServer } from '../../infrastructure/servers/abstracts/i-server';
-import type { ApiResponse } from '../abstracts/api-response';
+import { BaseDomain } from '../abstracts/base-domain';
 
 class FakeDomain extends BaseDomain {
   constructor() {
@@ -27,7 +26,7 @@ class FakeDomain extends BaseDomain {
     return this.send(request);
   }
 
-  mapApiResponse(response: ApiResponse) {
+  mapApiResponse(response: { completion_tokens: number; total_tokens: number }) {
     return this.responseTokens(response);
   }
 }

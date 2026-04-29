@@ -1,4 +1,4 @@
-import { IChatModel } from './i-chat-model';
+import { IChatModel } from '../interfaces/i-chat-model';
 
 export interface IModelsListResponse {
   defaultModel?: string;

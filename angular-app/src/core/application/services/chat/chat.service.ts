@@ -8,7 +8,7 @@ import { createChatGatewayChainHandler } from '../../../infrastructure/gateway/c
 import { ChatGatewayChainHandler } from '../../../infrastructure/gateway/chain/handler/chat-gateway-chain-handler';
 import { IChatMessageContext } from '../../../infrastructure/gateway/interfaces';
 import { ServiceErrorHandlerService } from '../../../infrastructure/errors-handlers';
-import { SendMessageResponse } from '../../dto/send-message-response';
+import { ISendMessageResponse } from '../../dto/i-send-message-response';
 import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse } from '../../interfaces';
 import { BaseService } from '../abstract/base.service';
 
@@ -103,7 +103,7 @@ export class ChatService extends BaseService {
     return response;
   }
 
-  async sendMessage(content: string, context?: IChatMessageContext): Promise<SendMessageResponse> {
+  async sendMessage(content: string, context?: IChatMessageContext): Promise<ISendMessageResponse> {
     const sendState = this.createSendObserverState();
     const observer = this.observerFactory.createInteractiveSendObserver(sendState.observerConfig);
 

@@ -1,4 +1,4 @@
-export interface SendMessageResponse {
+export interface ISendMessageResponse {
   content: string;
   gatewayStatus: string;
 }
