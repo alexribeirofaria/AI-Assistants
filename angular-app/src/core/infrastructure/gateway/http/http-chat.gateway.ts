@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { firstValueFrom, timeout } from 'rxjs';
 import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse, IProviderListResponse } from '../../../application/interfaces';
 import { BaseService } from '../../../application/services/abstract/base.service';
-import { ServiceErrorHandlerService } from '../../errors-handlers';
+import { ServiceErrorHandlerService } from '../../errors/services/service-error-handler.service';
 import { IChatGateway, IChatMessageContext } from '../interfaces';
 
 
