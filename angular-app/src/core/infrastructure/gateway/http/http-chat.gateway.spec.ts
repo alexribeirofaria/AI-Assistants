@@ -38,7 +38,7 @@ describe('HttpChatGateway Unit Tests', () => {
     expect(req.request.method).toBe('GET');
     req.flush({ error: 'Serviço indisponível no momento', status: 503 });
 
-    await expectAsync(promise).toBeRejectedWithError('Falha ao executar getProviders');
+    await expectAsync(promise).toBeRejectedWithError('Não foi possível concluir a operação: getProviders. Tente novamente.');
   });
 
   it('should fetch models with encoded provider', async () => {
@@ -74,7 +74,7 @@ describe('HttpChatGateway Unit Tests', () => {
     expect(req.request.method).toBe('GET');
     req.flush({ error: 'Serviço indisponível no momento', status: 503 });
 
-    await expectAsync(promise).toBeRejectedWithError('Falha ao executar getModels');
+    await expectAsync(promise).toBeRejectedWithError('Não foi possível concluir a operação: getModels. Tente novamente.');
   });
 
   it('should return default model', async () => {
