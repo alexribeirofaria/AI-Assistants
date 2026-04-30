@@ -21,6 +21,15 @@ process.chdir(PROJECT_ROOT);
 // ================================
 
 function removeDir(dir: string): void {
+  const protectedDirs = ["dist", "node_modules"];
+
+  const dirName = path.basename(dir);
+
+  if (protectedDirs.includes(dirName)) {
+    console.log(`🛑 Skipping protected directory: ${dir}`);
+    return;
+  }
+
   if (fs.existsSync(dir)) {
     console.log(`🧹 Cleaning ${dir}...`);
     fs.rmSync(dir, { recursive: true, force: true });
@@ -31,11 +40,21 @@ function runTests(): { output: string; success: boolean } {
   try {
     console.log("🧪 Running Angular tests...");
 
+    const chromeBin = resolveChromeBin();
+    if (chromeBin) {
+      process.env['CHROME_BIN'] = chromeBin;
+      console.log(`🌐 Using Chrome binary: ${chromeBin}`);
+    }
+
     const output = execSync(
       "npx ng test --watch=false --browsers=ChromeHeadless --source-map=false --code-coverage",
       {
         stdio: "pipe",
-        env: { ...process.env, BROWSER: "ChromeHeadless" },
+        env: {
+          ...process.env,
+          BROWSER: "ChromeHeadless",
+          ...(chromeBin ? { CHROME_BIN: chromeBin } : {}),
+        },
       }
     ).toString();
 
@@ -47,6 +66,31 @@ function runTests(): { output: string; success: boolean } {
 
     return { output, success: false };
   }
+}
+
+function resolveChromeBin(): string | null {
+  const explicit = process.env['CHROME_BIN'];
+  if (explicit && fs.existsSync(explicit)) {
+    return explicit;
+  }
+
+  const candidates = [
+    "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe",
+    "/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe",
+    "/mnt/c/Program Files/Microsoft/Edge/Application/msedge.exe",
+    "/usr/bin/google-chrome",
+    "/usr/bin/google-chrome-stable",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  return null;
 }
 
 function saveLog(content: string): void {
