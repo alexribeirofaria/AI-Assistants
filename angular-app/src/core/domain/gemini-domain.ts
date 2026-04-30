@@ -2,7 +2,7 @@ import { IServer, ModelDescriptor, TextCompletionResponse } from '../infrastruct
 import { BaseDomain } from './abstracts/base-domain';
 
 export class Gemini extends BaseDomain {
-  override readonly model = 'gemini-2.5-flash';
+  override readonly model = 'gemini-2.0-flash';
   override maxTokens = 4096;
 
   constructor(server: IServer, modelName: string) {
