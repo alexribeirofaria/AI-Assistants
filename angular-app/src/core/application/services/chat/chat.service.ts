@@ -7,7 +7,7 @@ import { ChatGatewayObserverFactory, CoreChatGateway, HttpChatGateway, SendMessa
 import { createChatGatewayChainHandler } from '../../../infrastructure/gateway/chain/factory/create-chat-gateway-chain-handler';
 import { ChatGatewayChainHandler } from '../../../infrastructure/gateway/chain/handler/chat-gateway-chain-handler';
 import { IChatMessageContext } from '../../../infrastructure/gateway/interfaces';
-import { ServiceErrorHandlerService } from '../../../infrastructure/errors-handlers';
+import { ServiceErrorHandlerService } from '../../../infrastructure/errors/services/service-error-handler.service';
 import { ISendMessageResponse } from '../../responses/i-send-message-response';
 import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse } from '../../interfaces';
 import { BaseService } from '../abstract/base.service';
@@ -181,17 +181,6 @@ export class ChatService extends BaseService {
   }
 
   private unwrapHandledError(error: unknown): unknown {
-    if (!(error instanceof Error)) {
-      return error;
-    }
-
-    const maybeHandled = error as Error & Record<string, unknown>;
-    if (maybeHandled[ChatService.HANDLED_ERROR_FLAG] !== true) {
-      return error;
-    }
-
-    const cloned = new Error(error.message);
-    cloned.name = error.name;
-    return cloned;
+    return error;
   }
 }
