@@ -2,7 +2,9 @@ import { Component, computed, inject, OnDestroy, OnInit, signal } from "@angular
 import { Subscription } from 'rxjs';
 import { IMessage, IModelProvider } from "../../../../../core/application/responses";
 import { ChatService } from "../../../../../core/application/services/chat";
-import { ChatUiErrorStateService, GlobalUiErrorStateService } from '../../../../../core/infrastructure/errors-handlers';
+import { ChatUiErrorStateService } from '../../../../../core/infrastructure/errors/state/chat-ui-error-state.service';
+import { GlobalUiErrorStateService } from '../../../../../core/infrastructure/errors/state/global-ui-error-state.service';
+import { ServiceErrorHandlerService } from '../../../../../core/infrastructure/errors/services/service-error-handler.service';
 
 @Component({ selector: "app-chat-container",
   templateUrl: "./chat-container.component.html",
@@ -181,8 +183,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // Erros globais de infraestrutura não devem interromper a experiência do chat.
-        // A UI permanece íntegra; os detalhes já foram registrados no fluxo de log.
+        this.appendAssistantErrorMessage(message, this.selectedProvider() || undefined);
         this.globalUiErrorState.clear();
       })
     );
