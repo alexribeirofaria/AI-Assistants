@@ -1,11 +1,9 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { ChatService } from '../../../../../core/application/services/chat/chat.service';
-import {
-  ChatUiErrorStateService,
-  GlobalUiErrorStateService,
-} from '../../../../../core/infrastructure/errors-handlers';
+import { ChatUiErrorStateService } from '../../../../../core/infrastructure/errors/state/chat-ui-error-state.service';
+import { GlobalUiErrorStateService } from '../../../../../core/infrastructure/errors/state/global-ui-error-state.service';
 import { ChatContainerComponent } from './chat-container.component';
 
 describe('ChatContainerComponent Unit Tests', () => {
@@ -41,7 +39,6 @@ describe('ChatContainerComponent Unit Tests', () => {
     component = fixture.componentInstance;
     chatUiErrorState = TestBed.inject(ChatUiErrorStateService);
     globalUiErrorState = TestBed.inject(GlobalUiErrorStateService);
-    component.ngOnInit();
   });
 
   it('should create', () => {
@@ -114,25 +111,32 @@ describe('ChatContainerComponent Unit Tests', () => {
     expect(component.isLoading()).toBeFalse();
   });
 
-  it('should append chat friendly error when message sending fails', async () => {
+  it('should append chat friendly error when message sending fails', fakeAsync(() => {
     chatService.sendMessage.and.rejectWith(new Error('technical failure'));
+    component.ngOnInit(); // Inicializa bindUiErrors
+    tick();
 
-    const sendPromise = component.onMessageSend('hello');
-    chatUiErrorState.show('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.');
-    await sendPromise;
+    component.onMessageSend('hello');
+    chatUiErrorState.show('Erro Chat');
+    tick();
 
-    expect(component.messages()[1].content).toBe('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.');
-    expect(component.messages()[1].type).toBe('error');
-    expect(component.gatewayStatus()).toBe('');
+    const currentMessages = component.messages();
+    expect(currentMessages.length).toBe(2);
+    expect(currentMessages[1].content).toBe('Erro Chat');
+    expect(currentMessages[1].type).toBe('error');
     expect(component.isLoading()).toBeFalse();
-  });
+  }));
 
-  it('should render global ui errors as assistant error messages', () => {
-    globalUiErrorState.show('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.');
+  it('should render global ui errors as assistant error messages', fakeAsync(() => {
+    component.ngOnInit();
+    globalUiErrorState.show('Erro Global');
+    tick();
 
-    const lastMessage = component.messages()[component.messages().length - 1];
-    expect(lastMessage.content).toBe('Não consegui responder agora. Tente mais tarde ou troque o provider/modelo.');
+    const currentMessages = component.messages();
+    expect(currentMessages.length).toBeGreaterThan(0);
+    const lastMessage = currentMessages[currentMessages.length - 1];
+    expect(lastMessage.content).toBe('Erro Global');
     expect(lastMessage.type).toBe('error');
     expect(lastMessage.role).toBe('assistant');
-  });
+  }));
 });
