@@ -37,13 +37,13 @@ describe('CoreChatGateway Unit Tests', () => {
 
   it('requests models with provider when provided', async () => {
     app.listModels.and.resolveTo({
-      defaultModel: 'gemini-2.5-flash',
-      models: [{ id: 'gemini-2.5-flash', modelName: 'gemini-2.5-flash', provider: 'gemini' }],
+      defaultModel: 'gemini-2.0-flash',
+      models: [{ id: 'gemini-2.0-flash', modelName: 'gemini-2.0-flash', provider: 'gemini' }],
     });
 
     await expectAsync(gateway.getModels('gemini')).toBeResolvedTo({
-      defaultModel: 'gemini-2.5-flash',
-      models: [{ id: 'gemini-2.5-flash', modelName: 'gemini-2.5-flash', provider: 'gemini' }],
+      defaultModel: 'gemini-2.0-flash',
+      models: [{ id: 'gemini-2.0-flash', modelName: 'gemini-2.0-flash', provider: 'gemini' }],
     });
 
     expect(app.listModels).toHaveBeenCalledOnceWith('gemini');
