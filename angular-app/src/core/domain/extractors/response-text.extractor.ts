@@ -53,7 +53,7 @@ export class ResponseTextExtractor {
       return undefined;
     }
 
-    const prefix = typeof candidate.prefix === 'string' ? candidate.prefix : '- ';
+    const prefix = (typeof candidate.prefix === 'string' && candidate.prefix.trim().length > 0) ? candidate.prefix : '- ';
     return `${candidate.header}\n${names.map((name) => `${prefix}${name}`).join('\n')}`;
   }
 }
