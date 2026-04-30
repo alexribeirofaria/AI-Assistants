@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { AIAssistantApp } from '../../../application';
 import { IAssistantResponse, IChangeProviderResponse, IChatAssistantApp, IModelsListResponse } from '../../../application/interfaces';
 import { BaseService } from '../../../application/services/abstract/base.service';
-import { ServiceErrorHandlerService } from '../../errors-handlers';
+import { ServiceErrorHandlerService } from '../../errors/services/service-error-handler.service';
 import { IChatGateway, IChatMessageContext } from '../interfaces';
 
 
