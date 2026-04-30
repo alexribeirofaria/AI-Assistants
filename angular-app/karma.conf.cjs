@@ -46,7 +46,7 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: false,
 
-    browsers: ['ChromeHeadless', selectedBrowser],
+    browsers: ['ChromeHeadlessNoSandbox', 'ChromeHeadless', selectedBrowser],
 
     debugger: {
       ChromeDebugging: {
