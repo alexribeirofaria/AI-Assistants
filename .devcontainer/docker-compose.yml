@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  dev:
+    container_name: ai-assistants-dev
+    working_dir: /workspace
+    volumes:
+      - ..:/workspace
+      - node_modules:/workspace/angular-app/node_modules
+
+    command: sleep infinity
+    shm_size: "2g"
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "2m"
+        max-file: "1"
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+volumes:
+  node_modules:
