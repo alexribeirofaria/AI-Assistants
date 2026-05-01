@@ -3,11 +3,14 @@ version: "3.8"
 services:
   dev:
     container_name: ai-assistants-dev
-    working_dir: /workspace
+    image: alexfariakof/jail-container:latest
+    working_dir: /workspaces
     volumes:
       - ..:/workspace
       - node_modules:/workspace/angular-app/node_modules
-
+    ports:
+      - "5000:5000"
+      - "4200:4200"
     command: sleep infinity
     shm_size: "2g"
 
