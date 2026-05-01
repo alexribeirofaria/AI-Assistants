@@ -211,3 +211,5 @@ environments/*.ts
 **/.log_erros/*.md
 .pyvenv
 ..docs/
+monoRepo/
+monoRepo/*
