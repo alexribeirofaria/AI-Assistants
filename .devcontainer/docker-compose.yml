@@ -4,30 +4,29 @@ services:
   dev:
     container_name: ai-assistants-dev
     image: alexfariakof/jail-container:latest
-    working_dir: /workspaces
     volumes:
-      - ..:/workspace
-      - node_modules:/workspace/angular-app/node_modules
+      - ../../monoRepo:/monoRepo
+      - node_modules:/workspaces/angular-app/node_modules
     ports:
+      - "9876:9876"
       - "5000:5000"
       - "4200:4200"
-    command: sleep infinity
+    command: /bin/bash
     shm_size: "2g"
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
 
     logging:
       driver: json-file
       options:
         max-size: "2m"
         max-file: "1"
-    build:
-      context: ..
-      dockerfile: .devcontainer/Dockerfile
     deploy:
       resources:
         limits:
           memory: 8G
         reservations:
           memory: 4G
-
 volumes:
   node_modules:
