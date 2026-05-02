@@ -2,8 +2,8 @@
   "name": "Ai Assistants",
   "dockerComposeFile": "docker-compose.yml",
   "service": "dev",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspaces",
   "remoteUser": "node",
-  "overrideCommand": false
+  "overrideCommand": false,
+
 }
