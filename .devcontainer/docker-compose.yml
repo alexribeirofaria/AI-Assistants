@@ -1,17 +1,24 @@
-version: "3.8"
-
 services:
   dev:
     container_name: ai-assistants-dev
     image: alexfariakof/jail-container:latest
     volumes:
-      - ../../monoRepo:/monoRepo
+      - ../../monoRepo:/monoRepo      
+      - ../../workspace:/workspaces
       - node_modules:/workspaces/angular-app/node_modules
+    secrets:
+      - env_file
+      - env_ts
     ports:
-      - "9876:9876"
-      - "5000:5000"
-      - "4200:4200"
-    command: /bin/bash
+      - "9877:9876"
+      - "5001:5000"
+      - "4201:4200"
+    command: >
+        /bin/bash -c "
+         ln -sf /run/secrets/env_file /workspaces/.env &&
+         ln -sf /run/secrets/env_ts /workspaces/angular-app/src/environments/.env.ts &&
+         chmod 444 /workspaces/.env /workspaces/angular-app/src/environments/.env.ts &&
+         exec /bin/bash"
     shm_size: "2g"
     build:
       context: ..
@@ -28,5 +35,12 @@ services:
           memory: 8G
         reservations:
           memory: 4G
+
+secrets:
+  env_file:
+    file: ../../workspace/.env
+  env_ts:
+    file: ../../workspace/angular-app/src/environments/.env.ts
+
 volumes:
   node_modules:
