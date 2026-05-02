@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { responseInterceptor } = require('http-proxy-middleware');
 
-const TARGET = 'http://localhost:5000';
+const TARGET = 'http://127.0.0.1:5000';
 const LOG_DIR = path.resolve(__dirname, '.log_erros');
 
 const DEFAULT_ERROR_MESSAGE = 'Serviço indisponível no momento';
@@ -137,7 +137,7 @@ module.exports = {
             // Reutiliza a lógica de escrita do próprio proxy
             const fileName = formattedError.destination;
             const filePath = path.join(LOG_DIR, fileName);
-            
+
             const currentContent = fs.existsSync(filePath)
               ? fs.readFileSync(filePath, 'utf8').trimEnd()
               : '';
@@ -149,7 +149,7 @@ module.exports = {
             ensureLogDir();
             fs.writeFileSync(filePath, mergedContent, 'utf8');
             console.log(`[PROXY] Log persistido em: ${filePath}`);
-            
+
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ status: 'ok' }));
           } catch (e) {
@@ -162,7 +162,7 @@ module.exports = {
       return false;
     }
   },
-  '/api': {
+  '*/api*': {
     target: TARGET,
     changeOrigin: true,
     secure: false,
