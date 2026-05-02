@@ -1,9 +1,4 @@
 FROM node:20-bullseye
-
-EXPOSE 5000
-EXPOSE 4200
-EXPOSE 9876
-
 # Instalar dependências
 RUN apt-get update && apt-get install -y \
     python3 \
