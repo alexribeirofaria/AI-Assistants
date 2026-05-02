@@ -127,16 +127,26 @@ describe('ChatContainerComponent Unit Tests', () => {
     expect(component.isLoading()).toBeFalse();
   }));
 
-  it('should render global ui errors as assistant error messages', fakeAsync(() => {
+  it('should keep empty-state behavior by not appending errors before user interaction', fakeAsync(() => {
     component.ngOnInit();
     globalUiErrorState.show('Erro Global');
     tick();
 
-    const currentMessages = component.messages();
-    expect(currentMessages.length).toBeGreaterThan(0);
-    const lastMessage = currentMessages[currentMessages.length - 1];
-    expect(lastMessage.content).toBe('Erro Global');
-    expect(lastMessage.type).toBe('error');
-    expect(lastMessage.role).toBe('assistant');
+    expect(component.messages().length).toBe(0);
+  }));
+
+  it('should keep only one friendly error message after user interaction', fakeAsync(() => {
+    component.ngOnInit();
+    component.onMessageSend('hello');
+    tick();
+
+    globalUiErrorState.show('Primeiro erro');
+    tick();
+    chatUiErrorState.show('Erro final amigavel');
+    tick();
+
+    const errorMessages = component.messages().filter((message) => message.type === 'error');
+    expect(errorMessages.length).toBe(1);
+    expect(errorMessages[0].content).toBe('Erro final amigavel');
   }));
 });
