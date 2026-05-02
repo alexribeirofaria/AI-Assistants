@@ -64,7 +64,7 @@
       "editor.defaultFormatter": "esbenp.prettier-vscode",
     },
     "[markdown]": {
-      "editor.formatOnSave": true,
+      "editor.formatOnSave": false,
       "editor.defaultFormatter": "esbenp.prettier-vscode",
     },
 
@@ -85,5 +85,6 @@
     "python.analysis.inlayHints.functionReturnTypes": true,
     "python.analysis.inlayHints.callArgumentNames": "all",
     "python.analysis.completeFunctionParens": true,
+    "remote.autoForwardPortsFallback": 0,
   },
 }
