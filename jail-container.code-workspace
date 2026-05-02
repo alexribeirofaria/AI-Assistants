@@ -1,12 +1,12 @@
 {
-	"folders": [
-    		{
-			"path": "."
-		},
-		{
-			"path": "../monoRepo"
-		}
-	],
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../monoRepo"
+    }
+  ],
   "settings": {
     "files.autoSave": "afterDelay",
     "files.insertFinalNewline": true,
@@ -17,7 +17,9 @@
       "source.fixAll.eslint": "always",
       "source.organizeImports": "always",
     },
-    "typescript.analysis.extraPaths": ["./angular-app"],
+    "typescript.analysis.extraPaths": [
+      "./angular-app"
+    ],
     "js/ts.updateImportsOnFileMove.enabled": "always",
     "js/ts.suggest.autoImports": true,
     "explorer.compactFolders": false,
@@ -36,7 +38,11 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "prettier.requireConfig": true,
     "eslint.run": "onType",
-    "eslint.validate": ["typescript", "javascript", "html"],
+    "eslint.validate": [
+      "typescript",
+      "javascript",
+      "html"
+    ],
     "github.copilot.enable": {
       "*": false,
     },
@@ -67,9 +73,10 @@
       "editor.formatOnSave": false,
       "editor.defaultFormatter": "esbenp.prettier-vscode",
     },
-
     // ===== PYTHON CONFIGURATIONS =====
-    "python.analysis.extraPaths": ["./python-app"],
+    "python.analysis.extraPaths": [
+      "./python-app"
+    ],
     "python.analysis.typeCheckingMode": "off",
     "python.analysis.autoImportCompletions": true,
     "python.analysis.useLibraryCodeForTypes": true,
