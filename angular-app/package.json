@@ -1,7 +1,7 @@
 {
   "name": "ai-assistants",
   "version": "1.0.0",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "start": "ng serve",
     "start:dev": "ng serve --configuration=development",
@@ -15,8 +15,8 @@
     "test": "set BROWSER=ChromeHeadless && ng test --browsers=ChromeHeadless --no-watch",
     "test:prompt": "set BROWSER=ChromeHeadless && ng test --browsers=ChromeHeadless --no-watch --code-coverage --include src/core/app/**/*.spec.ts --include src/app/core/console.app.sepc.ts",
     "test:debug": "set BROWSER=Chrome && ng test --browsers=Chrome",
-    "coverage": "node coverage_test_check.ts",
-    "e2e": "node .\\e2e\\e2e-runner.ts",
+    "coverage": "tsx coverage_test_check.ts",
+    "e2e": "npx tsx e2e/e2e-runner.ts",
     "dev:ssr": "ng run angularapp:serve-ssr",
     "serve:ssr": "node ./scripts/run-ssr-server.mjs",
     "build:ssr": "ng build && ng run angularapp:server",
