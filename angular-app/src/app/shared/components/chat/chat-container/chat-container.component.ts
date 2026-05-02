@@ -29,6 +29,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   private readonly _models = signal<IModelProvider[]>([]);
   private readonly _selectedModel = signal<string>('');
   private readonly _messages = signal<IMessage[]>([]);
+  private readonly _hasUserInteracted = signal<boolean>(false);
   private readonly _isLoading = signal<boolean>(false);
   private readonly _gatewayStatus = signal<string>('');
 
@@ -108,6 +109,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
     if (this.isLoading()) return;
 
     const provider = this.selectedProvider() || undefined;
+    this._hasUserInteracted.set(true);
 
     this.addUserMessage(message);
     this.startAssistantStreaming(provider);
@@ -203,6 +205,10 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   }
 
   private appendAssistantErrorMessage(content: string, provider?: string): void {
+    if (!this._hasUserInteracted()) {
+      return;
+    }
+
     this._messages.update((messages) => {
       const updated = [...messages];
       const last = updated[updated.length - 1];
@@ -211,7 +217,9 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
         updated.pop();
       }
 
-      updated.push({
+      const withoutErrors = updated.filter((message) => message.type !== 'error');
+
+      withoutErrors.push({
         id: `${Date.now()}-error`,
         role: 'assistant',
         content,
@@ -219,7 +227,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
         type: 'error',
       });
 
-      return updated;
+      return withoutErrors;
     });
     this._isLoading.set(false);
   }
