@@ -10,5 +10,4 @@ export type { IApplicationStrategyFactory } from './strategies/factories/abstrac
 export { StrategyApplicationFactory } from './strategies/factories/strategy-application-factory';
 export { GeminiStrategy } from './strategies/gemini-strategy';
 export { GroqStrategy } from './strategies/groq-strategy';
-export { LangChainStrategy } from './strategies/langchain-strategy';
 export { OpenAIStrategy } from './strategies/openai-strategy';
