@@ -28,3 +28,5 @@ RUN echo 'OSH_THEME="font"' >> /root/.bashrc && \
 RUN echo 'OSH_THEME="font"' >> /etc/bash.bashrc && \
     echo "alias cls='clear'" >> /etc/bash.bashrc && \
     echo "PS1='\[\e[32m\]\u@\h:\[\e[34m\]\w\[\e[0m\]\$ '" >> /etc/bash.bashrc
+USER node
+WORKDIR /workspaces
