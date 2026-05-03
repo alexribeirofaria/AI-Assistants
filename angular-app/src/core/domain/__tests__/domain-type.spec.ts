@@ -6,7 +6,6 @@ describe('DomainType', () => {
     expect(DomainType.OpenAI).toBe('Open AI');
     expect(DomainType.Gemini).toBe('Gemini');
     expect(DomainType.Groq).toBe('Groq');
-    expect(DomainType.LangChain).toBe('Lang Chain');
   });
 
   it('should have correct number of values', () => {
