@@ -2,17 +2,18 @@ import { Component, computed, inject, OnDestroy, OnInit, signal } from "@angular
 import { Subscription } from 'rxjs';
 import { IMessage, IModelProvider } from "../../../../../core/application/responses";
 import { ChatService } from "../../../../../core/application/services/chat";
+import { ChatStateService } from "../../../../../core/application/services/chat/state/chat-state.service";
 import { ChatUiErrorStateService } from '../../../../../core/infrastructure/errors/state/chat-ui-error-state.service';
 import { GlobalUiErrorStateService } from '../../../../../core/infrastructure/errors/state/global-ui-error-state.service';
-import { ServiceErrorHandlerService } from '../../../../../core/infrastructure/errors/services/service-error-handler.service';
 
-@Component({ selector: "app-chat-container",
+@Component({
+  selector: "app-chat-container",
   templateUrl: "./chat-container.component.html",
   styleUrl: "./chat-container.component.scss",
   standalone: false,
 })
-
 export class ChatContainerComponent implements OnInit, OnDestroy {
+
   private _chatService = inject(ChatService);
   public get chatService() {
     return this._chatService;
@@ -20,6 +21,8 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   public set chatService(value) {
     this._chatService = value;
   }
+
+  private readonly chatState = inject(ChatStateService);
   private readonly chatUiErrorState = inject(ChatUiErrorStateService);
   private readonly globalUiErrorState = inject(GlobalUiErrorStateService);
   private readonly subscriptions = new Subscription();
@@ -38,9 +41,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   readonly models = computed(() => {
     const provider = this._selectedProvider();
     const models = this._models();
-    if (!provider) {
-      return models;
-    }
+    if (!provider) return models;
     const selected = this.normalizeProvider(provider);
     return models.filter((model) => this.normalizeProvider(model.provider) === selected);
   });
@@ -61,12 +62,19 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   private async loadProviders(): Promise<void> {
     try {
       const providers = await this.chatService.getProviders();
+
       this._providers.set(providers);
+      this.chatState.setProviders(providers);
 
       if (providers.length > 0) {
         const defaultProvider = providers[0];
+
         this._selectedProvider.set(defaultProvider);
+        this.chatState.setProvider(defaultProvider);
+
         this._selectedModel.set('');
+        this.chatState.setModel('');
+
         await this.loadModels(defaultProvider);
       } else {
         await this.loadModels();
@@ -79,30 +87,41 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   private async loadModels(provider?: string): Promise<void> {
     try {
       const modelsData = await this.chatService.getModels(provider);
-      this._models.set(modelsData.models);
 
-      const defaultModel = modelsData.defaultModel ?? await this.chatService.getDefaultModel(provider);
+      this._models.set(modelsData.models);
+      this.chatState.setModels(modelsData.models);
+
+      const defaultModel =
+        modelsData.defaultModel ??
+        await this.chatService.getDefaultModel(provider);
+
       if (defaultModel) {
         this._selectedModel.set(defaultModel);
+        this.chatState.setModel(defaultModel);
       }
     } catch {
-      // Mensagem já é apresentada pelo fluxo global.
+      //TODO: Fazer Review
     }
   }
 
   async onProviderChange(provider: string): Promise<void> {
     this._selectedProvider.set(provider);
+    this.chatState.setProvider(provider);
+
     this._selectedModel.set('');
+    this.chatState.setModel('');
+
     try {
       await this.chatService.changeProvider(provider);
       await this.loadModels(provider);
     } catch {
-      // Mensagem já é apresentada pelo fluxo global.
+      //TODO: Fazer Review
     }
   }
 
   onModelChange(modelId: string): void {
     this._selectedModel.set(modelId);
+    this.chatState.setModel(modelId);
   }
 
   async onMessageSend(message: string): Promise<void> {
@@ -112,7 +131,10 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
     this._hasUserInteracted.set(true);
 
     this.addUserMessage(message);
+    this.chatState.addUserMessage(message);
+
     this.startAssistantStreaming(provider);
+    this.chatState.startStreaming();
 
     try {
       const result = await this.chatService.sendMessage(message, {
@@ -121,10 +143,20 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
       });
 
       this.finishAssistantStreaming(result.content, provider);
+      this.chatState.appendChunk(result.content);
+      this.chatState.stopStreaming();
+
       this._gatewayStatus.set(result.gatewayStatus);
+      this.chatState.setGatewayStatus?.(result.gatewayStatus);
+
     } catch (error) {
       void error;
+
       this.stopAssistantStreaming();
+      this.chatState.setError(
+        error instanceof Error ? error.message : 'Erro ao enviar mensagem'
+      );
+
       this._gatewayStatus.set('');
     }
   }
@@ -145,6 +177,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
       streaming: true,
       provider,
     }]);
+
     this._isLoading.set(true);
     this._gatewayStatus.set('');
   }
@@ -163,6 +196,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
       }
       return updated;
     });
+
     this._isLoading.set(false);
   }
 
@@ -175,39 +209,48 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
       }
       return updated;
     });
+
     this._isLoading.set(false);
   }
 
   private bindUiErrors(): void {
     this.subscriptions.add(
       this.globalUiErrorState.error$.subscribe((message) => {
-        if (!message) {
+        if (!message) return;
+        if (!this._hasUserInteracted() || !this._isLoading()) {
+          this.globalUiErrorState.clear();
           return;
         }
 
         this.appendAssistantErrorMessage(message, this.selectedProvider() || undefined);
+        this.chatState.setError(message);
+
         this.globalUiErrorState.clear();
       })
     );
 
     this.subscriptions.add(
       this.chatUiErrorState.error$.subscribe((message) => {
-        if (!message) {
+        if (!message) return;
+        if (!this._hasUserInteracted() || !this._isLoading()) {
+          this.chatUiErrorState.clear();
           return;
         }
 
         this.appendAssistantErrorMessage(message, this.selectedProvider() || undefined);
+
         this._isLoading.set(false);
         this._gatewayStatus.set('');
+
+        this.chatState.setError(message);
+
         this.chatUiErrorState.clear();
       })
     );
   }
 
   private appendAssistantErrorMessage(content: string, provider?: string): void {
-    if (!this._hasUserInteracted()) {
-      return;
-    }
+    if (!this._hasUserInteracted()) return;
 
     this._messages.update((messages) => {
       const updated = [...messages];
@@ -229,6 +272,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
 
       return withoutErrors;
     });
+
     this._isLoading.set(false);
   }
 
