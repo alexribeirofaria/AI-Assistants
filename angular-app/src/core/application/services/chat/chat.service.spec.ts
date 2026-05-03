@@ -1,6 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-
 import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse } from '../../interfaces';
 import { ChatService } from './chat.service';
 import { CoreChatGateway, HttpChatGateway } from '../../../infrastructure/gateway';
@@ -239,5 +238,54 @@ describe('ChatService Unit Tests', () => {
       content: 'fallback after error payload',
       gatewayStatus: 'Resposta recebida via HttpChatGateway.',
     });
+  });
+
+  it('rejects technical quota payload returned as assistant content', async () => {
+    coreGateway.sendMessage.and.resolveTo({
+      input: 'hello',
+      response: { response: '[QUOTA ERROR] Limite de cota atingido' },
+    });
+
+    await expectAsync(service.sendMessage('hello')).toBeRejected();
+  });
+
+  it('rejects authentication payload returned as assistant content', async () => {
+    coreGateway.sendMessage.and.resolveTo({
+      input: 'hello',
+      response: {
+        response: '[UNKNOWN ERROR] 401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"}}',
+      },
+    });
+
+    await expectAsync(service.sendMessage('hello')).toBeRejected();
+  });
+
+  it('rejects technical payload when error is in response.error', async () => {
+    coreGateway.sendMessage.and.resolveTo({
+      input: 'hello',
+      response: { error: 'unauthorized: invalid api key' } as never,
+    });
+
+    await expectAsync(service.sendMessage('hello')).toBeRejected();
+  });
+
+  it('rejects technical payload when message is in response.message', async () => {
+    coreGateway.sendMessage.and.resolveTo({
+      input: 'hello',
+      response: { message: 'The model `llama3-70b-8192` has been decommissioned' } as never,
+    });
+
+    await expectAsync(service.sendMessage('hello')).toBeRejected();
+  });
+
+  it('rejects technical payload when nested response contains error', async () => {
+    coreGateway.sendMessage.and.resolveTo({
+      input: 'hello',
+      response: {
+        response: { error: 'forbidden access' },
+      } as never,
+    });
+
+    await expectAsync(service.sendMessage('hello')).toBeRejected();
   });
 });
