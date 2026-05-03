@@ -57,7 +57,28 @@ export class ChatGatewayChainHandler {
   }
 
   private normalizeError(error: unknown): Error {
-    return error instanceof Error ? error : new Error(String(error));
+    if (error instanceof Error) {
+      return error;
+    }
+
+    if (typeof error === 'string') {
+      return new Error(error);
+    }
+
+    if (error && typeof error === 'object') {
+      const message = (error as { message?: unknown }).message;
+      if (typeof message === 'string' && message.trim().length > 0) {
+        return new Error(message);
+      }
+
+      try {
+        return new Error(JSON.stringify(error));
+      } catch {
+        return new Error('Erro desconhecido no gateway');
+      }
+    }
+
+    return new Error(String(error));
   }
 
   private getGatewayName(gateway: IChatGateway): string {
