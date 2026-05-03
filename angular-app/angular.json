@@ -117,8 +117,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "host": "0.0.0.0",
-            "port": 4200,
+            "disableHostCheck": true,
             "proxyConfig": "proxy.conf.cjs",
             "headers": {
               "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
@@ -211,6 +210,9 @@
         "serve-ssr": {
           "builder": "@angular-devkit/build-angular:ssr-dev-server",
           "configurations": {
+            "options": {
+              "proxyConfig": "proxy.conf.cjs"
+            },
             "development": {
               "browserTarget": "angularapp:build:development",
               "serverTarget": "angularapp:server:development"
