@@ -2,23 +2,44 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "npm: start",
+      "label": "npm:start",
       "type": "npm",
       "script": "start",
       "isBackground": true,
       "problemMatcher": {
-        "owner": "custom",
-        "pattern": [
-          {
-            "regexp": "."
-          }
-        ],
+        "owner": "typescript",
+        "pattern": {
+          "regexp": ".*"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": ".*",
-          "endsPattern": "Compiled successfully"
+          "endsPattern": "Compiled successfully|✔ Browser application bundle generation complete"
         }
       }
+    },
+    {
+      "label": "dev:ssr",
+      "type": "npm",
+      "script": "dev:ssr",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "pattern": {
+          "regexp": ".*"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "Compiled successfully|Server listening on"
+        }
+      }
+    },
+    {
+      "label": "terminate",
+      "type": "shell",
+      "command": "pkill -f \"ng serve\" || pkill -f \"node\" || true",
+      "problemMatcher": []
     }
   ]
 }
