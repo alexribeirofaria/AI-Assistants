@@ -1,7 +1,7 @@
 {
   "name": "ai-assistants",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "start": "ng serve",
     "start:dev": "ng serve --configuration=development",
@@ -38,8 +38,6 @@
     "@angular/ssr": "^21.2.7",
     "@anthropic-ai/sdk": "^0.62.0",
     "@google/genai": "^1.30.0",
-    "@langchain/core": "^1.1.44",
-    "@langchain/openai": "^1.4.5",
     "@ng-bootstrap/ng-bootstrap": "^20.0.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
