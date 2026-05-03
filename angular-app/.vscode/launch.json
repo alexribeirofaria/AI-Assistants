@@ -7,9 +7,19 @@
       "request": "launch",
       "url": "http://localhost:4200",
       "webRoot": "${workspaceFolder}",
-      "preLaunchTask": "npm: start",
+      "preLaunchTask": "npm:start",
+      "postDebugTask": "terminate",
+      "sourceMaps": true
+    },
+    {
+      "name": "SSR Angular Debug",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "dev:ssr",
       "postDebugTask": "terminate",
       "sourceMaps": true
     }
-  ]
+  ],
 }
