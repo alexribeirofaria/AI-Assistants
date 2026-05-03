@@ -2,11 +2,13 @@ import { TestBed } from '@angular/core/testing';
 
 import { AIAssistantApp } from '../../../application';
 import { IChatAssistantApp } from '../../../application/interfaces';
+import { ServiceErrorHandlerService } from '../../errors/services/service-error-handler.service';
 import { CoreChatGateway } from './core-chat-gateway';
 
 describe('CoreChatGateway Unit Tests', () => {
   let gateway: CoreChatGateway;
   let app: jasmine.SpyObj<IChatAssistantApp>;
+  let errorHandler: jasmine.SpyObj<ServiceErrorHandlerService>;
 
   beforeEach(() => {
     app = jasmine.createSpyObj<IChatAssistantApp>('IChatAssistantApp', [
@@ -18,10 +20,14 @@ describe('CoreChatGateway Unit Tests', () => {
       'selectModel',
     ]);
 
+    errorHandler = jasmine.createSpyObj<ServiceErrorHandlerService>('ServiceErrorHandlerService', ['handle']);
+    errorHandler.handle.and.callFake((error: unknown) => error as Error);
+
     TestBed.configureTestingModule({
       providers: [
         CoreChatGateway,
         { provide: AIAssistantApp, useValue: app },
+        { provide: ServiceErrorHandlerService, useValue: errorHandler },
       ],
     });
 
@@ -95,5 +101,25 @@ describe('CoreChatGateway Unit Tests', () => {
     expect(app.changeProvider).not.toHaveBeenCalled();
     expect(app.selectModel).not.toHaveBeenCalled();
     expect(app.sendMessage).toHaveBeenCalledOnceWith('hello');
+  });
+
+  it('handles initialization failures without presenting on UI', async () => {
+    app.getProviders.and.rejectWith('[UNKNOWN ERROR] 401 invalid x-api-key');
+
+    await expectAsync(gateway.getProviders()).toBeRejected();
+
+    expect(errorHandler.handle).toHaveBeenCalled();
+    const [, contextArg] = errorHandler.handle.calls.mostRecent().args;
+    expect((contextArg as { presentToUser?: boolean }).presentToUser).toBeFalse();
+  });
+
+  it('handles send message failures and allows UI presentation', async () => {
+    app.sendMessage.and.rejectWith('[QUOTA ERROR] Limite de cota atingido');
+
+    await expectAsync(gateway.sendMessage('hello')).toBeRejected();
+
+    expect(errorHandler.handle).toHaveBeenCalled();
+    const [, contextArg] = errorHandler.handle.calls.mostRecent().args;
+    expect((contextArg as { presentToUser?: boolean }).presentToUser).toBeTrue();
   });
 });
