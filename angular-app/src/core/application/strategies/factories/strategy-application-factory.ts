@@ -1,4 +1,4 @@
-import { ClaudeStrategy, GeminiStrategy, GroqStrategy, LangChainStrategy, OpenAIStrategy } from '..';
+import { ClaudeStrategy, GeminiStrategy, GroqStrategy, OpenAIStrategy } from '..';
 import { BaseDomain } from '../../../domain/abstracts/base-domain';
 import { BaseApplicationStrategy, DomainConstructor } from '../abstracts/base-application-strategy';
 
@@ -7,8 +7,7 @@ export class StrategyApplicationFactory {
     Groq: () => new GroqStrategy(),
     Gemini: () => new GeminiStrategy(),
     OpenAI: () => new OpenAIStrategy(),
-    Claude: () => new ClaudeStrategy(),
-    LangChain: () => new LangChainStrategy(),
+    Claude: () => new ClaudeStrategy()
   };
 
 constructor(
