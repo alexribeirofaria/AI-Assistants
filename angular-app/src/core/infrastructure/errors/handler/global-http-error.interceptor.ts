@@ -1,16 +1,10 @@
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {
-  HttpErrorResponse,
-  HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest,
-} from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { ServiceErrorHandlerService } from '../services/service-error-handler.service';
-import { ErrorSeverity } from '../domain/error-severity.enum';
 import { ErrorContext } from '../domain/error-context.enum';
+import { ErrorSeverity } from '../domain/error-severity.enum';
+import { ServiceErrorHandlerService } from '../services/service-error-handler.service';
 
 @Injectable()
 export class GlobalHttpErrorInterceptor implements HttpInterceptor {
