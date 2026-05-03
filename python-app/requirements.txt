@@ -6,10 +6,7 @@ openai
 anthropic
 google-genai
 groq
-langchain-openai
-langchain-core
 werkzeug
 types-flask
 types-requests
 types-Pillow
-
