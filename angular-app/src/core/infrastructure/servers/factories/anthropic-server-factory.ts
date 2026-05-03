@@ -9,7 +9,7 @@ export class AnthropicServerFactory extends BaseServerFactory {
   ];
 
   buildServer(): IServer {
-    const apiKey = this.requireEnv('LLM_CLAUDE_API_KEY', 'Claude API key não encontrada no .env');
+    const apiKey = this.requireEnv('LLM__CLAUDE_API_KEY', 'Claude API key não encontrada no .env');
     const client = new Anthropic({
       apiKey,
       dangerouslyAllowBrowser: true,
