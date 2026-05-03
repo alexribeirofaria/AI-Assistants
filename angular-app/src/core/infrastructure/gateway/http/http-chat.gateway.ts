@@ -89,10 +89,10 @@ export class HttpChatGateway extends BaseService implements IChatGateway {
     }
 
     const payload = response as { error?: unknown; status?: unknown };
-    const hasErrorMessage =
-      typeof payload.error === 'string' && payload.error.trim().length > 0;
+    const hasErrorMessage = typeof payload.error === 'string'
+          && payload.error.trim().length > 0;
     const status = typeof payload.status === 'number' ? payload.status : null;
-    const isErrorStatus = status !== null && status >= 400;
+    const isErrorStatus = status !== null && status !== 200;
 
     if (!hasErrorMessage && !isErrorStatus) {
       return;
