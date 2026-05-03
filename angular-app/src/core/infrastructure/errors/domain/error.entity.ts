@@ -1,3 +1,4 @@
+import { environment as env } from '../../../../environments/environment';
 import { ErrorContext } from './error-context.enum';
 import { ErrorSeverity } from './error-severity.enum';
 
@@ -12,6 +13,6 @@ export class ErrorEntity {
     public readonly operation: string,
     public readonly stack?: string,
     public readonly details?: Record<string, unknown>,
-    public readonly environment = 'dev',
+    public readonly environment = env.production === true ? 'prod' : 'dev'
   ) {}
 }
