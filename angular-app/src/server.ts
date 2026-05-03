@@ -1,9 +1,25 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine } from '@angular/ssr/node';
 import express from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { environment } from './environments/environment';
 import AppServerModule from './main.server';
+
+function resolveApiTarget(): string {
+  const baseUrl = (environment.BASE_URL ?? '').trim();
+  if (/^https?:\/\//i.test(baseUrl)) {
+    return baseUrl;
+  }
+
+  const apiTarget = (process.env['API_TARGET'] ?? '').trim();
+  if (/^https?:\/\//i.test(apiTarget)) {
+    return apiTarget;
+  }
+
+  return 'http://127.0.0.1:5000';
+}
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -20,8 +36,17 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', distFolder);
 
-  // Example Express Rest API endpoints
-  // server.get('/api/{*splat}', (req, res) => { });
+  // Proxy API calls in SSR mode to keep same behavior as ng serve + proxy.conf.cjs
+  server.use(
+    '/api',
+    createProxyMiddleware({
+      target: resolveApiTarget(),
+      changeOrigin: true,
+      secure: false,
+      pathRewrite: { '^/api': '' }
+    }),
+  );
+
   // Serve static files from /browser
   server.use(express.static(distFolder, {
     maxAge: '1y',
@@ -30,6 +55,10 @@ export function app(): express.Express {
 
   // All regular routes use the Angular engine
   server.use((req, res, next) => {
+    if (req.originalUrl.startsWith('/api/')) {
+      return next();
+    }
+
     const { protocol, originalUrl, baseUrl, headers } = req;
 
     commonEngine
