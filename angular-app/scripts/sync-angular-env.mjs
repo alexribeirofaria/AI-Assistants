@@ -36,7 +36,7 @@ const merged = { ...rootEnv, ...localEnv };
 const environment = {
   production: false,
   BASE_URL: merged.BASE_URL ?? "/api",
-  LLM_CLAUDE_API_KEY: merged.LLM_CLAUDE_API_KEY ?? "",
+  LLM__CLAUDE_API_KEY: merged.LLM__CLAUDE_API_KEY ?? "",
   LLM__OPEN_API_KEY: merged.LLM__OPEN_API_KEY ?? "",
   LLM__GEMINI_API_KEY: merged.LLM__GEMINI_API_KEY ?? "",
   LLM__GROQ_API_KEY: merged.LLM__GROQ_API_KEY ?? "",
@@ -47,7 +47,7 @@ const fileContent = [
   "export const environment = {",
   `  production: ${environment.production},`,
   `  BASE_URL: ${JSON.stringify(environment.BASE_URL)},`,
-  `  LLM_CLAUDE_API_KEY: ${JSON.stringify(environment.LLM_CLAUDE_API_KEY)},`,
+  `  LLM__CLAUDE_API_KEY: ${JSON.stringify(environment.LLM__CLAUDE_API_KEY)},`,
   `  LLM__OPEN_API_KEY: ${JSON.stringify(environment.LLM__OPEN_API_KEY)},`,
   `  LLM__GEMINI_API_KEY: ${JSON.stringify(environment.LLM__GEMINI_API_KEY)},`,
   `  LLM__GROQ_API_KEY: ${JSON.stringify(environment.LLM__GROQ_API_KEY)},`,
