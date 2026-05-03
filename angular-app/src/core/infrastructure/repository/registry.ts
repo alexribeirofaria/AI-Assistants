@@ -1,6 +1,6 @@
 import { DomainConstructor } from '../../application/strategies/abstracts/base-application-strategy';
-import { Claude, Gemini, Groq, LangChain, OpenAI } from '../../domain';
-import { ClaudeServer, GeminiServer, GroqServer, LangChainServer, OpenAIServer } from '../servers';
+import { Claude, Gemini, Groq, OpenAI } from '../../domain';
+import { ClaudeServer, GeminiServer, GroqServer, OpenAIServer } from '../servers';
 import { Builder } from './builder';
 import { RepositoryStrategy } from './strategies/repository-strategy';
 
@@ -14,7 +14,6 @@ export class Registry {
     Claude: { domainClass: Claude, provider: () => new RepositoryStrategy(new Builder(Claude, () => new ClaudeServer())) },
     Gemini: { domainClass: Gemini, provider: () => new RepositoryStrategy(new Builder(Gemini, () => new GeminiServer())) },
     Groq: { domainClass: Groq, provider: () => new RepositoryStrategy(new Builder(Groq, () => new GroqServer())) },
-    LangChain: { domainClass: LangChain, provider: () => new RepositoryStrategy(new Builder(LangChain, () => new LangChainServer())) },
     OpenAI: { domainClass: OpenAI, provider: () => new RepositoryStrategy(new Builder(OpenAI, () => new OpenAIServer())) },
   };
 
