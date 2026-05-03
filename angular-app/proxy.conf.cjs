@@ -166,9 +166,7 @@ module.exports = {
     target: TARGET,
     changeOrigin: true,
     secure: false,
-    logLevel: 'silent',
-    proxyTimeout: 10000,
-    timeout: 10000,
+    logLevel: 'debug',
     pathRewrite: {
       '^/api': '',
     },
