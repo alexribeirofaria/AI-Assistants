@@ -18,7 +18,7 @@ export interface BaseServiceDependencies {
 
 @Injectable()
 export abstract class BaseService {
-  protected baseUrl = environment.BASE_URL;
+  protected baseUrl = this.resolveBaseUrl(environment.BASE_URL);
   protected readonly http?: HttpClient;
   protected readonly errorHandler?: ServiceErrorHandlerService;
 
@@ -27,7 +27,19 @@ export abstract class BaseService {
     this.errorHandler = dependencies.errorHandler;
   }
 
-  // Default REST operations. Subclasses may override any method.
+  private resolveBaseUrl(baseUrl: string): string {
+    const normalized = (baseUrl ?? '').trim();
+    if (/^https?:\/\//i.test(normalized)) {
+      return normalized;
+    }
+
+    if (!environment.production && normalized.startsWith('/api')) {
+      return environment.API_URL;
+    }
+
+    return normalized;
+  }
+
   protected get<T>(endpoint: string): Observable<T> {
     if (!this.http) {
       throw this.buildServiceError('get', 'HttpClient não configurado para este serviço');
