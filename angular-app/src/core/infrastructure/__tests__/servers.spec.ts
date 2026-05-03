@@ -1,25 +1,17 @@
 import { ClaudeServer } from '../servers/claude-server';
-import { GeminiServer } from '../servers/gemini-server';
-import { GroqServer } from '../servers/groq-server';
-import { LangChainServer } from '../servers/langchain-server';
-import { OpenAIServer } from '../servers/openai-server';
 import { AnthropicServerFactory } from '../servers/factories/anthropic-server-factory';
 import { GeminiServerFactory } from '../servers/factories/gemini-server-factory';
 import { GroqServerFactory } from '../servers/factories/groq-server-factory';
-import { LangChainServerFactory } from '../servers/factories/langchain-server-factory';
 import { OpenAIServerFactory } from '../servers/factories/openai-server-factory';
+import { GeminiServer } from '../servers/gemini-server';
+import { GroqServer } from '../servers/groq-server';
+import { OpenAIServer } from '../servers/openai-server';
 
 describe('ConcreteServer Unit Tests', () => {
   it('creates an OpenAI factory', () => {
     const server = Object.create(OpenAIServer.prototype) as OpenAIServer;
 
     expect(server.createFactory()).toEqual(jasmine.any(OpenAIServerFactory));
-  });
-
-  it('creates a LangChain factory', () => {
-    const server = Object.create(LangChainServer.prototype) as LangChainServer;
-
-    expect(server.createFactory()).toEqual(jasmine.any(LangChainServerFactory));
   });
 
   it('creates a Groq factory', () => {
