@@ -21,10 +21,21 @@ export class ThemeService {
   }
 
   private loadTheme(): void {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
+    let saved: string | null = null;
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        saved = localStorage.getItem(this.STORAGE_KEY);
+      }
+    } catch {
+      saved = null;
+    }
+
     const isDark = saved ? saved === 'dark' : true;
+
     this._isDarkMode.set(isDark);
     this.applyTheme(isDark);
+
     if (!saved) {
       this.saveTheme(isDark);
     }
@@ -41,6 +52,12 @@ export class ThemeService {
   }
 
   private saveTheme(isDark: boolean): void {
-    localStorage.setItem(this.STORAGE_KEY, isDark ? 'dark' : 'light');
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(this.STORAGE_KEY, isDark ? 'dark' : 'light');
+      }
+    } catch {
+      // TODO: Fazer Review Ignora indisponibilidade de storage em SSR/runtime restrito.
+    }
   }
 }
