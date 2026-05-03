@@ -4,12 +4,12 @@ import { ModelNormalizer } from '../../../domain/normalizers/model.normalizer';
 import { ProviderNormalizer } from '../../../domain/normalizers/provider.normalizer';
 import { AssistantResponseValidator } from '../../../domain/normalizers/validators/assistant-response.validator';
 import { ChatGatewayObserverFactory, CoreChatGateway, HttpChatGateway, SendMessageObserverState } from '../../../infrastructure';
+import { ServiceErrorHandlerService } from '../../../infrastructure/errors/services/service-error-handler.service';
 import { createChatGatewayChainHandler } from '../../../infrastructure/gateway/chain/factory/create-chat-gateway-chain-handler';
 import { ChatGatewayChainHandler } from '../../../infrastructure/gateway/chain/handler/chat-gateway-chain-handler';
 import { IChatMessageContext } from '../../../infrastructure/gateway/interfaces';
-import { ServiceErrorHandlerService } from '../../../infrastructure/errors/services/service-error-handler.service';
-import { ISendMessageResponse } from '../../responses/i-send-message-response';
 import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse } from '../../interfaces';
+import { ISendMessageResponse } from '../../responses/i-send-message-response';
 import { BaseService } from '../abstract/base.service';
 
 @Injectable({
@@ -115,10 +115,93 @@ export class ChatService extends BaseService {
       observer,
     });
 
+    this.raiseIfTechnicalErrorPayload(data);
+    const responseContent = this.responseTextExtractor.extract(data);
+
     return {
-      content: this.responseTextExtractor.extract(data),
+      content: responseContent,
       gatewayStatus: sendState.gatewayStatus(),
     };
+  }
+
+  private raiseIfTechnicalErrorPayload(data: IAssistantResponse): void {
+    const candidates = this.collectErrorCandidates(data);
+    const matched = candidates.find((candidate) => this.isTechnicalErrorText(candidate));
+    if (!matched) return;
+
+    const sanitizedMessage = this.sanitizeTechnicalErrorMessage(matched);
+    throw this.errorHandler.handle(new Error(sanitizedMessage), {
+      source: ChatService.name,
+      operation: 'sendMessage',
+      channel: 'chat',
+      presentToUser: true,
+    });
+  }
+
+  private collectErrorCandidates(data: IAssistantResponse): string[] {
+    const values: string[] = [];
+    const response = data?.response as Record<string, unknown> | undefined;
+
+    const push = (value: unknown): void => {
+      if (typeof value === 'string' && value.trim().length > 0) {
+        values.push(value.trim());
+      }
+    };
+
+    push(this.responseTextExtractor.extract(data));
+    push(response?.['error']);
+    push(response?.['message']);
+
+    const nestedResponse = response?.['response'] as Record<string, unknown> | string | undefined;
+    if (typeof nestedResponse === 'string') {
+      push(nestedResponse);
+    } else if (nestedResponse && typeof nestedResponse === 'object') {
+      push(nestedResponse['error']);
+      push(nestedResponse['message']);
+    }
+
+    return values;
+  }
+
+  private isTechnicalErrorText(text: string): boolean {
+    const raw = text.trim();
+    if (!raw) return false;
+
+    const markers = [
+      /^\[(UNKNOWN ERROR|QUOTA ERROR)\]/i,
+      /\bauthentication_error\b/i,
+      /\binvalid x-api-key\b/i,
+      /\bdecommissioned\b/i,
+      /\brate[_\s-]?limit\b/i,
+      /\bquota\b/i,
+      /\bunauthorized\b/i,
+      /\bforbidden\b/i,
+      /\binvalid[_\s-]?api[_\s-]?key\b/i,
+      /\bmodel\b.+\bnot found\b/i,
+    ];
+
+    return markers.some((pattern) => pattern.test(raw));
+  }
+
+  private sanitizeTechnicalErrorMessage(raw: string): string {
+    const cleaned = raw
+      .replace(/^\[.*?\]\s*/i, '')
+      .replace(/^\d+\s*/, '')
+      .trim();
+
+    if (/quota|rate[_\s-]?limit/i.test(cleaned)) {
+      return 'Limite de uso atingido. Tente novamente em instantes.';
+    }
+
+    if (/authentication_error|invalid x-api-key|invalid[_\s-]?api[_\s-]?key|unauthorized|forbidden/i.test(cleaned)) {
+      return 'Falha de autenticacao com o provedor configurado.';
+    }
+
+    if (/decommissioned|model.+not found/i.test(cleaned)) {
+      return 'O modelo selecionado nao esta mais disponivel.';
+    }
+
+    return 'Nao foi possivel completar a operacao.';
   }
 
   private buildGatewayChain(): ChatGatewayChainHandler {
