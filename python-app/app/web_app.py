@@ -6,4 +6,4 @@ class WebApp:
         self.app: Flask = AppFactory().create_app()
 
     def run(self):
-        self.app.run(host="0.0.0.0", port=5000, debug=True)
+        self.app.run(debug=True)
