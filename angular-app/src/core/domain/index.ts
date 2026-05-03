@@ -5,10 +5,8 @@ export { ExpiringValueCache } from './cache/expiring-value-cache';
 export { Claude } from './claude-domain';
 export { Gemini } from './gemini-domain';
 export { Groq } from './groq-domain';
-export { LangChain } from './langchain-domain';
 export { OpenAI } from './openai-domain';
 export { AssistantResponseValidator } from './services/assistant-response.validator';
 export { ResponseTextExtractor } from './services/response-text.extractor';
 export { ModelVo } from './value-objects/model.vo';
 export { ProviderVo } from './value-objects/provider.vo';
-
