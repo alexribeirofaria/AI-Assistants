@@ -211,3 +211,6 @@ environments/*.ts
 **/.log_erros/*.md
 .pyvenv
 ..docs/
+
+*storybook.log
+storybook-static
