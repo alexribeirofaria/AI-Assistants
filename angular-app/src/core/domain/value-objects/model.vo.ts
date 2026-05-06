@@ -12,4 +12,9 @@ export class ModelVo {
   public isEmpty(): boolean {
     return this.value.length === 0;
   }
+
+  static create(name: string): ModelVo {
+    // TODO
+    return null;
+  }
 }

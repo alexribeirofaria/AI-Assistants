@@ -1,22 +1,32 @@
-import { Injectable } from '@angular/core';
-import { ResponseTextExtractor } from '../../../domain/extractors/response-text.extractor';
-import { ModelNormalizer } from '../../../domain/normalizers/model.normalizer';
-import { ProviderNormalizer } from '../../../domain/normalizers/provider.normalizer';
-import { AssistantResponseValidator } from '../../../domain/normalizers/validators/assistant-response.validator';
-import { ChatGatewayObserverFactory, CoreChatGateway, HttpChatGateway, SendMessageObserverState } from '../../../infrastructure';
-import { ServiceErrorHandlerService } from '../../../infrastructure/errors/services/service-error-handler.service';
-import { createChatGatewayChainHandler } from '../../../infrastructure/gateway/chain/factory/create-chat-gateway-chain-handler';
-import { ChatGatewayChainHandler } from '../../../infrastructure/gateway/chain/handler/chat-gateway-chain-handler';
-import { IChatMessageContext } from '../../../infrastructure/gateway/interfaces';
-import { IAssistantResponse, IChangeProviderResponse, IModelsListResponse } from '../../interfaces';
-import { ISendMessageResponse } from '../../responses/i-send-message-response';
-import { BaseService } from '../abstract/base.service';
+import { HttpErrorResponse } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { ResponseTextExtractor } from "../../../domain/extractors/response-text.extractor";
+import { ModelNormalizer } from "../../../domain/normalizers/model.normalizer";
+import { ProviderNormalizer } from "../../../domain/normalizers/provider.normalizer";
+import { AssistantResponseValidator } from "../../../domain/normalizers/validators/assistant-response.validator";
+import {
+  ChatGatewayObserverFactory,
+  CoreChatGateway,
+  HttpChatGateway,
+  SendMessageObserverState,
+} from "../../../infrastructure";
+import { ServiceErrorHandlerService } from "../../../infrastructure/errors/services/service-error-handler.service";
+import { createChatGatewayChainHandler } from "../../../infrastructure/gateway/chain/factory/create-chat-gateway-chain-handler";
+import { ChatGatewayChainHandler } from "../../../infrastructure/gateway/chain/handler/chat-gateway-chain-handler";
+import { BaseHttpGateway } from "../../../infrastructure/gateway/http/abstract/base-http.gateway";
+import { IChatMessageContext } from "../../../infrastructure/gateway/interfaces";
+import {
+  IAssistantResponse,
+  IChangeProviderResponse,
+  IModelsListResponse,
+} from "../../interfaces";
+import { ISendMessageResponse } from "../../responses/i-send-message-response";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
-export class ChatService extends BaseService {
-  private static readonly HANDLED_ERROR_FLAG = '__globalErrorHandled';
+export class ChatService extends BaseHttpGateway {
+  private static readonly HANDLED_ERROR_FLAG = "__globalErrorHandled";
 
   private gatewayChain: ChatGatewayChainHandler;
   private readonly coreGateway: CoreChatGateway;
@@ -30,7 +40,7 @@ export class ChatService extends BaseService {
   constructor(
     httpGateway: HttpChatGateway,
     coreGateway: CoreChatGateway,
-    errorHandler: ServiceErrorHandlerService
+    errorHandler: ServiceErrorHandlerService,
   ) {
     super({ errorHandler });
     this.coreGateway = coreGateway;
@@ -39,7 +49,9 @@ export class ChatService extends BaseService {
     this.providerNormalizer = new ProviderNormalizer();
     this.modelNormalizer = new ModelNormalizer();
     this.responseTextExtractor = new ResponseTextExtractor();
-    this.assistantResponseValidator = new AssistantResponseValidator(this.responseTextExtractor);
+    this.assistantResponseValidator = new AssistantResponseValidator(
+      this.responseTextExtractor,
+    );
     this.observerFactory = this.buildObserverFactory();
   }
 
@@ -47,8 +59,8 @@ export class ChatService extends BaseService {
     const providers = await this.gatewayChain.handle<string[]>({
       operation: (gateway) => gateway.getProviders(),
       validate: (result) => Array.isArray(result),
-      invalidResultMessage: 'Gateway retornou providers invalidos',
-      operationName: 'getProviders',
+      invalidResultMessage: "Gateway retornou providers invalidos",
+      operationName: "getProviders",
       observer: this.observerFactory.createSilentObserver(),
     });
 
@@ -59,8 +71,8 @@ export class ChatService extends BaseService {
     return this.gatewayChain.handle<IModelsListResponse>({
       operation: (gateway) => gateway.getModels(provider),
       validate: (result: unknown) => this.hasModelList(result),
-      invalidResultMessage: 'Gateway retornou models invalidos',
-      operationName: 'getModels',
+      invalidResultMessage: "Gateway retornou models invalidos",
+      operationName: "getModels",
       observer: this.observerFactory.createSilentObserver(),
     });
   }
@@ -72,14 +84,15 @@ export class ChatService extends BaseService {
       const model = await this.gatewayChain.handle({
         operation: async (gateway) => {
           const value = await gateway.getDefaultModel(provider);
-          if (typeof value !== 'string') {
+          if (typeof value !== "string") {
             hasMissingModel = true;
           }
           return value;
         },
-        validate: (result) => typeof result === 'string' && result.trim().length > 0,
-        invalidResultMessage: 'Gateway retornou default model invalido',
-        operationName: 'getDefaultModel',
+        validate: (result) =>
+          typeof result === "string" && result.trim().length > 0,
+        invalidResultMessage: "Gateway retornou default model invalido",
+        operationName: "getDefaultModel",
         observer: this.observerFactory.createSilentObserver(),
       });
 
@@ -95,7 +108,7 @@ export class ChatService extends BaseService {
   async changeProvider(provider: string): Promise<IChangeProviderResponse> {
     const response = await this.gatewayChain.handle<IChangeProviderResponse>({
       operation: (gateway) => gateway.changeProvider(provider),
-      operationName: 'changeProvider',
+      operationName: "changeProvider",
       observer: this.observerFactory.createSilentObserver(),
     });
 
@@ -103,20 +116,35 @@ export class ChatService extends BaseService {
     return response;
   }
 
-  async sendMessage(content: string, context?: IChatMessageContext): Promise<ISendMessageResponse> {
+  async sendMessage(
+    content: string,
+    context?: IChatMessageContext,
+  ): Promise<ISendMessageResponse> {
     const sendState = this.createSendObserverState();
-    const observer = this.observerFactory.createInteractiveSendObserver(sendState.observerConfig);
+    const observer = this.observerFactory.createInteractiveSendObserver(
+      sendState.observerConfig,
+    );
 
     const data = await this.gatewayChain.handle<IAssistantResponse>({
       operation: (gateway) => gateway.sendMessage(content, context),
       validate: (result) => this.assistantResponseValidator.isValid(result),
-      invalidResultMessage: 'Gateway retornou resposta invalida',
-      operationName: 'sendMessage',
+      invalidResultMessage: "Gateway retornou resposta invalida",
+      operationName: "sendMessage",
       observer,
     });
 
     this.raiseIfTechnicalErrorPayload(data);
     const responseContent = this.responseTextExtractor.extract(data);
+
+    if (this.isTechnicalErrorText(responseContent)) {
+      const sanitized = this.sanitizeTechnicalErrorMessage(responseContent);
+      throw this.errorHandler!.handle(new Error(sanitized), {
+        source: ChatService.name,
+        operation: "sendMessage",
+        channel: "chat",
+        presentToUser: true,
+      });
+    }
 
     return {
       content: responseContent,
@@ -126,14 +154,16 @@ export class ChatService extends BaseService {
 
   private raiseIfTechnicalErrorPayload(data: IAssistantResponse): void {
     const candidates = this.collectErrorCandidates(data);
-    const matched = candidates.find((candidate) => this.isTechnicalErrorText(candidate));
+    const matched = candidates.find((candidate) =>
+      this.isTechnicalErrorText(candidate),
+    );
     if (!matched) return;
 
     const sanitizedMessage = this.sanitizeTechnicalErrorMessage(matched);
     throw this.errorHandler.handle(new Error(sanitizedMessage), {
       source: ChatService.name,
-      operation: 'sendMessage',
-      channel: 'chat',
+      operation: "sendMessage",
+      channel: "chat",
       presentToUser: true,
     });
   }
@@ -143,21 +173,28 @@ export class ChatService extends BaseService {
     const response = data?.response as Record<string, unknown> | undefined;
 
     const push = (value: unknown): void => {
-      if (typeof value === 'string' && value.trim().length > 0) {
+      if (!value) return;
+      if (typeof value === "string" && value.trim().length > 0) {
         values.push(value.trim());
+      } else if (typeof value === "object" && value !== null) {
+        const err = value as Record<string, unknown>;
+        push(err["message"]);
+        push(err["error"]);
+        push(err["type"]);
+        push(err["code"]);
       }
     };
 
-    push(this.responseTextExtractor.extract(data));
-    push(response?.['error']);
-    push(response?.['message']);
+    push(response?.["error"]);
+    push(response?.["message"]);
 
-    const nestedResponse = response?.['response'] as Record<string, unknown> | string | undefined;
-    if (typeof nestedResponse === 'string') {
-      push(nestedResponse);
-    } else if (nestedResponse && typeof nestedResponse === 'object') {
-      push(nestedResponse['error']);
-      push(nestedResponse['message']);
+    const nestedResponse = response?.["response"] as
+      | Record<string, unknown>
+      | string
+      | undefined;
+    if (nestedResponse && typeof nestedResponse === "object") {
+      push(nestedResponse["error"]);
+      push(nestedResponse["message"]);
     }
 
     return values;
@@ -168,7 +205,8 @@ export class ChatService extends BaseService {
     if (!raw) return false;
 
     const markers = [
-      /^\[(UNKNOWN ERROR|QUOTA ERROR)\]/i,
+      /^\[(UNKNOWN ERROR|QUOTA ERROR|ERROR)\]/i,
+      /\bError code:\s*\d{3}\b/i,
       /\bauthentication_error\b/i,
       /\binvalid x-api-key\b/i,
       /\bdecommissioned\b/i,
@@ -185,27 +223,31 @@ export class ChatService extends BaseService {
 
   private sanitizeTechnicalErrorMessage(raw: string): string {
     const cleaned = raw
-      .replace(/^\[.*?\]\s*/i, '')
-      .replace(/^\d+\s*/, '')
+      .replace(/^\[.*?\]\s*/i, "")
+      .replace(/^\d+\s*/, "")
       .trim();
 
     if (/quota|rate[_\s-]?limit/i.test(cleaned)) {
-      return 'Limite de uso atingido. Tente novamente em instantes.';
+      return "Limite de uso atingido. Tente novamente em instantes.";
     }
 
-    if (/authentication_error|invalid x-api-key|invalid[_\s-]?api[_\s-]?key|unauthorized|forbidden/i.test(cleaned)) {
-      return 'Falha de autenticacao com o provedor configurado.';
+    if (
+      /authentication_error|invalid x-api-key|invalid[_\s-]?api[_\s-]?key|unauthorized|forbidden/i.test(
+        cleaned,
+      )
+    ) {
+      return "Falha de autenticacao com o provedor configurado.";
     }
 
     if (/decommissioned|model.+not found/i.test(cleaned)) {
-      return 'O modelo selecionado nao esta mais disponivel.';
+      return "O modelo selecionado nao esta mais disponivel.";
     }
 
-    return 'Nao foi possivel completar a operacao.';
+    return "Nao foi possivel completar a operacao.";
   }
 
   private buildGatewayChain(): ChatGatewayChainHandler {
-    return createChatGatewayChainHandler([this.coreGateway, this.httpGateway]);
+    return createChatGatewayChainHandler([this.httpGateway, this.coreGateway]);
   }
 
   private buildObserverFactory(): ChatGatewayObserverFactory {
@@ -215,23 +257,39 @@ export class ChatService extends BaseService {
         report.gatewayName,
         report.operation,
         report.details,
-        report.presentToUser
+        report.presentToUser,
       );
     });
   }
 
   private hasModelList(result: unknown): result is IModelsListResponse {
-    if (!result || typeof result !== 'object') {
+    if (!result || typeof result !== "object") {
       return false;
     }
 
     const modelResponse = result as { models?: unknown };
-    return Array.isArray(modelResponse.models);
+    if (
+      !Array.isArray(modelResponse.models) ||
+      modelResponse.models.length === 0
+    ) {
+      return false;
+    }
+
+    const first = modelResponse.models[0];
+    return (
+      typeof first === "object" &&
+      first !== null &&
+      "id" in first &&
+      "modelName" in first
+    );
   }
 
-  private createSendObserverState(): { observerConfig: SendMessageObserverState; gatewayStatus: () => string } {
+  private createSendObserverState(): {
+    observerConfig: SendMessageObserverState;
+    gatewayStatus: () => string;
+  } {
     let usedFallback = false;
-    let status = '';
+    let status = "";
 
     return {
       observerConfig: {
@@ -252,13 +310,23 @@ export class ChatService extends BaseService {
     gatewayName: string,
     operation: string,
     details?: Record<string, unknown>,
-    presentToUser = true
+    presentToUser = true,
   ): void {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const isAuthError =
+      (error instanceof HttpErrorResponse && error.status === 401) ||
+      errorMsg.includes("401") ||
+      errorMsg.includes("authentication_error");
+
     this.errorHandler?.handle(this.unwrapHandledError(error), {
       source: gatewayName,
       operation,
       details,
-      channel: operation === 'sendMessage' ? 'chat' : 'global',
+      channel: isAuthError
+        ? "global"
+        : operation === "sendMessage"
+          ? "chat"
+          : "global",
       presentToUser,
     });
   }

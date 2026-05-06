@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { ErrorEntity } from '../domain/error.entity';
-import { ErrorContext as DomainErrorContext } from '../domain/error-context.enum';
-import { ErrorSeverity } from '../domain/error-severity.enum';
 import { ErrorFormatterService } from '../application/error-formatter.service';
 import { ErrorMessageResolverService } from '../application/error-message-resolver.service';
 import { ErrorContext } from '../contracts/i-error-context';
 import { FormattedError, IErrorFormatter } from '../contracts/i-error-formatter';
+import { ErrorContext as DomainErrorContext } from '../domain/error-context.enum';
+import { ErrorSeverity } from '../domain/error-severity.enum';
+import { ErrorEntity } from '../domain/error.entity';
 
 @Injectable({
   providedIn: 'root',
@@ -20,9 +20,10 @@ export class ErrorFormatter implements IErrorFormatter {
   format(error: unknown, context: ErrorContext): FormattedError {
     const timestamp = (context.timestamp ?? new Date()).toISOString();
     const severity = context.severity ?? this.resolveSeverity(context.category);
+    const extractedMessage = this.extractMessage(error);
     const entity = new ErrorEntity(
-      this.extractMessage(error),
-      this.messageResolver.resolve(context.operation, severity),
+      extractedMessage,
+      this.messageResolver.resolve(context.operation, severity, extractedMessage, context),
       context.context ?? this.resolveContext(context.channel, context.category),
       severity,
       timestamp,

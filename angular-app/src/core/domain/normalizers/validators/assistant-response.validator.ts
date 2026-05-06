@@ -33,13 +33,23 @@ export class AssistantResponseValidator {
       return false;
     }
 
-    const directError = response.error;
-    if (typeof directError === 'string' && directError.trim().length > 0) {
+    if (this.isErrorObject(response.error)) {
       return true;
     }
 
     const nested = response.response as { error?: unknown } | undefined;
-    return typeof nested?.error === 'string' && nested.error.trim().length > 0;
+    return this.isErrorObject(nested?.error);
+  }
+
+  private isErrorObject(error: unknown): boolean {
+    if (!error) return false;
+    if (typeof error === 'string' && error.trim().length > 0) return true;
+    if (typeof error === 'object' && error !== null) {
+      // Common structures like { message: '...', code: '...' } or { type: '...', error: { ... } }
+      const err = error as Record<string, unknown>;
+      return 'message' in err || 'type' in err || 'error' in err || 'code' in err;
+    }
+    return false;
   }
 
   private hasContent(result: IAssistantResponse): boolean {

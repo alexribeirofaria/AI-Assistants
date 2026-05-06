@@ -15,6 +15,12 @@ export class ChatListModelsComponent {
   @Input() selectedModel = "";
   @Output() modelChange = new EventEmitter<string>();
 
+  get placeholderText(): string {
+    return this.models && this.models.length === 0 
+      ? 'Nenhum modelo esta disponivel para este provider' 
+      : 'Selecione um modelo';
+  }
+
   onModelSelected(value: string): void {
     if (value) {
       this.modelChange.emit(value);

@@ -2,17 +2,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
-    "types": [
-      "jasmine",
-      "node"
-    ],
+    "types": [ "jasmine", "node" ],
     "moduleResolution": "bundler",
     "module": "esnext"
   },
-  "files": [
-    "src/test.ts",
-    "src/polyfills.ts"
-  ],
+  "files": [ "src/test.ts" ],
   "include": [
     "src/**/*.spec.ts",
     "src/**/*.d.ts",

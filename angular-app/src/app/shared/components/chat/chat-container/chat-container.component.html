@@ -1,8 +1,5 @@
 <div class="chat-container">
   <app-chat-list [messages]="messages()"></app-chat-list>
-  @if (gatewayStatus()) {
-  <div class="alert alert-info">{{ gatewayStatus() }}</div>
-  }
   <div class="chat-wrapper-container ">
     <div class="container-wrapper">
       <app-chat-provider [providers]="providers()" [selectedProvider]="selectedProvider()"

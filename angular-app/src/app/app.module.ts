@@ -10,7 +10,7 @@ import { ChatModule } from "./shared/components/chat/chat.module";
 import { CookieConsentComponent } from "./shared/components/cookie-consent/cookie-consent.component";
 import { LayoutComponent } from "./shared/components/layout/layout.component";
 import { GlobalErrorHandler } from "../core/infrastructure/errors/handler/global-error-handler";
-import { GlobalHttpErrorInterceptor } from "../core/infrastructure/errors/handler/global-http-error.interceptor";
+import { GlobalHttpErrorInterceptor } from "../core/infrastructure/errors/interceptor/global-http-error.interceptor";
 import { ErrorFormatter } from "../core/infrastructure/errors/formatter/error-formatter";
 import { ErrorLoggerService } from "../core/infrastructure/errors/logger/error-logger.service";
 import { UIErrorPresenter } from "../core/infrastructure/errors/presenter/ui-error-presenter";

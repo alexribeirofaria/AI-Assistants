@@ -2,8 +2,9 @@
   <label for="model-select" class="form-label">Modelo</label>
   <select id="model-select" class="form-select" 
     [ngModel]="selectedModel" 
-    (ngModelChange)="onModelSelected($event)">
-    <option value="" disabled>Selecione um modelo</option>
+    (ngModelChange)="onModelSelected($event)"
+    [disabled]="models.length === 0">
+    <option value="" disabled>{{ placeholderText }}</option>
     @for (model of models; track model.id) {
       <option [value]="model.id">{{ model.modelName || model.id }}</option>
     }

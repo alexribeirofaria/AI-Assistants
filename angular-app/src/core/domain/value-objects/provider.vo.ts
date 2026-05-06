@@ -12,4 +12,9 @@ export class ProviderVo {
   public isEmpty(): boolean {
     return this.value.length === 0;
   }
+
+  static create(provider: string, active: boolean): ProviderVo {
+    //TODO: Implementation...
+    return null;
+  }
 }

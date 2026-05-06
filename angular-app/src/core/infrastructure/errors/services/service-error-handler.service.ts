@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { ErrorContext } from '../contracts/i-error-context';
+import { ErrorContext as DomainErrorContext } from '../domain/error-context.enum';
+import { ErrorSeverity } from '../domain/error-severity.enum';
 import { ErrorFormatter } from '../formatter/error-formatter';
 import { ErrorLoggerService } from '../logger/error-logger.service';
 import { UIErrorPresenter } from '../presenter/ui-error-presenter';
-import { ErrorContext } from '../contracts/i-error-context';
-import { ErrorSeverity } from '../domain/error-severity.enum';
-import { ErrorContext as DomainErrorContext } from '../domain/error-context.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -21,15 +21,24 @@ export class ServiceErrorHandlerService {
 
   handle(error: unknown, context: ErrorContext): Error {
     const candidate = this.unwrapError(error);
-    if (this.isHandledError(candidate)) {
+    const isHandled = this.isHandledError(candidate);
+
+    if (isHandled && context.presentToUser !== true) {
       return candidate;
     }
 
     const formatted = this.formatter.format(candidate, this.normalizeContext(candidate, context));
-    this.logger.log(formatted);
 
-    if (context.presentToUser !== false) {
+    if (!isHandled) {
+      this.logger.log(formatted);
+    }
+
+    if (context.presentToUser === true || (!isHandled && context.presentToUser !== false)) {
       this.presenter.present(formatted.publicMessage, context.channel ?? 'global');
+    }
+
+    if (isHandled) {
+      return candidate;
     }
 
     const handledError = candidate instanceof Error ? candidate : new Error(formatted.publicMessage);

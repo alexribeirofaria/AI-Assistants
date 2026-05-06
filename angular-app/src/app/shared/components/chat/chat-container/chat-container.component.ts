@@ -208,6 +208,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
           content,
           streaming: false,
           provider,
+          type: undefined,
         };
       }
       return updated;
