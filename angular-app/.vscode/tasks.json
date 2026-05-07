@@ -1,0 +1,62 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Launch Serve",
+      "type": "shell",
+      "command": "ng serve",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "node",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Compiled successfully|✔ Browser application bundle generation complete"
+        }
+      }
+    },
+    {
+      "label": "Launch SSR Serve",
+      "type": "shell",
+      "command": "npm run dev:ssr",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "node",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Compiled successfully|Server listening on"
+        }
+      }
+    },
+    {
+      "label": "Launch Test Serve",
+      "type": "shell",
+      "command": "npm run test",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "node",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "Compiled successfully|✔ Browser application bundle generation complete"
+        }
+      }
+    },
+    {
+      "label": "terminate",
+      "type": "shell",
+      "command": "pkill -f \"ng serve\" || pkill -f \"node\" || true",
+      "problemMatcher": [ ]
+    }
+  ]
+}

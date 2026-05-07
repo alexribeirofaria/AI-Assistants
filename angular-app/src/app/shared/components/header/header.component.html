@@ -1,0 +1,17 @@
+<header class="app-header">
+  <div class="header-content">
+    <div class="header-brand">
+      <i class="bi bi-robot"></i>
+      <span class="header-title">AI Assistants</span>
+    </div>
+    <div class="header-actions">
+      <button
+        class="btn btn-theme-toggle"
+        id="theme-toggle-button"
+        (click)="toggleTheme()"
+        [title]="isDarkMode() ? 'Modo Claro' : 'Modo Escuro'">
+        <i class="bi" [class.bi-sun-fill]="isDarkMode()" [class.bi-moon-fill]="!isDarkMode()"></i>
+      </button>
+    </div>
+  </div>
+</header>

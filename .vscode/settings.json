@@ -1,18 +1,33 @@
 {
-  "python.analysis.extraPaths": ["./src"],
-  "python.autoComplete.extraPaths": ["./src"],
-  "python.analysis.typeCheckingMode": "off",
-  "python.analysis.autoImportCompletions": true,
-  "python.analysis.useLibraryCodeForTypes": true,
-  "python.analysis.diagnosticMode": "openFilesOnly",
-  "python.analysis.inlayHints.variableTypes": true,
-  "python.analysis.inlayHints.functionReturnTypes": true,
-  "python.analysis.inlayHints.callArgumentNames": "all",
-  "python.analysis.completeFunctionParens": true,
-  "python.analysis.indexing": true,
-  "pylint.args": [
-    "--rcfile=pylintrc",
-    "--load-plugins=pylint_django",
-    "--ignore=E402,F401,F403,E0401,C0115,C0116"
-  ]
+  "files.autoSave": "afterDelay",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always",
+    "source.organizeImports": "always"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "vscode.configuration-editing",
+  "github.copilot.enable": { "*": false },
+  "editor.inlineSuggest.enabled": false,
+  "editor.codeActions.triggerOnFocusChange": false,
+  "editor.lightbulb.enabled": "onCode",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "explorer.compactFolders": false,
+  "js/ts.suggest.autoImports": true,
+  "python.terminal.activateEnvironment": true,
+  "python.defaultInterpreterPath": "./python-app/venv/bin",
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  }
 }

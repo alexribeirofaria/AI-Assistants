@@ -1,0 +1,95 @@
+{
+  "folders": [
+    {
+      "name": "python-app",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.autoSave": "afterDelay",
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "editor.detectIndentation": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "always",
+      "source.organizeImports": "always",
+    },
+    "typescript.analysis.extraPaths": [
+      "./angular-app"
+    ],
+    "js/ts.updateImportsOnFileMove.enabled": "always",
+    "js/ts.suggest.autoImports": true,
+    "explorer.compactFolders": false,
+    "angular.enable-strict-mode-prompt": false,
+    "editor.formatOnSave": false,
+    "editor.inlineSuggest.enabled": false,
+    "editor.codeActions.triggerOnFocusChange": false,
+    "editor.lightbulb.enabled": "onCode",
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": false,
+    },
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.requireConfig": true,
+    "eslint.run": "onType",
+    "eslint.validate": [
+      "typescript",
+      "javascript",
+      "html"
+    ],
+    "github.copilot.enable": {
+      "*": false,
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[javascript]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[html]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[json]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[css]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[scss]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[markdown]": {
+      "editor.formatOnSave": false,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    // ===== PYTHON CONFIGURATIONS =====
+    "python.analysis.extraPaths": [
+      "./python-app"
+    ],
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.useLibraryCodeForTypes": true,
+    "python.analysis.diagnosticMode": "openFilesOnly",
+    "[python]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "charliermarsh.ruff",
+    },
+    "ruff.enable": true,
+    "ruff.organizeImports": true,
+    "python.analysis.indexing": true,
+    "python.analysis.inlayHints.variableTypes": true,
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.callArgumentNames": "all",
+    "python.analysis.completeFunctionParens": true,
+    "remote.autoForwardPortsFallback": 0,
+  },
+}

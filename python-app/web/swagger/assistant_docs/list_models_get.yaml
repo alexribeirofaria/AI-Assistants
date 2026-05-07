@@ -1,0 +1,29 @@
+---
+swagger: '2.0'
+info:
+  title: List Models
+  version: 1.0.0
+parameters:
+  - name: q
+    in: query
+    type: string
+    description: Search query
+  - name: prefix
+    in: query
+    type: string
+  - name: provider
+    in: query
+    type: string
+responses:
+  200:
+    description: Success
+    schema:
+      type: object
+      properties:
+        models:
+          type: array
+          items:
+            type: string
+  400:
+    description: Bad Request
+

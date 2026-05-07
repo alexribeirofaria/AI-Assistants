@@ -1,0 +1,207 @@
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+@use '_variables' as v; // importa variáveis globais
+
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+
+$my-theme: mat.define-theme((color: (theme-type: light,
+        primary: mat.$azure-palette),
+      typography: (brand-family: 'sans-serif'
+      ),
+      density: (scale: -5)));
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+html {
+  @include mat.all-component-themes($my-theme);
+}
+
+// ============================================
+// CSS Custom Properties (Light Mode - Default)
+// ============================================
+:root {
+  --primary-color: #0d6efd;
+  --accent-color: #6c757d;
+  --bg-color: #ffffff;
+  --surface-color: #f8f9fa;
+  --text-color: #212529;
+  --text-muted: #6c757d;
+  --border-color: #dee2e6;
+  --input-bg: #ffffff;
+  --input-area-bg: rgba(255, 255, 255, 0.8);
+  --controls-bg: rgba(248, 249, 250, 0.9);
+  --header-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --user-msg-bg: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  --assistant-msg-bg: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+  --error-msg-bg: linear-gradient(135deg, #fff1f1 0%, #ffdede 100%);
+  --error-msg-text: #58151c;
+  --error-msg-border: #dc3545;
+  --error-msg-role: #7d1b24;
+  --error-msg-icon-bg: #dc3545;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+// ============================================
+// Dark Mode
+// ============================================
+body.dark-mode {
+  --primary-color: #4dabf7;
+  --accent-color: #adb5bd;
+  --bg-color: #0d1117;
+  --surface-color: #161b22;
+  --text-color: #e6edf3;
+  --text-muted: #8b949e;
+  --border-color: #30363d;
+  --input-bg: #161b22;
+  --input-area-bg: rgba(22, 27, 34, 0.9);
+  --controls-bg: rgba(22, 27, 34, 0.95);
+  --header-bg: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1f2937 100%);
+  --user-msg-bg: linear-gradient(135deg, #1a3a5c 0%, #1e3a5f 100%);
+  --assistant-msg-bg: linear-gradient(135deg, #1c1c2e 0%, #21213a 100%);
+  --error-msg-bg: linear-gradient(135deg, #3b1f24 0%, #52262d 100%);
+  --error-msg-text: #ffd9de;
+  --error-msg-border: #ff6b7a;
+  --error-msg-role: #ffb7bf;
+  --error-msg-icon-bg: #ff6b7a;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+  color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+html,
+body {
+  height: v.$height-full;
+  overflow: hidden;
+  color: var(--text-color, v.$text-color);
+  background-color: var(--bg-color, #fff);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', Roboto, "Helvetica Neue", sans-serif;
+}
+
+footer {
+  .opacity-50 {
+    opacity: v.$footer-opacity;
+  }
+}
+
+h2 {
+  font-size: smaller;
+  font-weight: lighter;
+  margin: 2vw;
+  color: v.$h2-color;
+}
+
+.scroll-content {
+  scrollbar-width: 0;
+  scrollbar-color: v.$scroll-thumb-color;
+  scroll-margin: 0;
+  border: 0;
+}
+
+.scroll-content::-webkit-scrollbar-corner {
+  width: 0;
+}
+
+/* Works on Chrome, Edge, and Safari */
+.scroll-content::-webkit-scrollbar {
+  width: v.$scrollbar-width;
+}
+
+.scroll-content::-webkit-scrollbar-track {
+  scroll-margin: 0;
+  background-color: transparent;
+  border: 0;
+}
+
+.scroll-content::-webkit-scrollbar-thumb {
+  scroll-margin: 0;
+  background-color: transparent;
+  border-radius: v.$scroll-thumb-radius;
+  border: v.$scroll-thumb-border;
+}
+
+.content-header-max-height {
+  height: v.$height-header;
+}
+
+.content-body-max-height {
+  height: v.$height-body;
+  max-width: v.$max-width-body;
+  max-height: v.$max-height-body;
+  margin-bottom: 1.4vh;
+}
+
+// Classe Responsável por Abrir elementos a frente do modalformComponent ex.: Mat-Select, Mat-Datepicker
+.cdk-overlay-container {
+  z-index: 1999;
+}
+
+.loading-modal .modal-content {
+  background-color: transparent;
+  text-align: center;
+}
+
+
+.custom-alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s;
+
+  &.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .custom-alert-box {
+    background: #1e1e2f;
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    min-width: 300px;
+    text-align: center;
+
+    .custom-alert-message {
+      margin-bottom: 15px;
+    }
+
+    .custom-alert-btn {
+      background: #4f46e5;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+
+      &:hover {
+        background: #4338ca;
+      }
+    }
+  }
+}

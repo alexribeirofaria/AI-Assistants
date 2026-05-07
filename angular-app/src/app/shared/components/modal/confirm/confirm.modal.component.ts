@@ -1,0 +1,36 @@
+import { Component } from '@angular/core';
+import { NgbModalConfig, NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+@Component({
+  selector: 'app-modal-confirm',
+  templateUrl: './confirm.modal.component.html',
+  standalone: false
+})
+
+export class ModalConfirmComponent {
+  header = 'Mensagem';
+  message = '';
+  onClickConfirm: () => void = () => { };
+
+  constructor(config: NgbModalConfig, public modalService: NgbModal, public activeModal: NgbActiveModal) {
+    config.backdrop = 'static';
+    config.keyboard = false;
+  }
+
+  open(content: any, _message: string) {
+    const modalRef = this.modalService.open(content);
+    modalRef.componentInstance.message = _message;
+    return modalRef;
+  }
+
+  close() {
+    this.modalService.dismissAll();
+  }
+
+  setConfirmButton(_confirm: () => void) {
+    this.onClickConfirm = () => {
+      _confirm();
+      this.activeModal.close();
+    };
+  }
+}

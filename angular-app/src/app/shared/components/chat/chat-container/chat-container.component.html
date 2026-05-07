@@ -1,0 +1,12 @@
+<div class="chat-container">
+  <app-chat-list [messages]="messages()"></app-chat-list>
+  <div class="chat-wrapper-container ">
+    <div class="container-wrapper">
+      <app-chat-provider [providers]="providers()" [selectedProvider]="selectedProvider()"
+        (providerChange)="onProviderChange($event)"></app-chat-provider>
+      <app-chat-list-models [models]="models()" [selectedModel]="selectedModel()" (modelChange)="onModelChange($event)">
+      </app-chat-list-models>
+      <app-chat-input [disabled]="isLoading()" (messageSend)="onMessageSend($event)"></app-chat-input>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<div class="chat-input-container">
+  <div class="input-wrapper">
+    <input type="text" class="form-control" id="chat-message-input" placeholder="Digite sua mensagem..."
+      [(ngModel)]="inputText" (keydown)="onKeydown($event)" [disabled]="disabled" autocomplete="off" />
+    <button class="btn btn-send" id="chat-send-button" (click)="onSend()" [disabled]="disabled || !inputText.trim()"
+      title="Enviar">
+      @if (disabled) {
+      <span class="spinner-border spinner-border-sm" role="status"></span>
+      } @else {
+      <i class="bi bi-send-fill"></i>
+      }
+    </button>
+  </div>
+</div>

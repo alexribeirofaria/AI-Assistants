@@ -1,0 +1,30 @@
+import { CommonModule } from "@angular/common";
+import { AfterViewChecked, Component, ElementRef, Input, ViewChild } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { IMessage } from "../../../../../core/application/responses";
+import { ChatMessageComponent } from "../chat-message/chat-message.component";
+
+@Component({
+  selector: "app-chat-list",
+  standalone: true,
+  imports: [CommonModule, FormsModule, ChatMessageComponent],
+  templateUrl: "./chat-list.component.html",
+  styleUrl: "./chat-list.component.scss",
+})
+
+export class ChatListComponent implements AfterViewChecked {
+  @Input() messages: IMessage[] = [];
+  @ViewChild("scrollContainer")
+  private scrollContainer!: ElementRef<HTMLElement>;
+
+  ngAfterViewChecked(): void {
+    this.scrollToBottom();
+  }
+
+  private scrollToBottom(): void {
+    if (this.scrollContainer) {
+      const el = this.scrollContainer.nativeElement;
+      el.scrollTop = el.scrollHeight;
+    }
+  }
+}

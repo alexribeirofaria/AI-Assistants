@@ -1,0 +1,63 @@
+.app-header {
+  background: var(--header-bg, linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%));
+  color: white;
+  padding: 0 1.5rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  i {
+    font-size: 1.4rem;
+    color: #64b5f6;
+  }
+
+  .header-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-theme-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  transition: all 0.25s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(15deg);
+  }
+
+  i {
+    font-size: 1.1rem;
+  }
+}
