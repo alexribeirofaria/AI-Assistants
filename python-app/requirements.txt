@@ -10,3 +10,9 @@ werkzeug
 types-flask
 types-requests
 types-Pillow
+langchain-core
+dotenv
+CORS
+flask_cors
+langchain_openai
+pydantic
