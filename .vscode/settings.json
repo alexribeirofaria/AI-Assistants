@@ -23,7 +23,7 @@
   "explorer.compactFolders": false,
   "js/ts.suggest.autoImports": true,
   "python.terminal.activateEnvironment": true,
-  "python.defaultInterpreterPath": ".venv/bin",
+  "python.defaultInterpreterPath": "./python-app/venv/bin",
   "[typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"
   },
