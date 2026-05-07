@@ -1,7 +1,20 @@
-import { Component, computed, inject, OnInit, signal } from "@angular/core";
-
-import { ChatService } from "../../../services/chat/chat.service";
-import { IHomeModel, IMessage } from "../../../models";
+import {
+  Component,
+  computed,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+} from "@angular/core";
+import { Subscription } from "rxjs";
+import {
+  IMessage,
+  IModelProvider,
+} from "../../../../../core/application/responses";
+import { ChatService } from "../../../../../core/application/services/chat";
+import { ChatStateService } from "../../../../../core/application/services/chat/state/chat-state.service";
+import { ChatUiErrorStateService } from "../../../../../core/infrastructure/errors/state/chat-ui-error-state.service";
+import { GlobalUiErrorStateService } from "../../../../../core/infrastructure/errors/state/global-ui-error-state.service";
 
 @Component({
   selector: "app-chat-container",
@@ -9,55 +22,75 @@ import { IHomeModel, IMessage } from "../../../models";
   styleUrl: "./chat-container.component.scss",
   standalone: false,
 })
-  
-export class ChatContainerComponent implements OnInit {
-  private chatService = inject(ChatService);
+export class ChatContainerComponent implements OnInit, OnDestroy {
+  private _chatService = inject(ChatService);
+  public get chatService() {
+    return this._chatService;
+  }
+  public set chatService(value) {
+    this._chatService = value;
+  }
+
+  private readonly chatState = inject(ChatStateService);
+  private readonly chatUiErrorState = inject(ChatUiErrorStateService);
+  private readonly globalUiErrorState = inject(GlobalUiErrorStateService);
+  private readonly subscriptions = new Subscription();
 
   private readonly _providers = signal<string[]>([]);
-  private readonly _selectedProvider = signal<string>('');
-  private readonly _models = signal<IHomeModel[]>([]);
-  private readonly _selectedModel = signal<string>('');
+  private readonly _selectedProvider = signal<string>("");
+  private readonly _models = signal<IModelProvider[]>([]);
+  private readonly _selectedModel = signal<string>("");
   private readonly _messages = signal<IMessage[]>([]);
+  private readonly _hasUserInteracted = signal<boolean>(false);
   private readonly _isLoading = signal<boolean>(false);
-  private readonly _error = signal<string>('');
-  private readonly _gatewayStatus = signal<string>('');
+  private readonly _gatewayStatus = signal<string>("");
 
   readonly providers = this._providers.asReadonly();
   readonly selectedProvider = this._selectedProvider.asReadonly();
   readonly models = computed(() => {
     const provider = this._selectedProvider();
     const models = this._models();
-    if (!provider) {
-      return models;
-    }
+    if (!provider) return models;
     const selected = this.normalizeProvider(provider);
-    return models.filter((model) => this.normalizeProvider(model.provider) === selected);
+    return models.filter(
+      (model) => this.normalizeProvider(model.provider) === selected,
+    );
   });
   readonly selectedModel = this._selectedModel.asReadonly();
   readonly messages = this._messages.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
-  readonly error = this._error.asReadonly();
   readonly gatewayStatus = this._gatewayStatus.asReadonly();
-  
+
   ngOnInit(): void {
+    this.bindUiErrors();
     this.loadProviders();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   private async loadProviders(): Promise<void> {
     try {
       const providers = await this.chatService.getProviders();
+
       this._providers.set(providers);
-      
+      this.chatState.setProviders(providers);
+
       if (providers.length > 0) {
         const defaultProvider = providers[0];
+
         this._selectedProvider.set(defaultProvider);
-        this._selectedModel.set('');
+        this.chatState.setProvider(defaultProvider);
+
+        this._selectedModel.set("");
+        this.chatState.setModel("");
+
         await this.loadModels(defaultProvider);
       } else {
         await this.loadModels();
       }
     } catch {
-      this._error.set("Erro ao carregar providers");
       await this.loadModels();
     }
   }
@@ -65,39 +98,54 @@ export class ChatContainerComponent implements OnInit {
   private async loadModels(provider?: string): Promise<void> {
     try {
       const modelsData = await this.chatService.getModels(provider);
+
       this._models.set(modelsData.models);
-      
-      const defaultModel = modelsData.defaultModel ?? await this.chatService.getDefaultModel(provider);
+      this.chatState.setModels(modelsData.models);
+
+      const defaultModel =
+        modelsData.defaultModel ??
+        (await this.chatService.getDefaultModel(provider));
+
       if (defaultModel) {
         this._selectedModel.set(defaultModel);
+        this.chatState.setModel(defaultModel);
       }
     } catch {
-      this._error.set("Erro ao carregar modelos");
+      //TODO: Fazer Review
     }
   }
-  
+
   async onProviderChange(provider: string): Promise<void> {
     this._selectedProvider.set(provider);
-    this._selectedModel.set('');
+    this.chatState.setProvider(provider);
+
+    this._selectedModel.set("");
+    this.chatState.setModel("");
+
     try {
       await this.chatService.changeProvider(provider);
       await this.loadModels(provider);
     } catch {
-      this._error.set("Erro ao trocar provider");
+      //TODO: Fazer Review
     }
   }
-  
+
   onModelChange(modelId: string): void {
     this._selectedModel.set(modelId);
+    this.chatState.setModel(modelId);
   }
 
   async onMessageSend(message: string): Promise<void> {
     if (this.isLoading()) return;
 
     const provider = this.selectedProvider() || undefined;
+    this._hasUserInteracted.set(true);
 
     this.addUserMessage(message);
+    this.chatState.addUserMessage(message);
+
     this.startAssistantStreaming(provider);
+    this.chatState.startStreaming();
 
     try {
       const result = await this.chatService.sendMessage(message, {
@@ -106,49 +154,66 @@ export class ChatContainerComponent implements OnInit {
       });
 
       this.finishAssistantStreaming(result.content, provider);
+      this.chatState.appendChunk(result.content);
+      this.chatState.stopStreaming();
+
       this._gatewayStatus.set(result.gatewayStatus);
-    } catch {
+      this.chatState.setGatewayStatus?.(result.gatewayStatus);
+    } catch (error) {
+      void error;
+
       this.stopAssistantStreaming();
-      this._gatewayStatus.set('');
-      this._error.set('Falha ao executar sendMessage');
+      this.chatState.setError(
+        error instanceof Error ? error.message : "Erro ao enviar mensagem",
+      );
+
+      this._gatewayStatus.set("");
     }
   }
 
   private addUserMessage(content: string): void {
-    this._messages.update((messages) => [...messages, {
-      id: Date.now().toString(),
-      role: 'user',
-      content,
-    }]);
+    this._messages.update((messages) => [
+      ...messages,
+      {
+        id: Date.now().toString(),
+        role: "user",
+        content,
+      },
+    ]);
   }
 
   private startAssistantStreaming(provider?: string): void {
-    this._messages.update((messages) => [...messages, {
-      id: (Date.now() + 1).toString(),
-      role: 'assistant',
-      content: '',
-      streaming: true,
-      provider,
-    }]);
+    this._messages.update((messages) => [
+      ...messages,
+      {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "",
+        streaming: true,
+        provider,
+      },
+    ]);
+
     this._isLoading.set(true);
-    this._error.set('');
-    this._gatewayStatus.set('');
+    this._gatewayStatus.set("");
   }
 
   private finishAssistantStreaming(content: string, provider?: string): void {
     this._messages.update((messages) => {
       const updated = [...messages];
       const last = updated[updated.length - 1];
-      if (last && last.role === 'assistant') {
+      if (last && last.role === "assistant") {
         updated[updated.length - 1] = {
           ...last,
           content,
           streaming: false,
           provider,
+          type: undefined,
         };
       }
       return updated;
     });
+
     this._isLoading.set(false);
   }
 
@@ -156,15 +221,90 @@ export class ChatContainerComponent implements OnInit {
     this._messages.update((messages) => {
       const updated = [...messages];
       const last = updated[updated.length - 1];
-      if (last && last.role === 'assistant') {
-        updated[updated.length - 1] = { ...last, streaming: false };
+      if (last && last.role === "assistant" && last.streaming) {
+        updated.pop();
       }
       return updated;
     });
+
+    this._isLoading.set(false);
+  }
+
+  private bindUiErrors(): void {
+    this.subscriptions.add(
+      this.globalUiErrorState.error$.subscribe((message) => {
+        if (!message) return;
+        if (!this._hasUserInteracted() || !this._isLoading()) {
+          this.globalUiErrorState.clear();
+          return;
+        }
+
+        this.appendAssistantErrorMessage(
+          message,
+          this.selectedProvider() || undefined,
+        );
+        this.chatState.setError(message);
+
+        this.globalUiErrorState.clear();
+      }),
+    );
+
+    this.subscriptions.add(
+      this.chatUiErrorState.error$.subscribe((message) => {
+        if (!message) return;
+        if (!this._hasUserInteracted() || !this._isLoading()) {
+          this.chatUiErrorState.clear();
+          return;
+        }
+
+        this.appendAssistantErrorMessage(
+          message,
+          this.selectedProvider() || undefined,
+        );
+
+        this._isLoading.set(false);
+        this._gatewayStatus.set("");
+
+        this.chatState.setError(message);
+
+        this.chatUiErrorState.clear();
+      }),
+    );
+  }
+
+  private appendAssistantErrorMessage(
+    content: string,
+    provider?: string,
+  ): void {
+    if (!this._hasUserInteracted()) return;
+
+    this._messages.update((messages) => {
+      const updated = [...messages];
+      const last = updated[updated.length - 1];
+
+      if (last && last.role === "assistant" && last.streaming) {
+        updated.pop();
+      }
+
+      const withoutErrors = updated.filter(
+        (message) => message.type !== "error",
+      );
+
+      withoutErrors.push({
+        id: `${Date.now()}-error`,
+        role: "assistant",
+        content,
+        provider,
+        type: "error",
+      });
+
+      return withoutErrors;
+    });
+
     this._isLoading.set(false);
   }
 
   private normalizeProvider(provider: string | null | undefined): string {
-    return (provider ?? '').trim().toLowerCase().replace(/\s+/g, '');
+    return (provider ?? "").trim().toLowerCase().replace(/\s+/g, "");
   }
 }

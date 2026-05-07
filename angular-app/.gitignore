@@ -1,0 +1,216 @@
+# Byte-compiled / optimized / DLL files
+.pycache*/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.mypy_cache/
+.tmp.drivedownload/
+.tmp.driveupload/
+
+# Virtual Environments (most common names)
+venv/
+.venv/
+env/
+ENV/
+
+# Distribution / Packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Unit test / Coverage reports
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+
+# Local Environment Variables
+.env
+.env/*
+*.env/
+__docs/
+
+
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+**/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+!frontend/
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
+.angular/**
+obj/**
+!sonar-project.properties
+**/www
+**/client_secret.json
+**/app-android/android/app/build
+coverage/
+.angular/
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+**/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
+.angular/**
+obj/**
+!sonar-project.properties
+**/www
+**/client_secret.json
+**/app-android/android/app/build
+
+# ☕ Java
+*.class
+*.jar
+*.war
+
+# 📁 Cache
+.cache/
+.temp/
+.tmp/
+.ruff_cache
+
+# 🧠 VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+
+# 🧪 Testes / cobertura
+coverage/
+
+# 🧪 Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 💻 Sistema operacional
+.DS_Store
+
+# 🏗 Build / dist
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# 📦 Dependências
+node_modules/
+
+# 🔐 Variáveis de ambiente
+.env
+.env.*
+*.env
+!.env.example
+!**/.env.example
+
+# 🔑 Chaves e segredos e stubs
+*.key
+*.pem
+*.crt
+secrets.json
+.claude/
+.openclaude/
+.TODO/
+*TODO*
+..use_cases/
+..user_stories/
+*coverage*
+.test/
+angular-app/test-results/.last-run.json
+test-results/
+playwright-report/
+.codex/
+copilot/
+.claude/
+.openclaude/
+*mypy.ini
+.opencode/
+.blackbox/
+!coverage_test_check.ts
+environments/*.ts
+**/.log_erros/*.md
+.pyvenv
+..docs/
+
+*storybook.log
+storybook-static

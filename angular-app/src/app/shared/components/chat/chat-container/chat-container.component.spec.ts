@@ -1,13 +1,17 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
+import { ChatService } from '../../../../../core/application/services/chat/chat.service';
+import { ChatUiErrorStateService } from '../../../../../core/infrastructure/errors/state/chat-ui-error-state.service';
+import { GlobalUiErrorStateService } from '../../../../../core/infrastructure/errors/state/global-ui-error-state.service';
 import { ChatContainerComponent } from './chat-container.component';
-import { ChatService } from '../../../services/chat/chat.service';
 
 describe('ChatContainerComponent Unit Tests', () => {
   let component: ChatContainerComponent;
   let fixture: ComponentFixture<ChatContainerComponent>;
   let chatService: jasmine.SpyObj<ChatService>;
+  let chatUiErrorState: ChatUiErrorStateService;
+  let globalUiErrorState: GlobalUiErrorStateService;
 
   beforeEach(async () => {
     chatService = jasmine.createSpyObj<ChatService>('ChatService', [
@@ -17,6 +21,9 @@ describe('ChatContainerComponent Unit Tests', () => {
       'changeProvider',
       'sendMessage',
     ]);
+    chatService.getProviders.and.resolveTo([]);
+    chatService.getModels.and.resolveTo({ defaultModel: undefined, models: [] });
+    chatService.getDefaultModel.and.resolveTo(undefined);
 
     await TestBed.configureTestingModule({
       declarations: [ChatContainerComponent],
@@ -30,6 +37,8 @@ describe('ChatContainerComponent Unit Tests', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ChatContainerComponent);
     component = fixture.componentInstance;
+    chatUiErrorState = TestBed.inject(ChatUiErrorStateService);
+    globalUiErrorState = TestBed.inject(GlobalUiErrorStateService);
   });
 
   it('should create', () => {
@@ -53,7 +62,7 @@ describe('ChatContainerComponent Unit Tests', () => {
     expect(component.selectedModel()).toBe('gpt-4o');
   });
 
-  it('should set provider error and still try loading models when provider loading fails', async () => {
+  it('should keep flow and still try loading models when provider loading fails', async () => {
     chatService.getProviders.and.rejectWith(new Error('providers failure'));
     chatService.getModels.and.resolveTo({
       defaultModel: undefined,
@@ -63,7 +72,7 @@ describe('ChatContainerComponent Unit Tests', () => {
 
     await (component as any).loadProviders();
 
-    expect(component.error()).toBe('Erro ao carregar providers');
+    expect(component.messages().length).toBe(0);
     expect(chatService.getModels).toHaveBeenCalledOnceWith(undefined);
   });
 
@@ -99,17 +108,45 @@ describe('ChatContainerComponent Unit Tests', () => {
     expect(component.messages()[0].content).toBe('hello');
     expect(component.messages()[1].content).toBe('assistant reply');
     expect(component.gatewayStatus()).toBe('Resposta recebida via CoreChatGateway.');
-    expect(component.error()).toBe('');
     expect(component.isLoading()).toBeFalse();
   });
 
-  it('should set public error when message sending fails', async () => {
+  it('should append chat friendly error when message sending fails', fakeAsync(() => {
     chatService.sendMessage.and.rejectWith(new Error('technical failure'));
+    component.ngOnInit(); // Inicializa bindUiErrors
+    tick();
 
-    await component.onMessageSend('hello');
+    component.onMessageSend('hello');
+    chatUiErrorState.show('Erro Chat');
+    tick();
 
-    expect(component.error()).toBe('Falha ao executar sendMessage');
-    expect(component.gatewayStatus()).toBe('');
+    const currentMessages = component.messages();
+    expect(currentMessages.length).toBe(2);
+    expect(currentMessages[1].content).toBe('Erro Chat');
+    expect(currentMessages[1].type).toBe('error');
     expect(component.isLoading()).toBeFalse();
-  });
+  }));
+
+  it('should keep empty-state behavior by not appending errors before user interaction', fakeAsync(() => {
+    component.ngOnInit();
+    globalUiErrorState.show('Erro Global');
+    tick();
+
+    expect(component.messages().length).toBe(0);
+  }));
+
+  it('should keep only one friendly error message after user interaction', fakeAsync(() => {
+    component.ngOnInit();
+    component.onMessageSend('hello');
+    tick();
+
+    globalUiErrorState.show('Primeiro erro');
+    tick();
+    chatUiErrorState.show('Erro final amigavel');
+    tick();
+
+    const errorMessages = component.messages().filter((message) => message.type === 'error');
+    expect(errorMessages.length).toBe(1);
+    expect(errorMessages[0].content).toBe('Erro final amigavel');
+  }));
 });

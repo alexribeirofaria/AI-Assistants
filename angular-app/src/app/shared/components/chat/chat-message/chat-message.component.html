@@ -1,6 +1,6 @@
-<div class="chat-message" [class.user]="isUser" [class.assistant]="!isUser">
+<div class="chat-message" [class.user]="isUser" [class.assistant]="!isUser" [class.error]="isError">
   <div class="message-avatar">
-    <i class="bi" [class.bi-person-fill]="isUser" [class.bi-robot]="!isUser"></i>
+    <i class="bi" [class.bi-person-fill]="isUser" [class.bi-robot]="!isUser && !isError" [class.bi-exclamation-triangle-fill]="isError"></i>
   </div>
   <div class="message-content">
     <div class="message-role">{{ assistantLabel }}</div>

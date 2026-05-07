@@ -3,11 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const { responseInterceptor } = require('http-proxy-middleware');
 
-const TARGET = 'http://localhost:5000';
+const TARGET = 'http://127.0.0.1:5000';
 const LOG_DIR = path.resolve(__dirname, '.log_erros');
 
 const DEFAULT_ERROR_MESSAGE = 'Serviço indisponível no momento';
-const SOURCE = 'angular_dev';
+const SOURCE = 'ProxyDevServer';
 
 // ---------- Utils ----------
 
@@ -64,20 +64,20 @@ const writeErrorLog = ({ endpoint, method, error, statusCode, reqUrl }) => {
 
   const content = [
     `# Log de Erro ${sequence}`,
-    '',
-    `- Fonte: \`${SOURCE}\``,
-    `- Endpoint: \`${endpoint}\``,
-    `- Método: \`${method}\``,
-    `- URL: \`${reqUrl}\``,
+    `- Classe: \`${SOURCE}\``,
+    `- Metodo: \`${method} ${endpoint}\``,
+    `- Severidade: \`high\``,
     `- Timestamp: \`${now.toISOString()}\``,
-    statusCode && `- Status: \`${statusCode}\``,
-    error?.code && `- Code: \`${error.code}\``,
     '',
-    '## Erro',
+    `## Erro`,
+    `\`\`\`text`,
+    `Status: ${statusCode || 503}`,
+    `URL: ${reqUrl}`,
+    `Code: ${error?.code || 'N/A'}`,
+    `Message: ${error?.message || `Falha na requisição ${endpoint}`}`,
+    `\`\`\``,
     '',
-    '```text',
-    error?.message || `Falha na requisição ${endpoint}`,
-    '```',
+    '---',
     '',
   ]
     .filter(Boolean)
@@ -124,13 +124,49 @@ const sendJsonResponse = (res, payload) => {
 };
 
 module.exports = {
-  '/api': {
+  '/api/_internal_log': {
+    target: TARGET,
+    bypass: (req, res) => {
+      if (req.url.includes('_internal_log') && req.method === 'POST') {
+        console.log(`[PROXY] Recebendo log interno do Browser...`);
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+          try {
+            const formattedError = JSON.parse(body);
+            // Reutiliza a lógica de escrita do próprio proxy
+            const fileName = formattedError.destination;
+            const filePath = path.join(LOG_DIR, fileName);
+
+            const currentContent = fs.existsSync(filePath)
+              ? fs.readFileSync(filePath, 'utf8').trimEnd()
+              : '';
+
+            const mergedContent = currentContent
+              ? `${currentContent}\n\n---\n\n${formattedError.content}`
+              : formattedError.content;
+
+            ensureLogDir();
+            fs.writeFileSync(filePath, mergedContent, 'utf8');
+            console.log(`[PROXY] Log persistido em: ${filePath}`);
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'ok' }));
+          } catch (e) {
+            res.writeHead(500);
+            res.end('Erro ao processar log interno');
+          }
+        });
+        return true; // Interceptado
+      }
+      return false;
+    }
+  },
+  '*/api*': {
     target: TARGET,
     changeOrigin: true,
     secure: false,
-    logLevel: 'silent',
-    proxyTimeout: 5000,
-    timeout: 5000,
+    logLevel: 'debug',
     pathRewrite: {
       '^/api': '',
     },

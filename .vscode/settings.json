@@ -1,5 +1,5 @@
 {
-  "files.autoSave": "afterDelay",  
+  "files.autoSave": "afterDelay",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always",
     "source.organizeImports": "always"
@@ -23,5 +23,11 @@
   "explorer.compactFolders": false,
   "js/ts.suggest.autoImports": true,
   "python.terminal.activateEnvironment": true,
-  "python.defaultInterpreterPath": ".venv/bin"
+  "python.defaultInterpreterPath": "./python-app/venv/bin",
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  }
 }

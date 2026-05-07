@@ -34,6 +34,12 @@ describe('ChatMessageComponent', () => {
     expect(component.assistantLabel).toBe('Assistente · OpenAI');
   });
 
+  it('should expose error label for friendly ui errors', () => {
+    component.message = { id: '1', role: 'assistant', content: 'Nao foi possivel completar a operacao.', type: 'error' };
+    expect(component.isError).toBe(true);
+    expect(component.assistantLabel).toBe('Erro');
+  });
+
   it('should set isStreaming true when streaming is true', () => {
     component.message = { id: '1', role: 'user', content: 'test', streaming: true };
     expect(component.isStreaming).toBe(true);

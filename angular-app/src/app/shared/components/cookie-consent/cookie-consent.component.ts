@@ -13,7 +13,16 @@ export class CookieConsentComponent implements OnInit {
   showBanner = false;
 
   public ngOnInit() {
-    const consent = localStorage.getItem('cookie-consent');
+    let consent: string | null = null;
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        consent = localStorage.getItem('cookie-consent');
+      }
+    } catch {
+      consent = null;
+    }
+
     if (!consent) {
       this.showBanner = true;
     }

@@ -18,6 +18,12 @@
     margin-right: 2rem;
   }
 
+  &.error {
+    background: var(--error-msg-bg, linear-gradient(135deg, #fff1f1 0%, #ffdede 100%));
+    border: 1px solid var(--error-msg-border, #dc3545);
+    color: var(--error-msg-text, #58151c);
+  }
+
   .message-avatar {
     width: 36px;
     height: 36px;
@@ -35,6 +41,11 @@
 
     .assistant & {
       background: var(--accent-color, #6c757d);
+      color: white;
+    }
+
+    .error & {
+      background: var(--error-msg-icon-bg, #dc3545);
       color: white;
     }
   }
@@ -58,6 +69,11 @@
       white-space: pre-wrap;
       word-break: break-word;
     }
+  }
+
+  &.error .message-role {
+    color: var(--error-msg-role, #7d1b24);
+    opacity: 1;
   }
 }
 
