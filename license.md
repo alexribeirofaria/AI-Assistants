@@ -49,6 +49,33 @@ Without prior written permission from the author, it is strictly prohibited to:
 
 ---
 
+## Educational & Research Exception
+
+Limited use for educational, academic, research, and learning purposes may be permitted exclusively in non-commercial contexts, provided that full and visible attribution to the original author and repository is maintained.
+
+Any educational usage must include proper bibliographic reference and explicit citation in:
+- academic materials;
+- research papers;
+- documentation;
+- presentations;
+- studies;
+- technical articles;
+- educational repositories;
+- learning content;
+- derived academic materials.
+
+This exception does not grant:
+- ownership rights;
+- redistribution rights;
+- sublicensing rights;
+- commercial usage rights;
+- permission to republish the software;
+- permission to remove authorship or attribution notices.
+
+All original intellectual property, authorship, and repository ownership remain exclusively with the original author.
+
+---
+
 ## Artificial Intelligence and Machine Learning Restrictions
 
 It is strictly prohibited to:
