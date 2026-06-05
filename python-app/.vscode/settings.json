@@ -1,10 +1,14 @@
 {
-  "python.analysis.extraPaths": ["./python-app"],
+  "terminal.integrated.env.linux": {
+    "PATH": "/opt/venv/bin:${env:PATH}"
+  },
+  "python.analysis.extraPaths": [
+    "./python-app"
+  ],
   "python.analysis.typeCheckingMode": "off",
   "python.analysis.autoImportCompletions": true,
   "python.analysis.useLibraryCodeForTypes": true,
   "python.analysis.diagnosticMode": "openFilesOnly",
-
   // ===== FORMATADOR ESTILO PRETTIER =====
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "charliermarsh.ruff",
@@ -13,20 +17,16 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
-
   // Ruff como lint + format
   "ruff.enable": true,
   "ruff.organizeImports": true,
-
   // Alternativa caso use Black
   "python.formatting.provider": "none",
-
   // mantém autocomplete rápido
   "python.analysis.indexing": true,
   "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.inlayHints.functionReturnTypes": true,
   "python.analysis.inlayHints.callArgumentNames": "all",
   "python.analysis.completeFunctionParens": true,
-
   "files.autoSave": "afterDelay"
 }
