@@ -1,0 +1,19 @@
+services:
+  angular-app:
+    build:
+      context: ..
+      dockerfile: ./.docker/Dockerfile
+      secrets:
+        - angular_env
+    container_name: ai-assistants
+    image: alexfariakof/ai-assistants:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../ssl:/etc/nginx/ssl:ro
+    restart: unless-stopped
+
+secrets:
+  angular_env:
+    file: ../src/environments/.env.ts
